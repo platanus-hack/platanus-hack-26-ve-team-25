@@ -22,8 +22,9 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { enviarTexto } from "@/lib/telegram";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+// Next 16 con `cacheComponents` rechaza `export const runtime` y `export const dynamic` en las
+// rutas: con ellas el build no pasa (ver 6d547ba). No hacen falta, porque esto es un POST y
+// corre en cada petición.
 
 /**
  * Verifica el secreto del webhook de Telegram. Si TELEGRAM_WEBHOOK_SECRET no está definido,
