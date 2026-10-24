@@ -39,6 +39,9 @@ guarda lo que está en el récipe. Falta encenderla:
 
 ### Josuep · Telegram
 
+Lo único que queda del canal son dos pruebas que necesitan teléfonos de verdad; el código, el
+webhook y el vigilante están hechos y verificados.
+
 - [ ] Probar el aviso sin wifi, por datos móviles.
 - [ ] Probar con un segundo teléfono suscrito, no solo con el de Josuep.
 
@@ -96,7 +99,9 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
 
 **Supabase:** esquema, funciones con secretos en hash, escalamiento atómico, casa de demo, avisos
 y pastillas, con 11 pruebas de integración. El vigilante corre en la base cada 5 s con pg_cron
-desde las 16:21.
+desde las 16:21, y a las 18:30 se verificó de verdad: una alerta nueva se envió y se selló sola en
+5 segundos. Quedan en la base dos casas de prueba de esas verificaciones («Prueba de avisos» y
+«Prueba del vigilante»); no hay función de borrado y son inofensivas.
 
 **«Sin señal»:** la casa late cada 90 s, y la web de la familia declara «sin señal» cuando pasan
 180 s sin latido, es decir, dos latidos perdidos
@@ -107,7 +112,9 @@ desde las 16:21.
 aguanta 50 teléfonos leyendo cada 5 s sin fallas.
 
 **Telegram:** bot `@CasaAvisoBot`, suscripción desde la invitación con `/start`, y el aviso con el
-enlace cuando la alerta escala. Probado de punta a punta contra la base real.
+enlace cuando la alerta escala. **El vigilante lo manda solo**: el sábado ~18:30 se creó una alerta
+urgente en una casa de prueba y pasó de «1 en cola» a «0 en cola» **en 5 segundos**, sin que nadie
+llamara a `/api/vigilar` a mano. Probado de punta a punta contra la base real.
 
 **Cifras para el pitch, con fuente:**
 
@@ -128,6 +135,9 @@ Para que nadie lo retome sin saber por qué:
 - **WhatsApp por Kapso, entero:** Meta restringió la cuenta y el sandbox exige activar cada
   teléfono a mano. Los avisos van **solo por Telegram**. El código de Kapso sigue en `web/` pero no
   se usa. La **llamada** de WhatsApp de la casa al hijo sí sigue: es otra cosa, sale del teléfono.
+  **No queda ninguna tarea pendiente de este canal**: `/api/vigilar` solo lo despacharía si
+  existiera una suscripción con `canal = 'whatsapp'`, y hoy no hay ninguna; la invitación muestra
+  «Avisos por WhatsApp: pronto» y el botón nunca aparece.
 - **Comprar en una farmacia:** no se hace. Farmatodo no es VTEX ni Magento ni Shopify: es una SPA
   propia en Angular 12 sobre Google Cloud. Verificado el 24-oct-2026 con fetch directo al sitio: el
   catálogo, el precio y el stock se leen sin llave ni login (la búsqueda corre sobre Algolia, app
