@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../tema.dart';
+
 /// El botón de la casa: grande, de un solo toque y con el texto en negrita.
 class BotonGrande extends StatelessWidget {
   const BotonGrande({
@@ -41,6 +43,7 @@ class BotonGrande extends StatelessWidget {
                 : BorderSide(color: borde!, width: 2),
           ),
           textStyle: TextStyle(
+            fontFamily: fuente,
             fontSize: tamano,
             fontWeight: FontWeight.w700,
             height: 1.15,

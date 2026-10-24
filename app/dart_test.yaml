@@ -1,0 +1,5 @@
+tags:
+  # Capturas de pantalla para mirarlas sin teléfono: no son pruebas y varían según la máquina.
+  # Se generan con: flutter test --run-skipped --update-goldens -t captura
+  captura:
+    skip: "Solo genera capturas: flutter test --run-skipped --update-goldens -t captura"

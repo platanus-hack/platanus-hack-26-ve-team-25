@@ -28,7 +28,12 @@ guarda lo que está en el récipe. Falta encenderla:
 
 ### Abrahan · la app de la casa y el demo
 
-- [ ] **Rehacer las vistas del teléfono de mesa** con las indicaciones que va a dar Abrahan.
+- [x] **El reposo, más grande** (sábado 18:40, con el skill ui-ux-pro-max): reloj más alto y
+      más grande, «Leer récipe» bajo «Pedir ayuda» con el alto de la cinta de la pastilla, la cinta
+      más alta y con letra de 27, y el borde de los botones a 3,8:1 de contraste. Captura sin
+      teléfono: `flutter test --run-skipped --update-goldens -t captura` →
+      [`app/test/capturas/reposo.png`](../app/test/capturas/reposo.png).
+- [ ] **Las demás vistas del teléfono de mesa,** con las indicaciones que va a dar Abrahan.
 - [ ] **Armar el demo** con los cuatro teléfonos ([armar-demo.md](armar-demo.md)): Infinix de
       mesa, Samsung de la familia, iPhone como «el 911» y el Honor por definir.
 - [ ] **Probar todo en el teléfono real**, de punta a punta, con la tabla de

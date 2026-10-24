@@ -34,9 +34,10 @@ const _meses = [
   'diciembre',
 ];
 
-/// El teléfono acostado como reloj de mesa. A la izquierda la hora, grande y tenue sobre negro
-/// (gasta poco y no calienta), y abajo las pastillas en chico y el botón para leer un récipe. A
-/// la derecha, de arriba abajo, «Pedir ayuda»: lo único que hay que encontrar con prisa.
+/// El teléfono acostado como reloj de mesa. A la izquierda la hora, grande, tenue sobre negro (gasta
+/// poco y no calienta) y más arriba que abajo, y debajo la cinta de la próxima pastilla. A la
+/// derecha, «Pedir ayuda», lo único que hay que encontrar con prisa, y debajo «Leer récipe», a la
+/// misma altura que la cinta.
 ///
 /// «Huele a gas» y «Me siento mal» ya no son botones: se dicen en voz alta (ver
 /// Controlador._reconocerPedido y el banco de pedidos.dart).
@@ -45,6 +46,9 @@ const _meses = [
 /// - mantener el reloj simula una alarma de humo;
 /// - mantener «Cuidando la casa» abre la configuración (la usa el familiar);
 /// - mantener «Pastillas de hoy» recuerda ya la próxima pastilla.
+/// La cinta de la pastilla y «Leer récipe» comparten la fila de abajo y su alto.
+const _altoDeAbajo = 96.0;
+
 class Reposo extends StatelessWidget {
   const Reposo({super.key, required this.c});
 
@@ -84,17 +88,19 @@ class Reposo extends StatelessWidget {
                       child: GestureDetector(
                         onLongPress: () => c.oirEvento(TipoEvento.alarma),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Más espacio abajo que arriba: el reloj queda alto.
+                            const Spacer(),
                             Flexible(
+                              flex: 10,
                               child: FittedBox(
                                 child: Text(
                                   hora,
                                   style: const TextStyle(
-                                    fontSize: 116,
+                                    fontSize: 160,
                                     height: 1,
-                                    letterSpacing: -3,
+                                    letterSpacing: -4,
                                     color: Colores.relojTenue,
                                   ),
                                 ),
@@ -118,20 +124,15 @@ class Reposo extends StatelessWidget {
                                   color: Colores.textoTenue,
                                 ),
                               ),
+                            const Spacer(flex: 2),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 12),
                     SizedBox(
-                      height: 72,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(child: _Pastillas(c: c)),
-                          const SizedBox(width: 10),
-                          const _LeerRecipe(),
-                        ],
-                      ),
+                      height: _altoDeAbajo,
+                      child: _Pastillas(c: c),
                     ),
                   ],
                 ),
@@ -139,13 +140,22 @@ class Reposo extends StatelessWidget {
               const SizedBox(width: 22),
               SizedBox(
                 width: 300,
-                child: BotonGrande(
-                  texto: 'Pedir ayuda',
-                  alto: double.infinity,
-                  tamano: 40,
-                  fondo: Colores.rojo,
-                  color: Colors.white,
-                  alTocar: () => c.pedirAyuda(TipoEvento.panico),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: BotonGrande(
+                        texto: 'Pedir ayuda',
+                        alto: double.infinity,
+                        tamano: 44,
+                        fondo: Colores.rojo,
+                        color: Colors.white,
+                        alTocar: () => c.pedirAyuda(TipoEvento.panico),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const SizedBox(height: _altoDeAbajo, child: _LeerRecipe()),
+                  ],
                 ),
               ),
             ],
@@ -185,18 +195,18 @@ class _Pastillas extends StatelessWidget {
         onTap: toca != null ? c.recordarAhora : null,
         onLongPress: c.recordarAhora,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Row(
             children: [
               if (proxima != null)
-                Capsula(colores: proxima.colores, ancho: 40, alto: 18)
+                Capsula(colores: proxima.colores, ancho: 60, alto: 26)
               else
                 const Icon(
                   Icons.check_rounded,
                   color: Colores.verdePunto,
-                  size: 26,
+                  size: 34,
                 ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -204,14 +214,14 @@ class _Pastillas extends StatelessWidget {
                   children: [
                     const Text(
                       'Pastillas de hoy',
-                      style: TextStyle(fontSize: 14, color: Colores.textoTenue),
+                      style: TextStyle(fontSize: 18, color: Colores.textoTenue),
                     ),
                     Text(
                       linea,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 27,
                         fontWeight: FontWeight.w700,
                         color: toca != null ? Colors.white : Colores.textoClaro,
                       ),
@@ -234,11 +244,11 @@ class _LeerRecipe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 150,
+      width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () => Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: (_) => const LeerRecipe())),
-        icon: const Icon(Icons.document_scanner_rounded, size: 26),
+        icon: const Icon(Icons.document_scanner_rounded, size: 32),
         label: const Text('Leer récipe', textAlign: TextAlign.center),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colores.textoClaro,
@@ -249,7 +259,7 @@ class _LeerRecipe extends StatelessWidget {
           ),
           textStyle: const TextStyle(
             fontFamily: fuente,
-            fontSize: 17,
+            fontSize: 24,
             fontWeight: FontWeight.w700,
             height: 1.1,
           ),
@@ -278,7 +288,7 @@ class _Estado extends StatelessWidget {
           Flexible(
             child: Text(
               'Cuidando la casa',
-              style: TextStyle(fontSize: 16, color: Colores.verdeClaro),
+              style: TextStyle(fontSize: 19, color: Colores.verdeClaro),
             ),
           ),
         ],

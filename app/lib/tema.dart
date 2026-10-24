@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 abstract final class Colores {
   static const noche = Color(0xFF0B0B0C);
   static const nocheBoton = Color(0xFF18181A);
-  static const nocheBorde = Color(0xFF3F3F3B);
+  // 3,8:1 sobre la noche: un borde que da forma a un botón necesita 3:1 o más.
+  static const nocheBorde = Color(0xFF6E6E68);
   static const relojTenue = Color(0xFFD4D4CF);
   static const textoTenue = Color(0xFFA3A39E);
   static const textoClaro = Color(0xFFF4F4F0);
