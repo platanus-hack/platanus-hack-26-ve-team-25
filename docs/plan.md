@@ -2,6 +2,23 @@
 
 > Decidido el sábado 24-oct a las 00:30 y validado con el mentor. Si cambia, se reescribe aquí.
 > El porqué, lo que ya existe y las decisiones de diseño están en [contexto.md](contexto.md).
+> Lo que puede fallar: [riesgos.md](riesgos.md). Las preguntas de cada uno: [investigacion.md](investigacion.md).
+
+## Decisiones del equipo (sábado 24-oct, 01:00)
+
+- **Flutter** para la app. Rogelio publica en iOS con su Mac.
+- **Supabase** para la base de datos, por ahora.
+- **Lo que se pueda, en el teléfono** y en caché. A la base solo va lo relevante: eventos,
+  alertas, latidos y el perfil de la casa.
+- **Un filtro muy bueno antes de avisar.** La meta es despreocupar al que cuida desde lejos, no
+  llenarlo de alertas. Tres niveles: 🔴 urgente, 🟡 para saber, 🟢 todo bien
+  ([riesgos.md](riesgos.md#la-regla-de-oro-despreocupar-no-angustiar)).
+- **El perfil de salud cambia las reglas.** Un apagón no es igual para una persona hipertensa que
+  para una que usa oxígeno. Reglas generales por condición más calibración por casa
+  ([investigacion.md](investigacion.md#el-perfil-de-salud)).
+
+⚠️ **Por cerrar ya:** Flutter para el teléfono de la casa (Android) y la app de la familia en web,
+para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-técnicos).
 
 ## Reloj (hora de Caracas)
 
@@ -29,21 +46,25 @@
 1. **El oído.** Micrófono → compuerta de dB → YAMNet en el navegador (ya existe como prueba en
    `/escucha`). Se suma el acelerómetro para la vibración del piso y se combinan las dos señales
    en un evento con su confianza.
-2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s y un botón grande para apagar.
+2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s y dos botones grandes:
+   «Estoy bien» y «Necesito ayuda». Siempre en pantalla: el **botón de pánico** (🔴 directo) y
+   los reportes de la persona («huele a gas», «me siento mal»).
 3. **El escalamiento que no depende de un solo teléfono.** La casa registra la alerta con su hora
    de vencimiento. Si nadie la cancela, el primero que vea el vencimiento (la casa o cualquier
    teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico. Si la casa
    deja de reportar, la familia ve «sin señal desde las 14:05».
 4. **La app de la familia.** Estado de la casa en vivo (última actividad, TV, luz), alertas e
    historial del día. Sin login: se entra con un enlace de invitación, que en el demo es un QR.
-5. **La rutina.** «Se levantó a las 7:12» y aviso si a la hora de siempre no hubo actividad. Si no
+5. **El perfil de salud.** Una condición inventada por casa que cambia el nivel de los avisos.
+6. **La rutina.** «Se levantó a las 7:12» y aviso si a la hora de siempre no hubo actividad. Si no
    llega al sábado 12:00, va después.
 
 ## Extras (solo si el núcleo está listo)
 
 - Voz: «Carmen, ¿está bien?», y que pueda responder hablando.
 - El vecino de confianza como segundo escalón.
-- Detectar el apagón porque el teléfono dejó de cargar.
+- Palabra clave por voz («¡auxilio!») con el reconocimiento del sistema, sin conexión.
+- SMS desde el chip del teléfono cuando no hay internet (Android).
 
 ## Demo
 
@@ -54,15 +75,17 @@
 3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» apaga la alarma y se ve
    que no escala.
 4. Se prende la TV con una escena de gritos: no dispara, porque el piso no tembló.
+5. Se desenchufa el teléfono: «se fue la luz». En la casa de Carmen, que usa oxígeno, es 🔴. En
+   otra casa del demo es solo 🟡. El mismo evento, dos avisos.
 
 ## Roles
 
 | Rol | Qué | Quién |
 |---|---|---|
-| Detección | Audio, vibración, fusión de señales, umbrales por casa | |
-| Confirmación + escalamiento | Alarma local, vencimientos, estado atómico, canal real de aviso | |
-| App de la familia + demo | Estado en vivo, alertas, historial, invitación por QR | |
-| Datos + pitch | Las cifras con fuente, la competencia, el README de arquitectura y el video | |
+| Detección e IA | Modelo local o nube, YAMNet en Flutter, vibración, fusión, umbrales por casa, la persona como sensor | Abrahan |
+| Alertas y conexión | Pánico, «¿Está bien?», filtro de falsos positivos, niveles, escalamiento, aviso sin señal o sin luz | Josuep |
+| Datos y usuarios | Cifras con fuente, diáspora, usuarios potenciales, testimonios, competencia | Anttony |
+| Orquestación, UX/UI y riesgos | Organización, experiencia de las dos pantallas, huecos y muros, viabilidad, deploy, pitch | Rogelio |
 
 ## Infra (presupuesto cero)
 
@@ -82,7 +105,7 @@
 
 ## Pendiente
 
+- [ ] **Cerrar el reparto Flutter / web** (ver arriba)
 - [ ] Probar `/escucha` con micrófono real: alarma de humo, golpe, grito, TV
-- [ ] Nombres en la tabla de roles
-- [ ] Cifras con fuente: venezolanos emigrados (R4V), adultos mayores que viven solos, caídas
-- [ ] Elegir el canal real de aviso: correo o Telegram
+- [ ] Cifras con fuente: ver [investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)
+- [ ] Elegir el canal real de aviso: Telegram (recomendado) o correo

@@ -49,6 +49,11 @@ Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 | Una alarma en la casa que hay que apagar en 60 s | Una falsa alarma cuesta un toque de la persona, no un susto a la familia. Cada alarma apagada calibra esa casa |
 | Escalamiento por vencimiento, una sola vez | Si el teléfono de la casa se apaga en plena alarma, la alerta escala igual: cualquier teléfono de la familia ve que venció |
 | El silencio también avisa | Si la casa deja de reportar, la familia lo ve |
+| Tres niveles de aviso y un presupuesto al día | La meta es que la familia esté tranquila. Si la app suena por todo, la silencian y el día que importa no la ven |
+| El perfil de salud cambia las reglas | Un apagón es una molestia para unos y una emergencia para quien usa oxígeno. Reglas generales por condición, calibradas por casa. No entrenamos un modelo por persona: no hay datos ni tiempo |
+| La persona también es sensor | «Huele a gas» o «me siento mal» lo confirma un humano: no hay falso positivo. Y cubre lo que el teléfono no puede oler |
+| Todo lo posible en el teléfono | Sin luz ni internet, que en Venezuela es lo normal, la alarma local sigue funcionando y los eventos esperan en cola |
+| Flutter, Supabase y Telegram | Flutter da micrófono en segundo plano, batería y SMS en el teléfono de la casa. Telegram suena en cualquier teléfono sin pagar cuentas de desarrollador |
 
 ## Pendiente
 

@@ -11,6 +11,8 @@ Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.verc
 
 - El plan, los roles y el demo: [docs/plan.md](docs/plan.md)
 - Por qué, lo que ya existe y las decisiones de diseño: [docs/contexto.md](docs/contexto.md)
+- Dónde puede fallar y cómo lo evitamos: [docs/riesgos.md](docs/riesgos.md)
+- Las preguntas abiertas de cada uno: [docs/investigacion.md](docs/investigacion.md)
 
 ## Estado
 
@@ -18,7 +20,9 @@ Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.verc
 |---|---|
 | Micrófono → compuerta de dB → YAMNet en el navegador | Prueba funcionando en [`/escucha`](https://platanus-hack-26-ve-team-25.vercel.app/escucha). Falta probarla con micrófono real |
 | Vibración del piso con el acelerómetro | Por hacer |
-| Alarma de confirmación de 60 s | Por hacer |
+| Alarma de confirmación de 60 s, botón de pánico y reportes de la persona | Por hacer |
+| Perfil de salud y niveles de aviso (🔴 🟡 🟢) | Por hacer |
+| App del teléfono de la casa en Flutter | Por hacer |
 | Alertas con vencimiento y escalamiento (Supabase) | Por hacer |
 | App de la familia | Por hacer |
 | Aviso real (Telegram o correo) | Por decidir |
@@ -53,18 +57,20 @@ producción o abre un túnel: `cloudflared tunnel --url http://localhost:3000`.
 ```text
 docs/plan.md               el plan, los roles y el demo
 docs/contexto.md           el porqué, la competencia y las decisiones
+docs/riesgos.md            los muros, los huecos y cómo hacer que sume y no reste
+docs/investigacion.md      las preguntas abiertas de cada uno
 web/src/app/escucha/       la página de prueba del oído
 web/src/lib/escucha/       lógica pura con pruebas: nivel y compuerta, buffer circular, clases de YAMNet
 ```
 
 ## Por dónde empieza cada rol
 
-| Rol | Primera tarea | Dónde |
+| Rol | Quién | Primera tarea |
 |---|---|---|
-| Detección | Probar `/escucha` con alarma de humo, golpe, grito y TV; sumar el acelerómetro | `web/src/lib/escucha/` |
-| Confirmación + escalamiento | La alarma de 60 s y la tabla de alertas con vencimiento en Supabase | `web/src/lib/alertas/` (nuevo) |
-| App de la familia | Estado de la casa y alertas en vivo, entrando por un enlace de invitación | `web/src/app/familia/` (nuevo) |
-| Datos + pitch | Las cifras con fuente y la competencia | `docs/` |
+| Detección e IA | Abrahan | Probar `/escucha` con alarma de humo, golpe, grito y TV; YAMNet en Flutter |
+| Alertas y conexión | Josuep | Niveles de aviso, alarma de 60 s, pánico y la tabla de alertas con vencimiento en Supabase |
+| Datos y usuarios | Anttony | Las cifras con fuente y dos o tres testimonios |
+| Orquestación, UX/UI y riesgos | Rogelio | Cerrar el reparto Flutter / web, las pantallas y [docs/riesgos.md](docs/riesgos.md) |
 
 ## Cómo trabajamos
 
