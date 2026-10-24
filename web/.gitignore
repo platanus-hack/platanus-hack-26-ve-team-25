@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# …menos el de ejemplo: es la lista de variables, sin valores reales, y sí va al repo.
+!.env.example
 
 # vercel
 .vercel
