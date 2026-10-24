@@ -25,6 +25,9 @@ abstract interface class Telefono {
   /// Cada vez que termina una llamada de WhatsApp, cuántos segundos duró, timbre incluido.
   /// Android no dice si la contestaron.
   Stream<int> get finDeWhatsApp;
+
+  /// Lo mismo para la llamada telefónica al primer contacto. Tampoco dice si contestaron.
+  Stream<int> get finDeTelefono;
 }
 
 /// WhatsApp primero: los hijos suelen estar fuera del país, y una llamada normal al exterior
@@ -47,22 +50,25 @@ Future<ViaLlamada> llamarPrimeroPorWhatsApp(String numero, Telefono t) async {
 class TelefonoAndroid implements Telefono {
   TelefonoAndroid() {
     _canal.setMethodCallHandler((llamada) async {
-      if (llamada.method == 'whatsappTermino') {
-        _fin.add((llamada.arguments as Map)['segundos'] as int);
-      }
+      final segundos = (llamada.arguments as Map?)?['segundos'] as int? ?? 0;
+      if (llamada.method == 'whatsappTermino') _fin.add(segundos);
+      if (llamada.method == 'telefonoTermino') _finTelefono.add(segundos);
     });
   }
 
   static const _canal = MethodChannel('casa/llamadas');
   final _fin = StreamController<int>.broadcast();
+  final _finTelefono = StreamController<int>.broadcast();
 
   @override
   Future<bool> whatsapp(String numero) async =>
       await _canal.invokeMethod<bool>('whatsapp', {'numero': numero}) ?? false;
 
   @override
-  Future<void> llamar(String numero) async =>
-      FlutterPhoneDirectCaller.callNumber(numero);
+  Future<void> llamar(String numero) async {
+    await FlutterPhoneDirectCaller.callNumber(numero);
+    await _canal.invokeMethod<void>('vigilarTelefono');
+  }
 
   @override
   Future<bool> hayInternet() async =>
@@ -75,4 +81,7 @@ class TelefonoAndroid implements Telefono {
 
   @override
   Stream<int> get finDeWhatsApp => _fin.stream;
+
+  @override
+  Stream<int> get finDeTelefono => _finTelefono.stream;
 }

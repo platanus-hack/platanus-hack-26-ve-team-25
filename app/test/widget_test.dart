@@ -87,6 +87,77 @@ void main() {
       await tester.pump();
     }
 
+    Future<void> hastaLaLlamadaPorTelefono(
+      WidgetTester tester, {
+      String emergencias = '04120000911',
+    }) async {
+      comoRelojDeMesa(tester);
+      ahora = temprano();
+      t = TelefonoFalso();
+      c = Controlador(
+        casa: casaConNumero,
+        reloj: () => ahora,
+        telefono: t,
+        numeroEmergencias: emergencias,
+      );
+      await tester.pumpWidget(AppCasa(controlador: c));
+      await tester.tap(find.text('Llamar a Josuep'));
+      await tester.pump();
+      t.terminarWhatsApp(3); // no timbró: llamada por teléfono
+      await tester.pump();
+      expect(t.porTelefono, ['04120000000']);
+    }
+
+    testWidgets(
+      'si el hijo tampoco contesta el teléfono, llama a emergencias',
+      (tester) async {
+        await hastaLaLlamadaPorTelefono(tester);
+        t.terminarTelefono(40);
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('¿Pudo hablar con Josuep?'), findsOneWidget);
+        expect(
+          find.text('Si no, llamamos a emergencias en 0:15.'),
+          findsOneWidget,
+        );
+
+        for (var i = 0; i < 15; i++) {
+          ahora = ahora.add(const Duration(seconds: 1));
+          await tester.pump(const Duration(seconds: 1));
+        }
+        expect(t.enAltavoz, ['04120000911']);
+        expect(find.text('Estamos llamando a emergencias'), findsOneWidget);
+        await _cerrar(tester, c);
+      },
+    );
+
+    testWidgets('si hablaron por teléfono, no llama a emergencias', (
+      tester,
+    ) async {
+      await hastaLaLlamadaPorTelefono(tester);
+      t.terminarTelefono(90);
+      await tester.pump();
+      await tester.pump();
+      await tester.tap(find.text('Sí, ya hablamos'));
+      await tester.pump();
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(t.enAltavoz, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets(
+      'sin número de emergencias no pregunta ni promete esa llamada',
+      (tester) async {
+        await hastaLaLlamadaPorTelefono(tester, emergencias: '');
+        t.terminarTelefono(40);
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('¿Pudo hablar con Josuep?'), findsNothing);
+        expect(t.enAltavoz, isEmpty);
+        await _cerrar(tester, c);
+      },
+    );
+
     testWidgets('el pánico llama primero por WhatsApp, una sola vez', (
       tester,
     ) async {

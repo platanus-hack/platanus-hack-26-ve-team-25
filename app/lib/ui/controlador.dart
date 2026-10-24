@@ -41,6 +41,7 @@ class Controlador extends ChangeNotifier {
     );
     _oyendo = escuchas?.listen(_alOir);
     _finDeWhatsApp = telefono?.finDeWhatsApp.listen(_alTerminarWhatsApp);
+    _finDeTelefono = telefono?.finDeTelefono.listen(_alTerminarTelefono);
     _ventanas = sirena?.ventanas.listen(_alAbrirseLaVentana);
   }
 
@@ -99,7 +100,16 @@ class Controlador extends ChangeNotifier {
   /// True mientras el reconocimiento de voz escucha la respuesta.
   bool escuchandoVoz = false;
   StreamSubscription<int>? _finDeWhatsApp;
+  StreamSubscription<int>? _finDeTelefono;
   bool _esperandoWhatsApp = false;
+  bool _esperandoTelefono = false;
+
+  /// True si «¿Pudo hablar con…?» se pregunta después de la llamada por teléfono: si no hablaron,
+  /// lo siguiente es emergencias.
+  bool preguntaTrasTelefono = false;
+
+  /// True desde que la casa llamó a emergencias porque el hijo no contestó.
+  bool llamandoAEmergencias = false;
   DateTime? _preguntaHasta;
   late final Timer _tic;
   StreamSubscription<Escucha>? _oyendo;
@@ -212,7 +222,43 @@ class Controlador extends ChangeNotifier {
     notifyListeners();
     if (t == null || numero.isEmpty) return;
     await t.llamar(numero);
+    // Si es la llamada de una alerta, al terminar se pregunta otra vez si hablaron.
+    _esperandoTelefono = _alerta?.estado == EstadoAlerta.escalada;
   }
+
+  /// El hijo no contestó ni por WhatsApp ni por teléfono: llamada normal a emergencias, en
+  /// altavoz y con el volumen al máximo. La familia ya recibió el Telegram al escalar.
+  Future<void> llamarEmergencias() async {
+    _preguntaHasta = null;
+    preguntaTrasTelefono = false;
+    _esperandoTelefono = false;
+    final t = telefono;
+    if (t == null || numeroEmergencias.isEmpty) return notifyListeners();
+    llamandoAEmergencias = true;
+    notifyListeners();
+    if (!await t.llamarEnAltavoz(numeroEmergencias)) {
+      await t.llamar(numeroEmergencias);
+    }
+  }
+
+  // Igual que con WhatsApp, Android no dice si contestaron la llamada telefónica: se pregunta. Si
+  // no hablaron, o nadie responde en 15 s, se llama a emergencias. Sin número de emergencias
+  // configurado no se pregunta nada: no habría nada que prometer.
+  void _alTerminarTelefono(int segundos) {
+    if (!_esperandoTelefono) return;
+    _esperandoTelefono = false;
+    if (_alerta?.estado != EstadoAlerta.escalada || numeroEmergencias.isEmpty) {
+      return;
+    }
+    preguntaTrasTelefono = true;
+    _preguntaHasta = ahora.add(esperaPregunta);
+    notifyListeners();
+    unawaited(_preguntarPorVoz());
+  }
+
+  /// No hablaron: después del WhatsApp se llama por teléfono; después del teléfono, a emergencias.
+  Future<void> _siNoHablaron() =>
+      preguntaTrasTelefono ? llamarEmergencias() : llamarPorTelefono();
 
   // Android no dice si contestaron el WhatsApp. Si terminó muy rápido, no timbró: se llama por
   // teléfono ya. Si duró más, pudo haber timbrado sin respuesta o haber una conversación: se
@@ -253,7 +299,7 @@ class Controlador extends ChangeNotifier {
       case Respuesta.si:
         siHablamos();
       case Respuesta.no:
-        await llamarPorTelefono();
+        await _siNoHablaron();
       case null:
         notifyListeners();
     }
@@ -504,7 +550,7 @@ class Controlador extends ChangeNotifier {
       unawaited(_llamarYa(llamada));
     }
     final hasta = _preguntaHasta;
-    if (hasta != null && !ahora.isBefore(hasta)) unawaited(llamarPorTelefono());
+    if (hasta != null && !ahora.isBefore(hasta)) unawaited(_siNoHablaron());
     _cambiar(_alerta?.revisar(ahora));
   }
 
@@ -528,6 +574,9 @@ class Controlador extends ChangeNotifier {
     if (!(nueva?.abierta ?? false)) {
       _preguntaHasta = null;
       _esperandoWhatsApp = false;
+      _esperandoTelefono = false;
+      preguntaTrasTelefono = false;
+      llamandoAEmergencias = false;
     }
     // Al escalar, una sola vez, la casa llama al primer contacto.
     if (antes != EstadoAlerta.escalada &&
@@ -544,6 +593,7 @@ class Controlador extends ChangeNotifier {
     _tic.cancel();
     _oyendo?.cancel();
     _finDeWhatsApp?.cancel();
+    _finDeTelefono?.cancel();
     _ventanas?.cancel();
     super.dispose();
   }

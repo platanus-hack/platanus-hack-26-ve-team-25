@@ -29,6 +29,7 @@ class MainActivity : FlutterActivity() {
                     "whatsapp" -> result.success(llamarPorWhatsApp(call.argument<String>("numero").orEmpty()))
                     "llamarEnAltavoz" -> result.success(llamarEnAltavoz(call.argument<String>("numero").orEmpty()))
                     "hayInternet" -> result.success(hayInternet())
+                    "vigilarTelefono" -> { vigilarLlamada(AudioManager.MODE_IN_CALL, "telefonoTermino"); result.success(null) }
                     else -> result.notImplemented()
                 }
             }
@@ -173,7 +174,7 @@ class MainActivity : FlutterActivity() {
                 }
                 return try {
                     startActivity(intent)
-                    vigilarLlamada()
+                    vigilarLlamada(AudioManager.MODE_IN_COMMUNICATION, "whatsappTermino")
                     true
                 } catch (e: ActivityNotFoundException) {
                     false
@@ -184,12 +185,12 @@ class MainActivity : FlutterActivity() {
     }
 
     /**
-     * Android no avisa a otra app si la llamada de WhatsApp fue contestada. Lo que sí se ve es el
-     * modo de audio: mientras hay una llamada de voz por internet está en MODE_IN_COMMUNICATION.
-     * Se mira cada medio segundo; cuando la llamada termina, la app vuelve al frente y le dice a
-     * Dart cuántos segundos duró (timbre incluido). Si nunca empezó en 20 s, cuenta como 0.
+     * Android no avisa a otra app si una llamada fue contestada. Lo que sí se ve es el modo de
+     * audio: MODE_IN_COMMUNICATION mientras hay una llamada de WhatsApp, MODE_IN_CALL mientras hay
+     * una telefónica. Se mira cada medio segundo; cuando la llamada termina, la app vuelve al frente
+     * y le dice a Dart cuántos segundos duró (timbre incluido). Si nunca empezó en 20 s, cuenta 0.
      */
-    private fun vigilarLlamada() {
+    private fun vigilarLlamada(modo: Int, aviso: String) {
         val audio = getSystemService(AUDIO_SERVICE) as AudioManager
         val pedida = SystemClock.elapsedRealtime()
         var empezo = 0L
@@ -197,11 +198,11 @@ class MainActivity : FlutterActivity() {
         val tic = object : Runnable {
             override fun run() {
                 val ahora = SystemClock.elapsedRealtime()
-                val enLlamada = audio.mode == AudioManager.MODE_IN_COMMUNICATION
+                val enLlamada = audio.mode == modo
                 when {
                     empezo == 0L && enLlamada -> empezo = ahora
-                    empezo == 0L && ahora - pedida > 20_000 -> return terminar(0)
-                    empezo != 0L && !enLlamada -> return terminar(((ahora - empezo) / 1000).toInt())
+                    empezo == 0L && ahora - pedida > 20_000 -> return terminar(aviso, 0)
+                    empezo != 0L && !enLlamada -> return terminar(aviso, ((ahora - empezo) / 1000).toInt())
                 }
                 reloj.postDelayed(this, 500)
             }
@@ -209,7 +210,7 @@ class MainActivity : FlutterActivity() {
         reloj.postDelayed(tic, 500)
     }
 
-    private fun terminar(segundos: Int) {
+    private fun terminar(aviso: String, segundos: Int) {
         // Volver al frente necesita el permiso «Mostrar sobre otras apps»: sin él, Android no deja
         // que una app en segundo plano se abra sola. Si no está, la persona vuelve con la tecla
         // de inicio, porque la app es la pantalla de inicio del teléfono de la casa.
@@ -221,6 +222,6 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             // Si Android no deja volver, igual se avisa a Dart para que llame por teléfono.
         }
-        canal?.invokeMethod("whatsappTermino", mapOf("segundos" to segundos))
+        canal?.invokeMethod(aviso, mapOf("segundos" to segundos))
     }
 }

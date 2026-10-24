@@ -75,7 +75,7 @@ webhook y el vigilante están hechos y verificados.
 Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en el teléfono desde los
 últimos cambios.
 
-**App de la casa ([`app/`](../app/README.md)), 117 pruebas:**
+**App de la casa ([`app/`](../app/README.md)), 120 pruebas:**
 
 - [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
       en chico y «Leer récipe».
@@ -88,7 +88,10 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
       gas»), y órdenes con «Lucero»: «llama a mi hijo», «… al vecino», «… a emergencias» (5 s
       para decir «no»), «Lucero, estoy bien» para callar la alarma, y «ya me la tomé».
 - [x] Al escalar, llama al hijo por WhatsApp y, si no contestan, por teléfono. Sin internet
-      (ni wifi ni datos que salgan de verdad) no intenta WhatsApp: llama directo por teléfono. A emergencias y
+      (ni wifi ni datos que salgan de verdad) no intenta WhatsApp: llama directo por teléfono.
+- [x] Si el hijo no contesta ni el WhatsApp ni el teléfono, la casa llama a emergencias en altavoz.
+      Android no dice si contestaron, así que después de la llamada por teléfono pregunta otra vez
+      «¿Pudo hablar con Josuep?»; con «no» o sin respuesta en 15 s, llama a `NUMERO_EMERGENCIAS`. A emergencias y
       al vecino, llamada normal en altavoz y con el volumen al máximo.
 - [x] El recordatorio de la pastilla en toda la pantalla, que solo se quita con «Ya me la tomé»,
       y que descuenta del inventario con `casa_tomar` (probado contra la base: de 8 a 7).

@@ -25,10 +25,16 @@ class Ayuda extends StatelessWidget {
 
     final String titulo;
     final String detalle;
-    if (pregunta != null) {
-      titulo = '¿Pudo hablar con ${contacto.nombre}?';
+    final cuenta = '0:${(pregunta?.inSeconds ?? 0).toString().padLeft(2, '0')}';
+    if (c.llamandoAEmergencias) {
+      titulo = 'Estamos llamando a emergencias';
       detalle =
-          'Si no, lo llamamos por teléfono en 0:${pregunta.inSeconds.toString().padLeft(2, '0')}.';
+          '${contacto.nombre} no contestó. Su familia ya recibió el aviso.';
+    } else if (pregunta != null) {
+      titulo = '¿Pudo hablar con ${contacto.nombre}?';
+      detalle = c.preguntaTrasTelefono
+          ? 'Si no, llamamos a emergencias en $cuenta.'
+          : 'Si no, lo llamamos por teléfono en $cuenta.';
     } else if (conNumero) {
       titulo = 'Estamos llamando a ${contacto.nombre}';
       detalle = 'Si contesta, puede hablarle desde aquí.';
@@ -158,13 +164,17 @@ class Ayuda extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       BotonGrande(
-                        texto: 'Llamar por teléfono ya',
+                        texto: c.preguntaTrasTelefono
+                            ? 'Llamar a emergencias ya'
+                            : 'Llamar por teléfono ya',
                         alto: 72,
                         tamano: 21,
                         fondo: Colors.transparent,
                         color: Colors.white,
                         borde: const Color(0xFFF3B7B3),
-                        alTocar: c.llamarPorTelefono,
+                        alTocar: c.preguntaTrasTelefono
+                            ? c.llamarEmergencias
+                            : c.llamarPorTelefono,
                       ),
                     ] else ...[
                       if (conNumero) ...[
