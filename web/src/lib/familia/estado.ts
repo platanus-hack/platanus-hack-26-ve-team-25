@@ -71,6 +71,15 @@ export function fecha(ahora: Date): string {
 }
 
 /** «hace un momento», «hace 1 min», «hace 2 h» */
+/** «25 minutos», «1 hora», «4 horas y 40 minutos», «2 días»: para leerlo de corrido. */
+export function duracion(minutos: number): string {
+  const n = (k: number, uno: string, varios: string) => `${k} ${k === 1 ? uno : varios}`;
+  if (minutos < 60) return n(minutos, "minuto", "minutos");
+  if (minutos >= 24 * 60) return n(Math.floor(minutos / (24 * 60)), "día", "días");
+  const h = n(Math.floor(minutos / 60), "hora", "horas");
+  return minutos % 60 === 0 ? h : `${h} y ${n(minutos % 60, "minuto", "minutos")}`;
+}
+
 export function haceCuanto(iso: string, ahora: Date): string {
   const min = Math.floor((ahora.getTime() - ms(iso)) / 60_000);
   if (min < 1) return "hace un momento";
@@ -105,7 +114,7 @@ function vistaAlerta(casa: Casa, alerta: Alerta, evento: Evento | undefined): Vi
   const hecho = [
     ...(lo_pidio ? [] : ["Le preguntamos en su casa si estaba bien"]),
     ...(primero ? [`Desde su casa llamamos a ${quien(primero, "su")}`] : []),
-    "Te avisamos por aquí y por WhatsApp",
+    "Te avisamos por aquí y por Telegram",
   ];
 
   return { tipo: "alerta", alerta, titular: TITULAR[tipo](casa.nombre), explicacion, hecho };

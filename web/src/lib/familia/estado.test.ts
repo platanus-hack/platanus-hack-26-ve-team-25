@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { atender, derivarVista, fecha, haceCuanto, hora, SILENCIO_SIN_SENAL_MS } from "./estado";
+import { atender, derivarVista, duracion, fecha, haceCuanto, hora, SILENCIO_SIN_SENAL_MS } from "./estado";
 import { ESCENARIOS, simular } from "./simulado";
 import type { DatosCasa } from "./tipos";
 
@@ -17,6 +17,14 @@ describe("horas en Caracas", () => {
     expect(haceCuanto("2026-10-24T18:06:50Z", AHORA)).toBe("hace un momento");
     expect(haceCuanto("2026-10-24T18:05:59Z", AHORA)).toBe("hace 1 min");
     expect(haceCuanto("2026-10-24T15:00:00Z", AHORA)).toBe("hace 3 h");
+  });
+  test("duracion se lee de corrido, sin «280 minutos»", () => {
+    expect(duracion(1)).toBe("1 minuto");
+    expect(duracion(25)).toBe("25 minutos");
+    expect(duracion(60)).toBe("1 hora");
+    expect(duracion(280)).toBe("4 horas y 40 minutos");
+    expect(duracion(61)).toBe("1 hora y 1 minuto");
+    expect(duracion(3000)).toBe("2 días");
   });
 });
 
