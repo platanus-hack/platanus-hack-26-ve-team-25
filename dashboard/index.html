@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>En Casa · Crisis Migratoria y Vulnerabilidad en Adultos Mayores</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <!-- Chart.js & Plugins via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- Hoja de Estilos Desacoplada -->
+  <link rel="stylesheet" href="styles/main.css"/>
+</head>
+
+<body>
+<div class="layout">
+
+  <!-- ════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🏠</div>
+      <div>
+        <h1>En Casa</h1>
+        <p>Platanus Hack 26 · TypeScript Edition</p>
+      </div>
+    </div>
+
+    <div class="sidebar-section">Navegación</div>
+
+    <a class="nav-item active" data-section="panorama">
+      <i data-lucide="bar-chart-2" class="icon"></i> Panorama General
+    </a>
+    <a class="nav-item" data-section="mayores">
+      <i data-lucide="users" class="icon"></i> Adultos Mayores
+    </a>
+    <a class="nav-item" data-section="solucion">
+      <i data-lucide="shield-check" class="icon"></i> Solución En Casa
+    </a>
+    <a class="nav-item" data-section="fuentes">
+      <i data-lucide="book-open" class="icon"></i> Fuentes
+    </a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">Filtro Temporal</div>
+    <div style="padding:.5rem .75rem;">
+      <label style="font-size:.72rem;color:var(--muted2);">Desde</label>
+      <select id="yearFrom"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:.4rem .5rem;font-size:.8rem;margin-bottom:.5rem;margin-top:.2rem;">
+        <option>2015</option><option>2016</option><option>2017</option><option>2018</option>
+        <option>2019</option><option>2020</option><option>2021</option><option>2022</option>
+      </select>
+      <label style="font-size:.72rem;color:var(--muted2);">Hasta</label>
+      <select id="yearTo"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:.4rem .5rem;font-size:.8rem;margin-top:.2rem;">
+        <option selected>2024</option><option>2023</option><option>2022</option><option>2021</option>
+      </select>
+    </div>
+
+    <div class="sidebar-footer">
+      Datos: ACNUR · OIM · CEPAL<br>OMS · HelpAge · Convite AC<br>Arquitectura Modular TypeScript
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ────────────────────────────────
+         SECCIÓN 1: PANORAMA GENERAL
+    ──────────────────────────────── -->
+    <section class="section active" id="sec-panorama">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-badge">🏆 Platanus Hack 26 · Proyecto En Casa</div>
+        <h2>Venezuela: La Crisis Silenciosa<br><span>de los que se Quedaron</span></h2>
+        <p>Más de 7.89 millones de venezolanos han emigrado. La población mayor que permanece
+           enfrenta soledad, vulnerabilidad y emergencias domésticas sin respuesta oportuna.</p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="section-header"><h3>📌 Indicadores Clave</h3></div>
+      <div class="grid-6" id="kpi-grid"></div>
+
+      <div class="section-header" style="margin-top:2.5rem;">
+        <h3>📈 Éxodo Venezolano</h3>
+        <p>Evolución histórica 2015–2024 · ACNUR / R4V</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Migrantes venezolanos acumulados (millones)</div>
+        <div class="card-sub">Total global vs. en las Américas</div>
+        <canvas id="chartMigracion" height="90"></canvas>
+        <div class="source">📚 ACNUR/UNHCR · R4V Plataforma de Coordinación · IOM/OIM — 2024</div>
+      </div>
+
+      <div class="grid-2-1" style="margin-top:1.5rem;">
+        <div class="card">
+          <div class="card-title">🌎 Top 10 Países Receptores</div>
+          <div class="card-sub">Venezolanos registrados · R4V 2024</div>
+          <canvas id="chartPaises" height="170"></canvas>
+          <div class="source">📚 R4V / GIFMM Colombia / Superintendencia de Migraciones Perú — 2024</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🎯 ¿Quién Emigra?</div>
+          <div class="card-sub">Distribución etaria · OIM DTM 2023</div>
+          <canvas id="chartEdades" height="220"></canvas>
+          <div class="alert alert-purple" style="margin-top:.75rem;">
+            <div class="alert-title">⚠️ 53% son jóvenes de 15–34 años</div>
+            <div class="alert-body">Su emigración destruye la red de cuidado natural de los adultos mayores.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN GLOBAL (REEMPLAZO DE REMESAS) -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h3>🌐 Más Allá de Venezuela: Un Fenómeno Global y Escalable</h3>
+        <p>Éxodo juvenil y la crisis de los "Adultos Mayores Dejados Atrás" (Left-Behind Elderly) · HelpAge / OIM / ONU</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">🌎 Países con Mayor Proporción de Mayores Afectados por Migración</div>
+          <div class="card-sub">% estimado de adultos mayores viviendo solos o sin red familiar presencial por emigración juvenil</div>
+          <canvas id="chartGlobalPaises" height="160"></canvas>
+          <div class="source">📚 HelpAge International · OIM (Left-Behind Elderly Reports) · ENCOVI 2023</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🚀 Escalabilidad de En Casa: Población Mayor en Riesgo por Diásporas</div>
+          <div class="card-sub">Millones de adultos mayores en soledad migratoria por región (Mercado Potencial)</div>
+          <canvas id="chartEscalabilidad" height="160"></canvas>
+          <div class="source">📚 Banco Mundial / CEPAL / UNDESA Population Division 2024</div>
+        </div>
+      </div>
+
+      <div class="alert alert-purple" style="margin-top:1.2rem;">
+        <div class="alert-title">💡 De una Urgencia Venezolana a una Solución de Impacto Global</div>
+        <div class="alert-body">
+          Venezuela representa uno de los escenarios más críticos (con más del <strong>35% de hogares habitados exclusivamente por mayores</strong> tras la partida de sus jóvenes), pero países como <strong>Ucrania, Cuba, Moldavia o el Triángulo Norte centroamericano</strong> sufren el mismo fenómeno demográfico. <strong>En Casa</strong> está concebido con procesamiento local de audio para funcionar como una solución universal y escalable para cualquier familia separada por la migración.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ────────────────────────────────
+         SECCIÓN 2: ADULTOS MAYORES
+    ──────────────────────────────── -->
+    <section class="section" id="sec-mayores">
+
+      <div class="hero" style="background:linear-gradient(135deg,#0d1a0d,#111a14,#0d1220);">
+        <div class="hero-badge" style="background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.3);">🚨 La Población Olvidada</div>
+        <h2>Adultos Mayores en Venezuela:<br><span style="color:#f87171;">El Costo Humano</span></h2>
+        <p>Más de 400.000 adultos mayores viven completamente solos como consecuencia directa
+           de la emigración de sus hijos y familiares cercanos.</p>
+      </div>
+
+      <div class="grid-6" id="kpi-mayores-grid"></div>
+
+      <div class="grid-2" style="margin-top:2rem;">
+        <div class="card">
+          <div class="card-title">🏠 Situación del Adulto Mayor Venezolano</div>
+          <div class="card-sub">Convite AC / ENCOVI 2023</div>
+          <canvas id="chartMayores" height="200"></canvas>
+          <div class="source">📚 Convite AC · ENCOVI (UCAB) 2023 · CEPAL/CELADE</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🚨 Causas de Emergencias en el Hogar</div>
+          <div class="card-sub">Adultos mayores que viven solos · OMS/OPS 2022</div>
+          <canvas id="chartAccidentes" height="200"></canvas>
+          <div class="source">📚 OPS/OMS · Global Report on Falls 2022</div>
+        </div>
+      </div>
+
+      <!-- Caídas globales OMS -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h3>🌐 El Riesgo Global de Caídas</h3>
+        <p>OMS/WHO · CDC · NIH — 2022–2024</p>
+      </div>
+      <div class="grid-3" id="grid-caidas"></div>
+
+      <!-- Tiempo de respuesta -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h3>⏱️ Tiempo de Respuesta ante Emergencias</h3>
+        <p>Comparativa sin y con sistema de alerta</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Minutos promedio hasta recibir ayuda</div>
+          <div class="card-sub">Por escenario de emergencia doméstica</div>
+          <canvas id="chartRespuesta" height="160"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Dependencia económica del exterior</div>
+          <div class="card-sub">% de adultos mayores por indicador</div>
+          <div id="prog-container"></div>
+          <div class="source">📚 Convite AC · ENCOVI 2023 · Banco Mundial</div>
+        </div>
+      </div>
+
+      <!-- Estado de Venezuela -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h3>🗺️ Índice de Vulnerabilidad por Estado</h3>
+        <p>Estimación basada en ENCOVI 2023 y patrones de emigración regional R4V</p>
+      </div>
+      <div class="card">
+        <canvas id="chartEstados" height="90"></canvas>
+        <div class="source">📚 ENCOVI 2023 (UCAB) · R4V · INE Venezuela</div>
+      </div>
+
+    </section>
+
+    <!-- ────────────────────────────────
+         SECCIÓN 3: SOLUCIÓN
+    ──────────────────────────────── -->
+    <section class="section" id="sec-solucion">
+
+      <div class="hero" style="background:linear-gradient(135deg,#0a1a0f,#0d1a14,#0d1220);">
+        <div class="hero-badge" style="background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.3);">📡 La Solución</div>
+        <h2>En Casa:<br><span style="color:#4ade80;">El Teléfono que Cuida</span></h2>
+        <p>Enchufado en la casa del adulto mayor, escucha y siente lo que pasa.
+           Procesa todo localmente: nunca sale el audio del hogar.</p>
+      </div>
+
+      <div class="grid-3" style="margin-top:1.5rem;">
+        <div class="sol-card">
+          <h4>🎙️ Oído Crudo & YAMNet Local</h4>
+          <p>Micrófono sin filtros destructivos + compuerta de dB. YAMNet (TFLite) clasifica 2 veces/seg en buffer circular de 5 s en memoria RAM. Audio 100% privado en el teléfono.</p>
+        </div>
+        <div class="sol-card">
+          <h4>⏰ Alerta de 60 s & Sensor de Proximidad</h4>
+          <p>Tono sonoro de 520 Hz + vibración. Deslizar riel ancho «Estoy bien» o pasar la mano por el sensor de proximidad apaga la alarma. Botón «Necesito ayuda» escala al instante.</p>
+        </div>
+        <div class="sol-card">
+          <h4>🚨 Escalamiento en Serie (T1 · T2 · T3)</h4>
+          <p>T1 (10 s) POST Supabase + Telegram a la familia en el exterior. Si falla o timeout: T2 (25 s) llamada GSM local automática al vecino de confianza. T3: SMS de respaldo.</p>
+        </div>
+      </div>
+
+      <!-- Flujo detallado -->
+      <div class="section-header" style="margin-top:2rem;">
+        <h3>🔄 Flujo Operativo Paso a Paso</h3>
+        <p>Desde la captación acústica en la vivienda hasta la respuesta transfronteriza y local</p>
+      </div>
+      <div id="flow-container" class="flow-grid"></div>
+
+      <!-- Arquitectura en 3 Capas -->
+      <div class="section-header" style="margin-top:2.5rem;">
+        <h3>🏛️ Arquitectura del Sistema: Casa · Red · Familia</h3>
+        <p>Separación de responsabilidades entre el dispositivo local, el enrutamiento y la experiencia familiar</p>
+      </div>
+      <div id="layers-container" class="layers-grid"></div>
+
+      <!-- Niveles de aviso -->
+      <div class="section-header" style="margin-top:1.5rem;">
+        <h3>🚦 Clasificación por Nivel de Aviso & Perfil de Salud</h3>
+        <p>El perfil médico de la persona define la urgencia del evento</p>
+      </div>
+      <div class="grid-3">
+        <div class="alert alert-red" style="margin:0;">
+          <div class="alert-title">🔴 Nivel Rojo · Urgente</div>
+          <div class="alert-body">
+            Caída confirmada, alarma de 60s sin apagar, botón de pánico, «Huele a gas», «Me siento mal» o apagón en vivienda de paciente con oxígeno. Notificación sonora forzada y llamada.
+          </div>
+        </div>
+        <div class="alert alert-purple" style="margin:0; border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.06); color: var(--yellow2);">
+          <div class="alert-title" style="color: var(--yellow2);">🟡 Nivel Amarillo · Para Saber</div>
+          <div class="alert-body" style="color: var(--muted2);">
+            Ruido anómalo aislado sin impacto, corte eléctrico en casa sin equipos médicos críticos, o recordatorio de medicinas de la mañana no confirmado a tiempo.
+          </div>
+        </div>
+        <div class="alert alert-green" style="margin:0;">
+          <div class="alert-title">🟢 Nivel Verde · Todo Bien</div>
+          <div class="alert-body">
+            Confirmación «Estoy bien hoy», pastilla tomada en horario, latido de conexión en línea cada minuto. La familia ve «Todo bien · Cuidando la casa».
+          </div>
+        </div>
+      </div>
+
+      <!-- Impacto en Tiempo de Respuesta -->
+      <div class="section-header" style="margin-top:2.5rem;">
+        <h3>⏱️ Impacto en Tiempo de Respuesta ante Emergencias</h3>
+        <p>Comparativa de tiempos de auxilio y protocolo de mitigación del síndrome de "Long Lie"</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Gráfica Comparativa de Tiempos -->
+        <div class="card">
+          <div class="card-title">Minutos promedio hasta recibir auxilio</div>
+          <div class="card-sub">Comparativa entre escenarios habituales y En Casa</div>
+          <canvas id="chartGauge" height="175"></canvas>
+          <div class="source">📚 OMS / WHO — Emergency Care Delay & NIH Long Lie Study</div>
+        </div>
+
+        <!-- Panel de Impacto Clínico y Protocolo de 120s -->
+        <div class="card">
+          <div class="impact-kpi-box">
+            <div>
+              <div class="impact-kpi-val">-95.7%</div>
+              <div style="font-size: 0.72rem; color: var(--green2); font-weight: 700; text-transform: uppercase;">Reducción del tiempo de respuesta</div>
+            </div>
+            <div class="impact-kpi-text">
+              De <strong>47 min</strong> habituales<br>a <strong>< 2 minutos</strong> con En Casa
+            </div>
+          </div>
+
+          <div class="card-title" style="font-size: 0.85rem;">Protocolo de los Primeros 120 Segundos</div>
+          <div class="timeline-mini">
+            <div class="timeline-item active-t">
+              <span class="timeline-time">00:00</span>
+              <div class="timeline-info"><strong>Detección Acústica:</strong> YAMNet en el teléfono clasifica el impacto o alarma.</div>
+            </div>
+            <div class="timeline-item active-t">
+              <span class="timeline-time">00:01</span>
+              <div class="timeline-info"><strong>Alarma Local 520 Hz:</strong> Ventana de 60 s para cancelar con riel o proximidad.</div>
+            </div>
+            <div class="timeline-item active-g">
+              <span class="timeline-time">01:10</span>
+              <div class="timeline-info"><strong>Canal T1 (Exterior):</strong> Aviso sonoro por Telegram y Web PWA a la familia.</div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-time">01:35</span>
+              <div class="timeline-info"><strong>Canal T2 (Local):</strong> Llamada GSM automática a vecino si no hay respuesta.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacidad -->
+      <div class="alert alert-green" style="margin-top:1.5rem;">
+        <div class="alert-title">🔒 Privacidad por Diseño — On-Device AI</div>
+        <div class="alert-body">
+          Todo el procesamiento de audio ocurre <strong>on-device</strong> usando modelos de inferencia local.
+          No se transmite ningún fragmento de audio a servidores externos. Solo se envía una notificación
+          de texto con el tipo de evento detectado. Cumple con GDPR y principios de privacidad diferencial.
+        </div>
+      </div>
+
+      <!-- Pitch -->
+      <div class="section-header" style="margin-top:2rem;"><h3>💬 Narrativa del Pitch</h3></div>
+      <div class="pitch-box">
+        <p>
+          "Más de <span class="hl-red">7.89 millones de venezolanos emigraron</span>.
+          La mayoría son jóvenes de 18–35 años que dejaron atrás entre
+          <span class="hl-red">300.000 y 500.000 adultos mayores completamente solos</span>.
+          <span class="hl-yellow">1 de cada 3</span> de esos adultos mayores sufrirá una caída este año.
+          <span class="hl-yellow">1 de cada 5</span> quedará en el suelo más de una hora sin que nadie lo ayude.
+          Eso puede costarles la vida.<br><br>
+          Esta crisis trasciende fronteras: en <span class="hl-accent">Cuba, Ucrania, Moldavia y Centroamérica</span>, millones de familias sufren la misma separación y angustia de no poder asistir a sus padres en una urgencia.
+          <span class="hl-green">En Casa</span> nació para el hogar venezolano, pero con una tecnología accesible y privada diseñada para proteger a los adultos mayores en cualquier parte del mundo."
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ────────────────────────────────
+         SECCIÓN 4: FUENTES
+    ──────────────────────────────── -->
+    <section class="section" id="sec-fuentes">
+
+      <div class="section-header"><h3>📚 Fuentes y Referencias</h3></div>
+
+      <div class="alert alert-purple" style="margin-bottom:1.5rem;">
+        <div class="alert-title">📝 Nota Metodológica</div>
+        <div class="alert-body">Los datos de adultos mayores solos son estimaciones construidas a partir de la tasa de
+          emigración general, la estructura familiar venezolana (ENCOVI 2023) y proyecciones de CEPAL/Convite AC.
+          Las cifras por estado son estimaciones basadas en patrones de emigración documentados por R4V y GIFMM.
+        </div>
+      </div>
+
+      <div id="references-container"></div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- Módulo Principal ES6 / Compilado de TypeScript -->
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
