@@ -27,7 +27,9 @@ export const Lectura = z.object({
 export type Lectura = z.infer<typeof Lectura>;
 
 /** Lo que devuelve /f/[token]/pastillas/factura/leer. */
-export type RespuestaLectura = { lectura: Lectura } | { error: "sin_llave" | "no_se_leyo" | "muy_grande" | "token" };
+export type RespuestaLectura =
+  | { lectura: Lectura }
+  | { error: "sin_llave" | "no_se_leyo" | "muy_grande" | "token" | "demasiadas" };
 
 /** Sin acentos, en minúsculas y solo letras, números y espacios: «Losartán Potásico» → «losartan potasico». */
 export function normalizar(s: string): string {

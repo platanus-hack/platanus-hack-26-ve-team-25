@@ -30,6 +30,7 @@ const ERRORES: Record<Exclude<RespuestaLectura, { lectura: Lectura }>["error"], 
   no_se_leyo: "No pudimos leer la factura. Tómale la foto de frente, con buena luz y que se vea entera.",
   muy_grande: "La foto es muy pesada. Prueba con otra.",
   token: "Este enlace no es de ninguna casa.",
+  demasiadas: "Se leyeron varias facturas seguidas. Espera un minuto y vuelve a intentarlo.",
 };
 
 type Fila = { renglon: RenglonLeido; medicamentoId: string | null; cajas: string; porCaja: string };

@@ -6,6 +6,9 @@ import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { cargarCasa } from "@/lib/familia/datos";
 import { Lectura, type RespuestaLectura } from "@/lib/familia/factura";
 import { nombreCompleto } from "@/lib/familia/inventario";
+import { crearTope, TOPE_FACTURA } from "@/lib/familia/tope";
+
+const puedeLeer = crearTope(TOPE_FACTURA);
 
 /** Una factura se lee en 10 a 30 s. */
 export const maxDuration = 60;
@@ -35,6 +38,8 @@ export async function POST(request: Request, ctx: RouteContext<"/f/[token]/pasti
   const tipo = TIPOS.find((t) => t === cuerpo?.tipo);
   if (!imagen || !tipo) return respuesta({ error: "no_se_leyo" }, 400);
   if (imagen.length > MAX_BASE64) return respuesta({ error: "muy_grande" }, 413);
+  // Solo cuenta lo que de verdad iría a Claude.
+  if (!puedeLeer(token, Date.now())) return respuesta({ error: "demasiadas" }, 429);
 
   const recipe = (cargada.datos.inventario ?? [])
     .map((m) => `- ${nombreCompleto(m)}${m.comerciales.length ? ` (${m.comerciales.join(", ")})` : ""}`)
