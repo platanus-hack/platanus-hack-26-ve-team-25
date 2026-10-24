@@ -17,10 +17,11 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
   real.**
 - **Web de la familia:** las pantallas, la invitación y `/demo` con el QR. Lee de Supabase cada 5 s
   y `?escenario=` fuerza los datos simulados. 13 pruebas del estado derivado. El inventario de
-  pastillas desde la factura está hecho en la web y espera su migración.
-- **Supabase:** esquema, funciones, casa de demo y 6 pruebas de integración contra la base real.
-  La migración de avisos quedó **aplicada y verificada** el sábado (las tres funciones existen y
-  responden). Falta aplicar la de pastillas.
+  pastillas desde la factura está hecho en la web, con su migración aplicada.
+- **Supabase:** esquema, funciones, casa de demo y 11 pruebas de integración contra la base real
+  (6 de alertas y 5 de pastillas). La migración de avisos quedó **aplicada y verificada** el
+  sábado (las tres funciones existen y responden). La de pastillas, aplicada el sábado ~16:20,
+  con el récipe inventado de Carmen cargado.
 - **WhatsApp (Kapso):** código escrito y **sin desplegar**. Meta restringió la cuenta
   (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
 - **Telegram:** hecho, **desplegado y con el webhook registrado** (sábado, tarde). Es el canal
@@ -272,11 +273,11 @@ pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)
       cuántos días alcanzan y, con **menos de 7 días** (`AVISO_DIAS`), sale el aviso 🟡 «Hay que
       comprar» en `/f/[token]` con qué comprar para un mes. Para verlo: `/f/demo?escenario=para-saber`.
       Lo que falta, en orden:
-  - [ ] **Aplicar la migración** [`20261024160000_pastillas_e_inventario.sql`](../supabase/migrations/20261024160000_pastillas_e_inventario.sql):
-        pegarla en el SQL Editor del proyecto en Supabase, como la primera. Después,
-        `cd web && bun run test:integracion` tiene que dar 11 pruebas en verde (6 de alertas y 5 de
-        pastillas), y `bun --env-file=.env.local scripts/recipe-demo.ts` carga el récipe inventado
-        de Carmen en la casa de demo.
+  - [x] **Aplicar la migración** [`20261024160000_pastillas_e_inventario.sql`](../supabase/migrations/20261024160000_pastillas_e_inventario.sql):
+        pegada en el SQL Editor el sábado ~16:20. `bun run test:integracion` da 11 en verde, y
+        `scripts/recipe-demo.ts` cargó el récipe de Carmen: losartán (08:00 y 20:00) y metformina
+        (14:00). **Todavía no tiene cuántas quedan:** falta cargar una factura o contarlas a mano en
+        `/f/demo/pastillas`.
   - [ ] **`ANTHROPIC_API_KEY`** en Vercel y en `web/.env.local`. Sin ella la página dice que la
         lectura no está activada y deja probar con la factura de ejemplo. Nunca en el repo.
   - [ ] **La app de la casa llama `casa_tomar`** al tocar «Ya me la tomé» (no se tocó `app/`
