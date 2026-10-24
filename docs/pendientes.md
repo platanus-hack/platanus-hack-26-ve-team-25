@@ -75,7 +75,7 @@ webhook y el vigilante están hechos y verificados.
 Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en el teléfono desde los
 últimos cambios.
 
-**App de la casa ([`app/`](../app/README.md)), 111 pruebas:**
+**App de la casa ([`app/`](../app/README.md)), 116 pruebas:**
 
 - [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
       en chico y «Leer récipe».
@@ -96,6 +96,13 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
       real con una casa que se crea y se borra.
 - [x] Servicio en primer plano para que siga oyendo con la pantalla apagada
       ([`Guardia.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Guardia.kt)).
+- [x] «Lucero, estoy bien» encima de la alarma (sábado 19:00, tras la prueba en el Infinix:
+      solo se entendía cuando la sirena paraba). Después de cada frase, la sirena se calla 4 s y
+      la pantalla dice «Le escucho»; al cerrarse, Vosk lee justo esos segundos. Y mientras suena,
+      un filtro le quita la sirena al audio que va a Vosk: muescas en 520 Hz y sus múltiplos, que
+      la bajan más de 30 dB y a la voz menos de 1 ([`filtro.dart`](../app/lib/oido/filtro.dart)).
+      La sirena ahora se arma con sus armónicos, sin frecuencias fantasma que el filtro no podría
+      quitar. Falta probarlo en el teléfono.
 - [x] La rutina: cuenta lo de siempre que suena por franja del día y lo manda como «Su día»; si
       de día no suena nada en 3 horas, avisa una vez como «día distinto»
       ([`rutina.dart`](../app/lib/dominio/rutina.dart)).

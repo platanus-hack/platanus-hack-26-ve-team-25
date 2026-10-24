@@ -87,11 +87,42 @@ class _AlarmaState extends State<Alarma> with SingleTickerProviderStateMixin {
                           color: Colores.tinta,
                         ),
                       ),
-                      // Para quien está lejos del teléfono o en el suelo.
-                      const Text(
-                        'O diga «$nombreDeLaCasa, estoy bien»',
-                        style: TextStyle(fontSize: 20, color: Colores.tinta),
-                      ),
+                      // Para quien está lejos del teléfono o en el suelo. En los 4 s en que la
+                      // sirena se calla para escuchar, se dice en grande.
+                      if (c.ventanaParaHablar)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colores.tinta,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.mic_rounded, color: Colors.white),
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  'Le escucho: diga «$nombreDeLaCasa, estoy bien»',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        const Text(
+                          'O diga «$nombreDeLaCasa, estoy bien»',
+                          style: TextStyle(fontSize: 20, color: Colores.tinta),
+                        ),
                       const SizedBox(height: 18),
                       Row(
                         children: [

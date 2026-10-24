@@ -43,8 +43,10 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     /** Lo que dice en el próximo turno de voz. Dart lo cambia cerca del final. */
     private var frase = ""
 
+    private val canal = MethodChannel(mensajero, "casa/sirena")
+
     init {
-        MethodChannel(mensajero, "casa/sirena").setMethodCallHandler { call, result ->
+        canal.setMethodCallHandler { call, result ->
             when (call.method) {
                 "sonar" -> { frase = call.argument<String>("frase").orEmpty(); sonar(); result.success(null) }
                 "decir" -> { frase = call.argument<String>("frase").orEmpty(); result.success(null) }
@@ -65,15 +67,16 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
             v.setAudioAttributes(atributos())
             v.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(id: String?) {}
-                override fun onDone(id: String?) { reloj.post { volverAlTono() } }
+                override fun onDone(id: String?) { reloj.post { abrirVentana() } }
                 @Deprecated("Deprecated in Java")
-                override fun onError(id: String?) { reloj.post { volverAlTono() } }
+                override fun onError(id: String?) { reloj.post { abrirVentana() } }
             })
             vozLista = true
         }
     }
 
-    // Dos ciclos del tono (8 s), la frase, y otra vez el tono.
+    // Dos ciclos del tono (8 s), la frase, 4 s callados para que la persona conteste, y otra vez el
+    // tono.
     private val turnoDeVoz: Runnable = Runnable {
         val p = pista ?: return@Runnable
         val v = voz
@@ -82,7 +85,21 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
             return@Runnable
         }
         p.pause()
+        vibrador().cancel()
         v.speak(frase, TextToSpeech.QUEUE_FLUSH, null, "frase")
+    }
+
+    // Después de la frase, silencio: sin tono ni vibración, para que «Lucero, estoy bien» se oiga
+    // limpio. Dart muestra «Le escucho…» y, al cerrarse, reconoce lo que se dijo en ese rato.
+    private fun abrirVentana() {
+        if (pista == null) return
+        canal.invokeMethod("ventana", true)
+        reloj.postDelayed(cerrarVentana, VENTANA_MS)
+    }
+
+    private val cerrarVentana: Runnable = Runnable {
+        canal.invokeMethod("ventana", false)
+        volverAlTono()
     }
 
     private fun programarVoz(): Boolean = reloj.postDelayed(turnoDeVoz, CICLOS_ENTRE_FRASES * 4000L)
@@ -90,6 +107,7 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     private fun volverAlTono() {
         val p = pista ?: return
         p.play()
+        vibrar()
         programarVoz()
     }
 
@@ -116,9 +134,12 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
                 setLoopPoints(0, muestras.size, -1)
                 play()
             }
+        vibrar()
         programarVoz()
+    }
 
-        // El mismo ritmo en la vibración: espera, pulso, pausa… y se repite desde el principio.
+    // El mismo ritmo en la vibración: espera, pulso, pausa… y se repite desde el principio.
+    private fun vibrar() {
         val patron = longArrayOf(0, 500, 500, 500, 500, 500, 1500)
         val efecto = VibrationEffect.createWaveform(patron, 0)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -131,6 +152,7 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
 
     private fun callar() {
         reloj.removeCallbacks(turnoDeVoz)
+        reloj.removeCallbacks(cerrarVentana)
         voz?.stop()
         pista?.run {
             stop()
@@ -156,16 +178,24 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         }
 
     // Un ciclo de 4 s: tono 0,5 s, silencio 0,5 s, tono, silencio, tono, silencio 1,5 s.
+    //
+    // La onda cuadrada se arma sumando sus armónicos impares (520, 1.560, 2.600 Hz…) y no
+    // saltando de +1 a -1 muestra a muestra: así no aparecen frecuencias fantasma (aliasing), y toda
+    // la sirena cae en múltiplos exactos de 520 Hz, que es donde el filtro de Dart la corta para que
+    // Vosk entienda lo que se dice encima (lib/oido/filtro.dart).
     private fun cicloTemporal3(): ShortArray {
-        val muestras = ShortArray(TASA * 4)
         val medio = TASA / 2
-        val periodo = TASA.toDouble() / FRECUENCIA
-        for (pulso in 0 until 3) {
-            val inicio = pulso * TASA
-            for (i in 0 until medio) {
-                val arriba = (i % periodo) < periodo / 2
-                muestras[inicio + i] = (if (arriba) AMPLITUD else -AMPLITUD).toShort()
-            }
+        val pulso = DoubleArray(medio)
+        var k = 1
+        while (k * FRECUENCIA < TASA / 2.0 - 1000) {
+            val w = 2 * Math.PI * k * FRECUENCIA / TASA
+            for (i in 0 until medio) pulso[i] += Math.sin(w * i) / k
+            k += 2
+        }
+        val pico = pulso.maxOf { Math.abs(it) }
+        val muestras = ShortArray(TASA * 4)
+        for (n in 0 until 3) {
+            for (i in 0 until medio) muestras[n * TASA + i] = (pulso[i] / pico * AMPLITUD).toInt().toShort()
         }
         return muestras
     }
@@ -176,5 +206,6 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         // No a tope: una cuadrada al máximo satura el parlante de un teléfono viejo y suena rota.
         const val AMPLITUD = 26000
         const val CICLOS_ENTRE_FRASES = 2
+        const val VENTANA_MS = 4000L
     }
 }

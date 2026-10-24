@@ -14,6 +14,8 @@ import '../dominio/pedidos.dart';
 import '../dominio/respuesta.dart';
 import '../dominio/rutina.dart';
 import '../dominio/tipos.dart';
+import '../oido/filtro.dart';
+import '../oido/nivel.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
 
@@ -39,6 +41,7 @@ class Controlador extends ChangeNotifier {
     );
     _oyendo = escuchas?.listen(_alOir);
     _finDeWhatsApp = telefono?.finDeWhatsApp.listen(_alTerminarWhatsApp);
+    _ventanas = sirena?.ventanas.listen(_alAbrirseLaVentana);
   }
 
   /// El mismo sonido no vuelve a preguntar «¿Está bien?» antes de este tiempo.
@@ -107,6 +110,13 @@ class Controlador extends ChangeNotifier {
 
   /// Lo de siempre que suena en la casa, y el silencio de día que no es normal.
   final rutina = Rutina();
+
+  StreamSubscription<bool>? _ventanas;
+
+  /// True mientras la sirena se calla para que la persona conteste: la pantalla dice «Le
+  /// escucho…».
+  bool ventanaParaHablar = false;
+  DateTime? _ventanaDesde;
 
   /// Hasta cuándo no se hace caso a los sonidos: justo después de callar la alarma, el oído
   /// todavía tiene el tono de 520 Hz en el anillo y abriría otro «¿Está bien?».
@@ -317,20 +327,58 @@ class Controlador extends ChangeNotifier {
         final desde = ahora.difference(llamada.desde);
         if (desde < cuanto) cuanto = desde;
       }
-      final versiones = await frases.reconocer(microfono.ultimoAudio(cuanto));
-      final orden = ordenPorVoz(versiones);
-      if (orden != null && _obedecer(orden)) return;
-      final pedido = pedidoPorVoz(versiones);
-      if (pedido == null) return;
-      // Pedir ayuda mientras «¿Está bien?» pregunta es la respuesta: no está bien. Llama ya.
-      if (_alerta?.estado == EstadoAlerta.pendiente) {
-        necesitoAyuda();
-      } else {
-        oirEvento(pedido);
-      }
+      _actuar(await frases.reconocer(_paraVosk(microfono.ultimoAudio(cuanto))));
     } finally {
       _reconociendo = false;
       notifyListeners();
+    }
+  }
+
+  /// La sirena se calló para escuchar (true) o volvió (false). Al cerrarse la ventana, se
+  /// reconoce justo lo que se dijo en ella, aunque YAMNet no haya llegado a marcarlo como voz.
+  void _alAbrirseLaVentana(bool abierta) {
+    ventanaParaHablar = abierta && _alerta?.estado == EstadoAlerta.pendiente;
+    if (abierta) {
+      _ventanaDesde = ahora;
+    } else {
+      final desde = _ventanaDesde;
+      _ventanaDesde = null;
+      final frases = this.frases;
+      final microfono = this.microfono;
+      if (desde != null &&
+          frases != null &&
+          microfono != null &&
+          _alerta?.estado == EstadoAlerta.pendiente) {
+        var cuanto = ahora.difference(desde);
+        if (cuanto > audioDelPedido) cuanto = audioDelPedido;
+        unawaited(
+          frases
+              .reconocer(_paraVosk(microfono.ultimoAudio(cuanto)))
+              .then(_actuar, onError: (_) {}),
+        );
+      }
+    }
+    notifyListeners();
+  }
+
+  /// Mientras suena la sirena, Vosk recibe el audio sin ella (filtro.dart). YAMNet sigue oyendo
+  /// todo: el filtro es solo para entender lo que se dice encima.
+  Uint8List _paraVosk(Uint8List pcm) {
+    if (_alerta?.estado != EstadoAlerta.pendiente) return pcm;
+    return pcm16DeMuestras(quitarSirena(LectorPcm16().leer(pcm)));
+  }
+
+  /// Lo que se entendió: una orden, un pedido de ayuda, o nada.
+  void _actuar(List<String> versiones) {
+    final orden = ordenPorVoz(versiones);
+    if (orden != null && _obedecer(orden)) return;
+    final pedido = pedidoPorVoz(versiones);
+    if (pedido == null) return;
+    // Pedir ayuda mientras «¿Está bien?» pregunta es la respuesta: no está bien. Llama ya.
+    if (_alerta?.estado == EstadoAlerta.pendiente) {
+      necesitoAyuda();
+    } else {
+      oirEvento(pedido);
     }
   }
 
@@ -432,7 +480,7 @@ class Controlador extends ChangeNotifier {
 
   /// Lo que dice la voz del teléfono entre los tonos de «¿Está bien?».
   String get fraseDeLaAlarma =>
-      '${casa.nombre}, ¿está bien? Si está bien, deslice el botón.';
+      '${casa.nombre}, ¿está bien? Diga «$nombreDeLaCasa, estoy bien», o deslice el botón.';
 
   /// Lo que dice cuando quedan [avisoFinal]: lo mismo que promete la pantalla.
   String get fraseDelFinal => primerContacto.telefono.isNotEmpty
@@ -496,6 +544,7 @@ class Controlador extends ChangeNotifier {
     _tic.cancel();
     _oyendo?.cancel();
     _finDeWhatsApp?.cancel();
+    _ventanas?.cancel();
     super.dispose();
   }
 }

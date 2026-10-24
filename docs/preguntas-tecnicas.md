@@ -9,7 +9,7 @@ respuesta dice en qué estado está:
 - ❌ **No se hizo**, y se dice.
 
 Al sábado 24-oct-2026, 18:30. **Lo de la app de la casa está probado con pruebas automáticas
-(111) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
+(116) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
 repitió desde los últimos cambios.**
 
 ## El audio y la privacidad
@@ -98,6 +98,17 @@ cuadrada despertó al 92% de las personas con pérdida auditiva, contra el 56% d
 ([investigacion-audio.md §1.1](investigacion-audio.md)). Suena con el patrón temporal-3 de las
 alarmas de humo, por el canal de alarma (aunque el teléfono esté en silencio), y la voz que
 pregunta es la del teléfono, grave y lenta, con frases fijas: predecible y sin internet.
+
+### ¿Cómo se entiende «Lucero, estoy bien» con la sirena sonando?
+
+✅ De dos formas. Después de cada frase de la voz del teléfono, la sirena se calla 4 s y la
+pantalla dice «Le escucho»; al cerrarse, Vosk lee justo esos segundos del anillo. Y mientras
+suena, Vosk recibe el audio sin la sirena: no se emite la onda contraria por el parlante (la
+cancelaría también para quien la tiene que oír), sino que se resta en lo que oye el micrófono.
+Como la sirena es una onda cuadrada de 520 Hz armada con sus armónicos, toda su energía está en
+múltiplos de 520 Hz; un filtro muesca en cada uno la baja más de 30 dB y a una voz entre ellos,
+menos de 1 dB ([`filtro.dart`](../app/lib/oido/filtro.dart), con pruebas). YAMNet sigue oyendo el
+audio completo.
 
 ### ¿Y una caída silenciosa?
 
@@ -193,7 +204,7 @@ contactos, condición de salud), nunca audio. Para el demo, todos los datos son 
 ## Cómo comprobarlo
 
 ```bash
-make test                # 111 pruebas de la app de la casa
+make test                # 116 pruebas de la app de la casa
 make test-integracion    # la app contra la base real, con una casa que se crea y se borra
 cd web && bun test       # la web: estado de la familia, audio, inventario
 cd experimentos/modelos-audio && uv sync && ./descargar.sh && uv run comparar.py

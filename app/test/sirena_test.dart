@@ -9,8 +9,17 @@ import 'package:casa/oido/sonidos.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'voz_falsa.dart';
+
 class SirenaFalsa implements Sirena {
   final pasos = <String>[];
+  final _ventanas = StreamController<bool>.broadcast(sync: true);
+
+  /// Simula que la sirena se calla para escuchar (true) o vuelve (false).
+  void ventana(bool abierta) => _ventanas.add(abierta);
+
+  @override
+  Stream<bool> get ventanas => _ventanas.stream;
 
   @override
   Future<void> sonar(String frase) async => pasos.add('sonar: $frase');
@@ -56,7 +65,7 @@ void main() {
   test('«¿Está bien?» suena mientras espera y se calla con «Estoy bien»', () {
     c.oirEvento(TipoEvento.alarma);
     expect(sirena.pasos, [
-      'sonar: Carmen, ¿está bien? Si está bien, deslice el botón.',
+      'sonar: Carmen, ¿está bien? Diga «Lucero, estoy bien», o deslice el botón.',
     ]);
     c.estoyBien();
     expect(sirena.pasos.last, 'callar');
@@ -101,5 +110,36 @@ void main() {
       'decir: Carmen, si no responde, voy a avisar a su familia.',
     ]);
     c.dispose();
+  });
+
+  testWidgets(
+    'en la ventana callada dice «Le escucho…» y entiende lo que se dijo',
+    (tester) async {
+      final frases = FrasesFalsas(['lucero estoy bien']);
+      final c = Controlador(
+        casa: casaSimulada,
+        reloj: () => ahora,
+        sirena: sirena,
+        frases: frases,
+        microfono: MicrofonoFalso(),
+      );
+      c.oirEvento(TipoEvento.golpe);
+      sirena.ventana(true);
+      expect(c.ventanaParaHablar, isTrue);
+
+      ahora = ahora.add(const Duration(seconds: 4));
+      sirena.ventana(false);
+      await tester.pump();
+      // Reconoció justo los 4 s de la ventana, y «Lucero, estoy bien» calló la alarma.
+      expect(frases.audios, [32000 * 4]);
+      expect(c.alerta, isNull);
+      expect(sirena.pasos.last, 'callar');
+      c.dispose();
+    },
+  );
+
+  test('sin alarma no hay ventana', () {
+    sirena.ventana(true);
+    expect(c.ventanaParaHablar, isFalse);
   });
 }
