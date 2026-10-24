@@ -38,7 +38,6 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 
 | Mejora | Por qué | Qué hace falta |
 |---|---|---|
-| **Telegram** | Llega a cualquiera sin verificación de negocio, a diferencia del sandbox de Kapso. Se cortó del demo el sábado 14:30 | Bot, webhook de `/start` y el mismo `/api/vigilar` ([pendientes.md](pendientes.md), punto 4b) |
 | **Push nativo** | No depender de WhatsApp ni de Telegram | Cuenta de Apple y Firebase Cloud Messaging |
 | **SMS automático cumpliendo la política de Play** | Avisar sin internet | Que la app sea la de SMS predeterminada del teléfono de la casa, que es un teléfono dedicado |
 | **Llamada en altavoz al vecino** | El vecino oye la sala y puede hablar con la persona | Permiso de llamadas y pruebas por marca |

@@ -22,7 +22,8 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
   Falta aplicar la migración de pastillas.
 - **WhatsApp (Kapso):** código escrito y **sin desplegar**. Meta restringió la cuenta
   (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
-- **Telegram:** cortado el sábado 14:30. Va como proyección ([futuro.md](futuro.md)).
+- **Telegram:** hecho por Josuep el sábado 15:25 y desplegado. Es el canal general. Falta el
+  `setWebhook` y el proceso que llame `/api/vigilar`.
 - **Alcance congelado el sábado 14:30:** lo que se presenta y quién hace qué está en
   [plan.md](plan.md#alcance-congelado-lo-que-se-presenta). Lo que no está ahí no se construye.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
@@ -171,10 +172,11 @@ El código ya está escrito: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
       *Sin hacer: hay que pegarla a mano en el SQL Editor de Supabase, como la primera, y no se ha
       pegado.*
 
-### 4b. El mismo aviso por Telegram · *cortado el sábado 14:30*
+### 4b. El mismo aviso por Telegram · *Josuep*
 
-**Fuera del alcance:** el público ve la alerta en la web y el WhatsApp de Kapso llega a la tarima.
-Lo de abajo queda como guía si se retoma.
+**Hecho el sábado 15:25** (`5ad9671`, `24a0bd8`) y desplegado. Falta el `setWebhook` y el proceso
+que llame `/api/vigilar`: sin él no sale ningún aviso. La lista de abajo es la de antes de
+empezar.
 
 El sandbox no sirve para «que le llegue a todos»: cada teléfono necesita sesión activa y la
 apelación de Meta tarda 24-48 h. **Telegram sí llega a cualquiera sin verificación de negocio**, y

@@ -26,10 +26,10 @@
   no entra en el demo.)*
 - **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
   porque su familia confía.
-- **El aviso real sale por dos vías.** La casa llama por WhatsApp al primer contacto, con respaldo
-  por llamada normal, y Kapso le manda el WhatsApp a los teléfonos activados en su sandbox. El
-  público ve la alerta en la web. *(Telegram se cortó el sábado 14:30: Meta restringió la cuenta de
-  WhatsApp, y no había una línea de Telegram escrita.)*
+- **El aviso real sale por tres vías.** La casa llama por WhatsApp al primer contacto, con
+  respaldo por llamada normal. **Telegram es el canal general:** cualquiera se suscribe con un
+  toque desde el QR y recibe el aviso (Josuep, sábado 15:25). Kapso le manda el WhatsApp solo a los
+  teléfonos activados en su sandbox, porque Meta restringió la cuenta.
 - **Se vende como un acompañante del día a día, y el oído sigue siendo el centro.** El pitch abre
   con lo de todos los días (la pastilla, la llamada con un toque) y llega a la alarma. No es un
   asistente médico: ya hubo proyectos así en Platanus (Tata y Memo, PH25), el track es Emergencias
@@ -54,7 +54,8 @@
    frase de ayuda dicha en voz alta.
 2. Suena una alarma fuerte en la casa: «¿Está bien?». La pantalla destella y vibra.
 3. Si nadie responde en 60 s, la alerta escala: la web de la familia se pone roja, la casa llama
-   por WhatsApp al primer contacto y Kapso manda el WhatsApp.
+   por WhatsApp al primer contacto, y el vigilante manda el Telegram a todos los suscritos y el
+   WhatsApp de Kapso.
 4. Cada «Estoy bien» queda anotado en la base. Que ajuste los umbrales de esa casa es proyección.
 
 ## Alcance congelado: lo que se presenta
@@ -71,26 +72,26 @@ Todo esto ya está escrito. Falta probarlo en el teléfono y conectarlo:
 | 1 | Instalar la app en el teléfono de la tarima y pasar la lista de prueba ([pendientes.md](pendientes.md), punto 1) | Abrahan | 17:00 | Nada se ha probado en un teléfono real. Sin esto no hay demo |
 | 2 | Que «¿Está bien?» suene (520 Hz) y vibre | Abrahan | 17:00 | Hoy solo se ve. Una alarma muda no convence en la tarima |
 | 3 | El ciclo casa → Supabase → `/f/demo` abierta en 5 a 10 teléfonos a la vez | Rogelio | 17:00 | Es lo que vive el público |
-| 4 | Kapso: migración `whatsapp`, deploy, webhook apuntando a `/api/kapso/webhook` y un cron que llame `/api/vigilar` | Josuep | 20:00 | El código está escrito. Es la integración real que ven los jueces |
+| 4 | Avisos: un proceso que llame `/api/vigilar` cada pocos segundos, el `setWebhook` de Telegram y el webhook de Kapso apuntando a `/api/kapso/webhook` | Josuep | 17:00 | Sin el proceso no sale ningún aviso: la alerta escala y nadie se entera. Es la integración real que ven los jueces |
 | 5 | Pastillas: migración, `ANTHROPIC_API_KEY` en Vercel y `casa_tomar` desde la app | Abrahan y Rogelio | 20:00 | La web está hecha, falta conectarla |
 | 6 | Nombre del producto, README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
 
-**Se cortó y va como proyección:** Telegram, la vibración del piso, el apagón con el perfil de
+**Se cortó y va como proyección:** la vibración del piso, el apagón con el perfil de
 salud, la ficha de emergencia, el teléfono personal de la persona con la pregunta del ánimo, el
 pedido de las pastillas a domicilio, la cámara, el modo kiosco, la rutina y la lectura del récipe
 por foto.
 
 ## Demo
 
-1. Un teléfono en la tarima es la casa de «la señora Carmen» (inventada). El público escanea el QR
-   y su teléfono pasa a ser la familia.
+1. Un teléfono en la tarima es la casa de «la señora Carmen» (inventada). El público escanea el QR,
+   su teléfono pasa a ser la familia y se suscribe por Telegram con un toque.
 2. **El día a día.** Suena el recordatorio de la pastilla y «Carmen» toca «Ya me la tomé». En la
    web de la familia se ve cuántos días de losartán le quedan.
 3. **La falsa alarma.** Un golpe fuerte junto al teléfono. Sale «¿Está bien?», «Carmen» dice que
    está bien y no escala. Es el filtro: despreocupar, no angustiar.
 4. **La alerta.** Otro golpe y nadie responde. Mientras corren los 60 s se cuenta el problema, con
-   las cifras. Al vencer, se pone roja la web de todos los que escanearon, la casa llama por
-   WhatsApp al hijo y a la tarima le llega el WhatsApp de Kapso. Los tiempos son los del producto:
+   las cifras. Al vencer, se pone roja la web de todos los que escanearon, a cada uno le llega el
+   Telegram, la casa llama por WhatsApp al hijo y a la tarima le llega el WhatsApp de Kapso. Los tiempos son los del producto:
    nada se acelera.
 
 Si algo falla en vivo, `/f/demo?escenario=alerta` muestra lo mismo con datos simulados, y queda el
@@ -159,8 +160,8 @@ Lo que ya hay, sin costo:
 - **Aviso de respaldo:** si no contestan el WhatsApp, la casa llama por teléfono normal.
 
 > **Cómo quedó el sábado en la tarde:** Meta restringió la cuenta de WhatsApp y solo funciona el
-> sandbox de Kapso, con cada teléfono activado a mano. El vigilante quedó como `/api/vigilar` en la
-> web y le falta un cron que lo llame. De Claude se usa la lectura de la factura de la farmacia; el
+> sandbox de Kapso, con cada teléfono activado a mano, y Telegram pasó a ser el canal general. El
+> vigilante quedó como `/api/vigilar` en la web y le falta el proceso que lo llame. De Claude se usa la lectura de la factura de la farmacia; el
 > resumen de la mañana y las preguntas por WhatsApp van como proyección.
 
 ### Propuesta: qué hace cada crédito
