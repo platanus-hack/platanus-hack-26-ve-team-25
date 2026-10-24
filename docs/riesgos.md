@@ -206,6 +206,31 @@ avisos. El adulto mayor confía porque su familia confía. Por eso:
 - **El wifi del evento se satura** con 50 teléfonos. Salida: el teléfono de la tarima usa datos
   propios.
 - **La TV que grita** tiene que no disparar en vivo. Ensayarlo antes de las 20:00.
+- **Probar el micrófono al lado de una corneta del evento no sirve.** Para comparar modelos no
+  hace falta micrófono: se usan archivos de audio (`experimentos/modelos-audio`). La prueba con
+  micrófono real se hace en un cuarto tranquilo, una escalera o un carro, a 1 m y a 4 m. Y se
+  hace una vez con ruido fuerte a propósito: si funciona con la corneta, funciona en una casa.
+
+## Cómo contar la verdad
+
+Los jueces son técnicos y tienen un agente leyendo el repo. Una exageración que encuentren cuesta
+más que una limitación que contemos nosotros.
+
+1. **Decir con qué se probó y cuánto.** Por ejemplo: «Probamos con 640 sonidos de casa del set
+   ESC-50 y con N voces de más de 60 años de Common Voice», no «detecta todo».
+2. **Mostrar los números, también los malos.** Por ejemplo: «Reconoce la tos y el vidrio. Le
+   cuesta el quejido débil: 6 de 10». Un número malo explicado da confianza.
+3. **Separar el demo de la realidad, en voz alta:**
+    - «En el demo la cuenta regresiva es de 15 s; en una casa es de 60 s».
+    - «El morral que cae representa una caída. Una caída silenciosa la detectamos por la
+      rutina, no por el golpe».
+    - Si se usa el botón oculto de «modo demo» porque la sala no deja oír, se dice: «La sala está
+      muy ruidosa, así que disparamos el evento a mano».
+4. **El README dice lo mismo que el pitch.** Una sección «Qué funciona y qué no» con la tabla de
+   resultados y las limitaciones. El agente del jurado la va a comparar con lo que digamos.
+5. **Lo que no existe se dice en futuro.** «La prueba en casas reales es el siguiente paso», no
+   «está probado con abuelos».
+6. **Cifras con fuente o no van.** Las de emigrados y caídas, con el enlace en el repo.
 
 ## Que sume y no reste
 

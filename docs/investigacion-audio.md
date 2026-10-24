@@ -64,6 +64,26 @@ combinan cuatro fuentes. Las grabaciones de personas reales nunca se suben al re
 En el pitch se dice tal cual: «Probado con voces mayores de Common Voice y voces reales donadas.
 La prueba en casas de verdad es el siguiente paso».
 
+**Cuántas notas de voz hacen falta.** Las usamos para medir, no para entrenar, así que importa
+más cuántas *personas* que cuántas notas.
+
+- **Meta: 10 personas de 60 años o más, 5 mujeres y 5 hombres, 5 notas cada una: 50 notas.**
+  Con 10 personas se puede decir «detectó a 9 de 10», que cualquiera entiende.
+- **Mínimo: 5 personas, 25 notas.** Con menos, cualquier resultado es anécdota.
+- **Las 5 notas:** «Estoy bien», un «¡ayuda!» débil, un quejido, una tos y «Huele a gas».
+  Que digan también su década de edad: sesenta, setenta u ochenta.
+- **Ojo con la distancia:** una nota de WhatsApp se graba con el teléfono pegado a la boca y
+  comprimida. En la casa, el abuelo estará a 3–4 m. Para simularlo, cada nota se reproduce desde
+  un parlante chico a 3–4 m del teléfono de prueba, en un cuarto tranquilo, y se graba de nuevo.
+
+Mensaje para pedirlas:
+
+> Hola, estamos en una hackatón haciendo una app que avisa a la familia si a un adulto mayor que
+> vive solo le pasa algo. Necesitamos probar si reconoce bien la voz de personas mayores. ¿Tu
+> abuela/abuelo nos ayudaría con 5 notas de voz cortas? Las frases son: «Estoy bien», «ayuda»
+> dicho bajito, un quejido como «ay», una tos y «huele a gas». Solo las usamos para medir este
+> fin de semana, no se publican y las borramos el lunes. ¿Nos dices su edad aproximada?
+
 ## 1.2 El audio llega crudo a YAMNet
 
 **Decidido: no se limpia el audio.** YAMNet se entrenó con audio crudo y ruidoso (videos de
@@ -136,6 +156,45 @@ géneros de música, así que lo que vale para nosotros se mide con nuestras pro
 Los datos de YAMNet son aproximados y salen de su documentación. Los de EfficientAT y PANNs, de sus
 repositorios. EfficientAT y PANNs están en PyTorch: pasarlos a TFLite para Flutter es un paso más
 que hay que probar (pregunta 2).
+
+### Resultado de la comparación (24-oct, madrugada)
+
+Corrimos los modelos sobre 640 sonidos de casa de ESC-50, en la computadora, con un solo hilo.
+El código y las tablas completas están en
+[experimentos/modelos-audio](../experimentos/modelos-audio/README.md).
+
+| Modelo | MB | ms por 1 s de audio | Acierto top-5, ventanas de 1 s | Acierto top-5, ventanas de 5 s |
+|---|---|---|---|---|
+| YAMNet (TFLite) | 4,1 | 2,5–4,8 | **82%** | 81% |
+| EfficientAT mn04 (ONNX) | 4,3 | 3,8–4,4 | 64% | 83% |
+| EfficientAT mn10 (ONNX) | 19,8 | 5,4–6,4 | 0% (se rompe) | 79% |
+| PANNs MobileNetV1 (ONNX) | 23,6 | 5,2–5,5 | 76% | 80% |
+| PANNs Cnn14 (ONNX) | 327 | 58–67 | 81% | 83% |
+| sherpa CED tiny int8 | 6,1 | 5,7–5,8 | 54% | **86%** |
+| sherpa CED mini int8 | 10,5 | 7,4–7,9 | 55% | **87%** |
+| sherpa Zipformer small int8 | 27 | 22–26 | 81% | 87% |
+
+**Lo que dice:**
+
+1. **Las dos conversiones funcionan.** EfficientAT y PANNs pasan de PyTorch a ONNX con el
+   espectrograma adentro y dan lo mismo que en PyTorch (diferencia menor a 0,000001).
+2. **El largo de la ventana decide.** Con ventanas de 1 s, como hoy en `/escucha`, gana YAMNet:
+   está hecho para eso. Con ventanas de 5 s ganan los CED de sherpa, que se entrenaron con clips
+   largos.
+3. **La diferencia es chica**: 81% contra 86–87%, en 640 clips. Es real, pero no cambia el demo.
+4. **Todos menos Cnn14 y Zipformer analizan 1 s de audio en menos de 10 ms** en la computadora.
+   En un teléfono viejo será varias veces más lento y seguirá sobrando tiempo, pero hay que
+   medirlo.
+5. **Las clases difíciles son las mismas para todos**: la puerta que cruje (15–30%) y la lavadora
+   (2–10%). No son emergencias.
+
+**Decisión propuesta:** se queda **YAMNet** para el núcleo, porque ya funciona y cumple el
+criterio. **sherpa CED tiny int8 con ventanas de 5 s** es el candidato si sobra tiempo: suma 5
+puntos y el mismo paquete de Flutter trae la palabra clave y la detección de voz. Una ventana de
+5 s tarda hasta 5 s más en avisar, y eso no importa si la alarma de la casa espera 60 s.
+
+**Límites:** ESC-50 son grabaciones limpias y cercanas, sin TV, sin distancia y sin voces de
+personas mayores. Falta medir con Common Voice 60+ y en el teléfono.
 
 ### Criterio de decisión
 

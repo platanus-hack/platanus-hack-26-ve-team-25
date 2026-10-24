@@ -1,0 +1,31 @@
+[project]
+name = "modelos-audio"
+version = "0.1.0"
+description = "Compara YAMNet, EfficientAT, PANNs y sherpa-onnx en velocidad y aciertos"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "torch",
+    "torchaudio",
+    "torchvision",
+    "onnx",
+    "onnxruntime",
+    "onnxscript",
+    "sherpa-onnx",
+    "ai-edge-litert",
+    "numpy",
+    "soundfile",
+    "librosa",
+    "torchlibrosa",
+    "pandas",
+    "tabulate>=0.10.0",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
