@@ -47,19 +47,21 @@ archivo no se sube, porque el repo es público.
       «Ya la tomé» y «Recuérdame en 10 min».
 - [ ] Anotar aquí lo que falló, con el modelo del teléfono y su versión de Android.
 
-### 2. Pasar a Flutter el reposo nuevo · *por asignar*
+### 2. El reposo nuevo · *Abrahan*
 
-En el lienzo, la pantalla «Casa · En reposo» ya tiene el diseño nuevo: un **listón de la
-pastilla arriba**, el **reloj centrado** y más arriba que abajo, y **solo «Pedir ayuda»**,
-grande. Abrahan pidió verlo; **falta que lo apruebe** antes de programarlo.
+Decidido por Abrahan el sábado 24: **«Pedir ayuda» ocupa el panel derecho** de arriba abajo, las
+**pastillas van en chico** abajo del reloj, y al lado un botón chico **«Leer récipe»**.
+**«Huele a gas» y «Me siento mal» dejan de ser botones y se dicen en voz alta.**
 
-- [ ] Que Abrahan apruebe el mockup.
-- [ ] Reescribir [`app/lib/ui/reposo.dart`](../app/lib/ui/reposo.dart) con ese diseño.
-- [ ] **Decidir con el equipo** qué pasa con «Huele a gas» y «Me siento mal»: el mockup nuevo los
-      quita, pero «la persona como sensor» es una decisión de [contexto.md](contexto.md). Si se
-      quitan, actualizar esa decisión y [preguntas-tecnicas.md](preguntas-tecnicas.md).
-- [ ] Dejar los toques largos de prueba (reloj → alarma, «Pastillas de hoy» → recordatorio) y
-      actualizar las pruebas de [`widget_test.dart`](../app/test/widget_test.dart).
+- [x] [`reposo.dart`](../app/lib/ui/reposo.dart) con ese diseño, con los toques largos de prueba.
+- [x] Pedir por voz: `pedidoPorVoz` en [`respuesta.dart`](../app/lib/dominio/respuesta.dart) y
+      `_escucharPedido` en el [controlador](../app/lib/ui/controlador.dart). Pasa por «¿Está
+      bien?», no llama directo, porque la voz puede ser de la TV.
+- [x] [contexto.md](contexto.md) actualizado: la persona sigue siendo sensor, por voz.
+- [ ] **Probarlo en el teléfono:** decir «me huele a gas» dos veces con la TV apagada y con la TV
+      prendida. Ver cuánto molesta el pitido del reconocedor de Android, si lo hace.
+- [ ] «Leer récipe» abre una pantalla que dice que todavía no está lista: falta la cámara y el
+      OCR (ver P1, «Las pastillas desde la foto del récipe»).
 
 ### 3. Supabase: que la casa y la familia hablen · *Josuep, alertas y conexión*
 

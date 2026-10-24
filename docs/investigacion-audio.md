@@ -32,7 +32,7 @@ y la música, y la voz de la TV es voz humana de verdad.
    casa tiene uno, el teléfono lo oye y avisa aunque el abuelo no reaccione. Falta confirmar
    cuántas casas en Venezuela tienen detector. Si son pocas, vale más para los abuelos que viven
    fuera, o como accesorio barato que la familia manda a instalar. El gas de las bombonas no se
-   oye: para eso está el botón «Huele a gas».
+   oye: para eso la persona puede decir «huele a gas» en voz alta.
 
 Pendiente de medir: en qué frecuencias cae el golpe de una caída de una persona sobre cerámica, a
 3–5 m del teléfono.

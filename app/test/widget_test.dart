@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:casa/datos/simulado.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:casa/main.dart';
+import 'package:casa/oido/oido.dart';
+import 'package:casa/oido/sonidos.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -280,6 +284,90 @@ void main() {
     c.oirEvento(TipoEvento.alarma);
     await tester.pump();
     expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
+    await _cerrar(tester, c);
+  });
+
+  group('pedir por voz, sin botones', () {
+    late VozFalsa voz;
+    late MicrofonoFalso mic;
+    late StreamController<Escucha> oido;
+    late Controlador c;
+
+    Escucha oye(Map<String, double> clases) => Escucha(
+      db: -40,
+      fondo: -50,
+      compuerta: false,
+      top: [for (final e in clases.entries) Clase(e.key, e.value)],
+    );
+
+    Future<void> abrir(WidgetTester tester) async {
+      comoRelojDeMesa(tester);
+      voz = VozFalsa();
+      mic = MicrofonoFalso();
+      oido = StreamController<Escucha>();
+      c = Controlador(
+        casa: casaSimulada,
+        reloj: temprano,
+        escuchas: oido.stream,
+        voz: voz,
+        microfono: mic,
+      );
+      await tester.pumpWidget(AppCasa(controlador: c));
+    }
+
+    testWidgets('«me huele a gas» pregunta «¿Está bien?» con el motivo', (
+      tester,
+    ) async {
+      await abrir(tester);
+      expect(find.text('Huele a gas'), findsNothing);
+
+      oido.add(oye({'Speech': 0.8}));
+      await tester.pump();
+      expect(voz.escucho, isTrue);
+      expect(mic.pasos, ['pausar']);
+      expect(find.text('Le escucho…'), findsOneWidget);
+
+      voz.responder(['me huele a gas']);
+      await tester.pump();
+      await tester.pump();
+      expect(mic.pasos, ['pausar', 'reanudar']);
+      expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
+      expect(find.text(TipoEvento.hueleGas.frase), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('la voz de la TV no despierta al reconocedor', (tester) async {
+      await abrir(tester);
+      oido.add(oye({'Speech': 0.7, 'Television': 0.4}));
+      await tester.pump();
+      expect(voz.escucho, isFalse);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('una conversación cualquiera vuelve al reposo', (tester) async {
+      await abrir(tester);
+      oido.add(oye({'Speech': 0.9}));
+      await tester.pump();
+      voz.responder(['qué rico está el café']);
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+  });
+
+  testWidgets('«Leer récipe» dice que todavía no está lista y vuelve', (
+    tester,
+  ) async {
+    comoRelojDeMesa(tester);
+    final c = Controlador(casa: casaSimulada, reloj: temprano);
+    await tester.pumpWidget(AppCasa(controlador: c));
+    await tester.tap(find.text('Leer récipe'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Todavía no está lista'), findsOneWidget);
+    await tester.tap(find.text('Volver'));
+    await tester.pumpAndSettle();
+    expect(find.text('Cuidando la casa'), findsOneWidget);
     await _cerrar(tester, c);
   });
 }

@@ -76,7 +76,7 @@ app/
 |---|---|---|---|---|
 | 1 | **¿Está bien?** (`alarma.dart`) | Cuenta regresiva de 60 s, «Estoy bien» cancela, «Necesito ayuda» escala ya | Tono de 520 Hz en onda cuadrada en bucle, vibración, el fondo destella. Pasar la mano por encima (sensor de proximidad) cuenta como «Estoy bien» | Se dispara con un botón de prueba, cuenta, y cada salida lleva al estado correcto |
 | 2 | **Avisando a la familia** (`ayuda.dart`) | Muestra a quién se avisó y su estado. «Fue sin querer» cancela | Los estados de los contactos vienen de los datos, simulados por ahora | Llega desde 1 o desde el pánico y vuelve a reposo al cancelar |
-| 3 | **En reposo** (`reposo.dart`) | Reloj, estado «Cuidando la casa», pánico y los tres botones de la persona | Fondo negro y brillo bajo. «Pedir ayuda» va directo a 2. «Huele a gas» y «Me siento mal» son 🔴. «Estoy bien hoy» es el 🟢 del día | Cada botón crea el evento correcto |
+| 3 | **En reposo** (`reposo.dart`) | Reloj, estado «Cuidando la casa», «Pedir ayuda» en todo el panel derecho, la pastilla en chico y «Leer récipe» | Fondo negro y brillo bajo. «Pedir ayuda» va directo a 2. «Huele a gas» y «Me siento mal» se dicen en voz alta y pasan por 1 | Cada gesto crea el evento correcto |
 | 4 | **Configuración** (`configurar.dart`) | Nombre, contactos, salud y QR | Para el demo puede quedar con datos fijos. El QR lleva el enlace de invitación | P1: el demo funciona sin ella |
 
 Paquetes ([investigacion-audio.md §4](investigacion-audio.md)): `flutter_foreground_task`,

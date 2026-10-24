@@ -51,7 +51,7 @@ Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 | El silencio también avisa | Si la casa deja de reportar, la familia lo ve |
 | Tres niveles de aviso y un presupuesto al día | La meta es que la familia esté tranquila. Si la app suena por todo, la silencian y el día que importa no la ven |
 | El perfil de salud cambia las reglas | Un apagón es una molestia para unos y una emergencia para quien usa oxígeno. Reglas generales por condición, calibradas por casa. No entrenamos un modelo por persona: no hay datos ni tiempo |
-| La persona también es sensor | «Huele a gas» o «me siento mal» lo confirma un humano: no hay falso positivo. Y cubre lo que el teléfono no puede oler |
+| La persona también es sensor | «Huele a gas» o «me siento mal» lo dice un humano, y cubre lo que el teléfono no puede oler. Se dice en voz alta, sin botón (sábado 24): la pantalla deja todo el espacio a «Pedir ayuda». Como la voz puede venir de la TV, pasa por «¿Está bien?» antes de avisar |
 | Todo lo posible en el teléfono | Sin luz ni internet, que en Venezuela es lo normal, la alarma local sigue funcionando y los eventos esperan en cola |
 | Flutter, Supabase y Telegram | Flutter da micrófono en segundo plano, batería y SMS en el teléfono de la casa. Telegram suena en cualquier teléfono sin pagar cuentas de desarrollador |
 | El cliente es el que cuida | Paga, configura y recibe los avisos el hijo o el familiar lejos. El adulto mayor confía porque su familia confía |

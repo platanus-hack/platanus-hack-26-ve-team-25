@@ -8,7 +8,13 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   (fuente `UNPROCESSED`) y nunca sale del teléfono.
 - **La alerta:** una máquina de estados en Dart puro. «Estoy bien» se desliza para no apagarla por
   reflejo; «Necesito ayuda» es un toque.
-- **Las pastillas del día:** el reloj muestra cuál le toca y «Ya la tomé». A la hora, una pantalla
+- **El reposo:** el reloj grande y, a la derecha, «Pedir ayuda» de arriba abajo. Abajo, en chico,
+  la pastilla que le toca o la próxima, y «Leer récipe», que todavía solo dice que no está lista.
+- **Pedir en voz alta:** cuando YAMNet oye hablar a alguien (y no es la TV), el reconocimiento de
+  voz escucha 6 s, como mucho cada 20 s. «Huele a gas», «me siento mal», «me caí» o «ayuda» abren
+  «¿Está bien?» con ese motivo, en vez de llamar directo: si era la TV, se apaga deslizando. El
+  reconocedor empieza después de oír la voz, así que entiende lo que la persona repite.
+- **Las pastillas del día:** a la hora, una pantalla
   verde la recuerda («Es hora de la losartán») con la pastilla dibujada en sus colores. Se puede
   posponer 10 minutos; pasadas 2 horas sin tomarla queda como olvidada.
 - **La llamada de emergencia:** al escalar, la casa llama al primer contacto, una sola vez,
@@ -90,7 +96,8 @@ El oído ya escucha. Además hay dos toques largos de prueba:
 | Mantener presionado el reloj | Simula una alarma de humo sin hacer ruido |
 | Mantener presionado «Cuidando la casa» | Abre la configuración, que en el producto usa el familiar |
 | Mantener presionado «Pastillas de hoy» | Recuerda ya la próxima pastilla, sin esperar a su hora |
-| Tocar «Pedir ayuda», «Huele a gas» o «Me siento mal» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
+| Tocar «Pedir ayuda» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
+| Decir «me huele a gas» o «me siento mal» (dos veces, la primera despierta al reconocedor) | Abre «¿Está bien?» con ese motivo. Arriba a la izquierda dice «Le escucho…» mientras escucha |
 
 Si la cuenta regresiva llega a cero, la alerta escala sola y **la casa llama de verdad** al número
 configurado. En modo debug, debajo de la fecha se ve lo que oye el modelo y su puntaje.

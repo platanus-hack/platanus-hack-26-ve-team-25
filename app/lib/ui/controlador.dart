@@ -43,6 +43,11 @@ class Controlador extends ChangeNotifier {
   /// Cuánto se espera a que la persona diga «Sí, ya hablamos» antes de llamar por teléfono.
   static const esperaPregunta = Duration(seconds: 15);
 
+  /// Cuánto escucha la voz cuando el oído oye hablar a alguien, y cada cuánto puede volver a
+  /// hacerlo. Mientras la voz escucha, YAMNet no oye: por eso no puede ser seguido.
+  static const escuchaPedido = Duration(seconds: 6);
+  static const repetirPedido = Duration(seconds: 20);
+
   final Casa casa;
 
   /// Las pastillas del día y cuáles ya tomó.
@@ -70,6 +75,7 @@ class Controlador extends ChangeNotifier {
   Alerta? _alerta;
   Escucha? _ultimaEscucha;
   final _ultimaVez = <TipoSonido, DateTime>{};
+  DateTime? _ultimoPedido;
 
   DateTime get ahora => _reloj();
 
@@ -217,6 +223,42 @@ class Controlador extends ChangeNotifier {
         oirEvento(evento);
       }
     }
+    if (_hablanEnLaCasa(escucha)) unawaited(_escucharPedido());
+    notifyListeners();
+  }
+
+  /// YAMNet oye a una persona hablar, y no es la TV. No se pide que la compuerta esté abierta:
+  /// un «ayuda» débil de una persona mayor puede no pasar el umbral de dB.
+  bool _hablanEnLaCasa(Escucha e) {
+    if (voz == null || alerta != null || escuchandoVoz) return false;
+    final antes = _ultimoPedido;
+    if (antes != null && ahora.difference(antes) < repetirPedido) return false;
+    double puntaje(String clase) =>
+        e.top.where((c) => c.nombre == clase).firstOrNull?.puntaje ?? 0;
+    final tv = puntaje('Television') + puntaje('Radio');
+    return puntaje('Speech') >= 0.4 && tv < 0.2;
+  }
+
+  /// «Huele a gas», «me siento mal» o «ayuda», dichos en voz alta. El reconocedor empieza a
+  /// escuchar después de que el oído oyó hablar, así que entiende lo que la persona dice a
+  /// continuación o repite. Lo que pide pasa por «¿Está bien?» y no llama directo: así, si la voz
+  /// venía de la TV o se entendió mal, la persona lo apaga deslizando, y si no responde, escala.
+  Future<void> _escucharPedido() async {
+    final voz = this.voz;
+    if (voz == null) return;
+    _ultimoPedido = ahora;
+    escuchandoVoz = true;
+    notifyListeners();
+    List<String> versiones = const [];
+    try {
+      await microfono?.pausar();
+      versiones = await voz.escuchar(hasta: escuchaPedido);
+    } finally {
+      escuchandoVoz = false;
+      await microfono?.reanudar();
+    }
+    final pedido = pedidoPorVoz(versiones);
+    if (pedido != null) oirEvento(pedido);
     notifyListeners();
   }
 
