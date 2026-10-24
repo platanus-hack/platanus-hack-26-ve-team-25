@@ -37,6 +37,7 @@ La raíz lleva a la última casa abierta en el teléfono. La prueba del oído si
 README.md                         presentación, estado y cómo correrlo
 docs/preguntas-tecnicas.md        preguntas técnicas frecuentes, con la evidencia de cada respuesta
 docs/pendientes.md                lo que falta, en orden, con dónde está el código y cómo probarlo
+docs/por-planificar.md            ideas de Abrahan que se van pensando antes de construirlas
 docs/plan.md                      decisiones del equipo, prioridades P0–P2, demo y roles
 docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
 docs/contexto.md                  el problema, la competencia y las decisiones de diseño
