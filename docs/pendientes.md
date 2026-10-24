@@ -15,7 +15,7 @@ y lo tache al terminar. Las preguntas de investigación por persona siguen en
 - **Web de la familia:** las cuatro pantallas, la invitación y `/demo` con el QR, con datos
   simulados (sábado 08:50).
 - **Supabase:** esquema, funciones y casa de demo listos. La app de la casa ya escribe
-  (sábado, mediodía), sin probar todavía contra la base real.
+  (sábado, mediodía), probada contra la base real; falta verlo en el teléfono.
 - **WhatsApp:** nada todavía.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
@@ -88,9 +88,11 @@ pruebas contra la base real corren con `cd web && bun run test:integracion`.
       internet ([`nube.dart`](../app/lib/datos/nube.dart), 8 pruebas con una base falsa). El
       latido lee `EXTRA_PLUGGED` en [`MainActivity.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/MainActivity.kt),
       como pide [investigacion-carga.md](investigacion-carga.md).
-- [ ] **Probarlo contra la base real:** poner `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` y
-      `CASA_CLAVE` en `app/config/local.json`, `make run`, disparar una alarma (toque largo en el
-      reloj) y ver que aparece en `/f/demo`. Todavía no se ha probado con la base de verdad.
+- [x] Probado contra la base real con `make test-integracion` (3 pruebas con una casa de prueba
+      que se crea y se borra; usa la llave secreta de `web/.env.local`). La clave de Carmen se
+      cambió el sábado 10:30: la nueva está solo en el `app/config/local.json` de Abrahan.
+- [ ] **En el teléfono:** `make run`, disparar una alarma (toque largo en el reloj) y ver que
+      aparece en `/f/demo`.
 - [ ] Guardar la cola en disco: hoy, si la app se cierra sin internet, lo que esperaba se pierde.
 - [ ] Decidir el latido y quién declara «sin señal»
       ([investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)).

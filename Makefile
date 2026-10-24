@@ -8,7 +8,7 @@ CONFIG := $(if $(wildcard $(APP)/config/local.json),--dart-define-from-file=conf
 BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
 .DEFAULT_GOAL := ayuda
-.PHONY: ayuda devices deps run run-demo debug profile release test analyze format \
+.PHONY: ayuda devices deps run run-demo debug profile release test test-integracion analyze format \
 	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
 	web-deps web-dev web-test web-lint web-build
 
@@ -39,6 +39,9 @@ release: deps ## Corre la app en modo release, como la vería el usuario
 
 test: deps ## Corre las pruebas de la app
 	cd $(APP) && flutter test
+
+test-integracion: deps ## Prueba la app contra Supabase con una casa de prueba (llaves en web/.env.local)
+	python3 -I $(APP)/tool/integracion.py
 
 analyze: deps ## Revisa el código de la app
 	cd $(APP) && flutter analyze
