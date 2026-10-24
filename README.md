@@ -31,7 +31,8 @@ TELÉFONO DE LA CASA · Flutter en Android
                                                     │
                                                     ▼
   «¿Está bien?» ─► casa_alerta(vence en 60 s) ──────────────────────────────────┐
-     ├─ «Estoy bien» ─► casa_responder('cancelar'): no escala                    │
+     ├─ «Estoy bien», deslizando o con la voz ─► casa_responder('cancelar')      │
+     ├─ «ayuda», «me caí» o «no» ─► escala sin esperar los 60 s                  │
      └─ vence sin respuesta ─► llama al hijo por WhatsApp; si no, por teléfono   │
   latido cada 90 s, con enchufado y batería ─► casa_latido                       │
                                                                                  ▼
@@ -79,7 +80,8 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
   resta y el conteo a mano ajusta. El conteo vive en la base, para que la casa y la web no tengan
   dos números; la web calcula cuántos días alcanzan ([`inventario.ts`](web/src/lib/familia/inventario.ts)).
 - **Telegram es el canal general** porque llega a cualquiera sin verificación de negocio. WhatsApp
-  por Kapso funciona solo en el sandbox, porque Meta restringió la cuenta.
+  por Kapso está desplegado, pero solo puede usar el sandbox, con cada teléfono activado a mano,
+  porque Meta restringió la cuenta.
 - **La casa es Android:** iOS no deja escuchar todo el día en segundo plano.
 
 ## Las pruebas
@@ -106,6 +108,8 @@ La carga se midió el sábado 24-oct contra producción, desde una laptop en Car
   pregunta «¿Pudo hablar con…?» y llama por teléfono normal.
 - Si se cierra la app sin internet, se pierde lo que esperaba en la cola: vive en memoria.
 - No se ha probado con voces de personas mayores reales.
+- El aviso por WhatsApp con Kapso no se ha probado de punta a punta. El circuito completo (escalar,
+  mandar y sellar) se probó con Telegram.
 
 Hacia dónde va el producto, en tres pasos: [futuro.md](docs/futuro.md#hacia-dónde-va).
 
