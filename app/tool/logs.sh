@@ -8,9 +8,10 @@ set -uo pipefail
 PAQUETE=ve.equipo25.casa
 DISPOSITIVO=${1:?falta el teléfono}
 ADB=(adb -s "$DISPOSITIVO")
-mkdir -p "$(dirname "$0")/../build/logs"
-ARCHIVO="$(dirname "$0")/../build/logs/casa-$(date +%Y%m%d-%H%M%S).log"
-echo "Log de $PAQUETE en $DISPOSITIVO · copia en ${ARCHIVO#*/app/} · Ctrl-C para salir"
+CARPETA="$(cd "$(dirname "$0")/.." && pwd)/build/logs"
+mkdir -p "$CARPETA"
+ARCHIVO="$CARPETA/casa-$(date +%Y%m%d-%H%M%S).log"
+echo "Log de $PAQUETE en $DISPOSITIVO · copia en $ARCHIVO · Ctrl-C para salir"
 
 # Lo que Android dice de la app aunque no venga de su proceso.
 AVISOS="$PAQUETE|ANR in|FATAL EXCEPTION|lowmemorykiller|Process .*$PAQUETE.* has died|Force finishing"
@@ -20,7 +21,12 @@ while true; do
   if [ -z "$PID" ]; then
     echo "$(date +%T) · la app no está corriendo; esperando…"
     until PID=$("${ADB[@]}" shell pidof -s "$PAQUETE" 2>/dev/null | tr -d '\r') && [ -n "$PID" ]; do
-      "${ADB[@]}" get-state >/dev/null 2>&1 || { echo "$(date +%T) · se perdió el teléfono (adb)"; exit 1; }
+      # La depuración inalámbrica se corta seguido: se espera a que vuelva en vez de salir.
+      if ! "${ADB[@]}" get-state >/dev/null 2>&1; then
+        echo "$(date +%T) · se perdió el teléfono (adb); esperando a que vuelva…"
+        until "${ADB[@]}" get-state >/dev/null 2>&1; do sleep 2; done
+        echo "$(date +%T) · el teléfono volvió"
+      fi
       sleep 1
     done
   fi
