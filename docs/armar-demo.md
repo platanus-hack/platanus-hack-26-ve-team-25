@@ -70,3 +70,40 @@ Los números van en `app/config/local.json`, que no se sube al repo:
 | 6 | Apagar la pantalla del Infinix 10 min y repetir el 2 | Sigue oyendo: lo mantiene vivo el servicio en primer plano |
 
 - [ ] Anotar aquí lo que falló, con el teléfono y la hora.
+
+## 6. Probar la voz
+
+Cada frase se dice a 1 m y a 3 m del Infinix, con la TV apagada y prendida. Se anota ✅ o ❌ y qué
+entendió (en modo debug, debajo de la fecha se ve qué oye el oído). Para las llamadas, los números
+de `local.json`, nunca el 911 de verdad.
+
+**En reposo:**
+
+| # | Decir | Tiene que pasar |
+|---|---|---|
+| V1 | «Lucero, llama a mi hijo» | «Llamando a Josuep» 5 s, y llama por WhatsApp (o teléfono) |
+| V2 | «Lucero, llama a mi hijo» y a los 2 s «no» | Se cancela y no llama |
+| V3 | «Lucero, llama al vecino» | 5 s y llamada normal en altavoz al Honor |
+| V4 | «Lucero, llama a emergencias» | Pantalla roja 5 s y llamada en altavoz al iPhone |
+| V5 | «Llama a mi hijo», sin «Lucero» | No llama: abre «¿Está bien?» (es un pedido de ayuda) |
+| V6 | «Ayuda» · «auxilio» · «me caí» · «me siento malita» · «huele a gas» | Abre «¿Está bien?» con el motivo |
+| V7 | Una conversación cualquiera y la TV hablando | No pasa nada |
+
+**Durante «¿Está bien?»** (toque largo en el reloj para dispararla):
+
+| # | Decir | Tiene que pasar |
+|---|---|---|
+| V8 | «Lucero, estoy bien» en los 4 s de «Le escucho» | Se calla y no avisa |
+| V9 | «Lucero, estoy bien» encima del tono | Se calla (prueba el filtro de la sirena) |
+| V10 | «Estoy bien», sin «Lucero» | No se calla |
+| V11 | «Ayuda» · «me caí» · «no» | Llama a Josuep de una vez |
+
+**Durante el aviso y la pastilla:**
+
+| # | Decir | Tiene que pasar |
+|---|---|---|
+| V12 | En «¿Pudo hablar con Josuep?»: «sí» | Cierra el aviso |
+| V13 | En «¿Pudo hablar con Josuep?»: «no» | Después del WhatsApp, llama por teléfono; después del teléfono, a emergencias |
+| V14 | Ya llamando: «Lucero, estoy bien» | Cierra el aviso y no sale la llamada por teléfono |
+| V15 | En el recordatorio (toque largo en «Pastillas de hoy»): «ya me la tomé» | Se quita y el losartán baja uno en `/f/demo/pastillas` |
+
