@@ -9,7 +9,7 @@ import { nombreCompleto } from "@/lib/familia/inventario";
 import { guardarCompra } from "@/lib/familia/supabase";
 import type { Medicamento } from "@/lib/familia/tipos";
 import { enlace } from "./pastillas";
-import { Boton, Pantalla } from "./pantallas";
+import { Boton, Pantalla, Volver } from "./pantallas";
 
 /** La foto se achica antes de salir del teléfono: una de 12 MP pesa 5 MB y Claude no necesita tanto. */
 const LADO_MAX = 1600;
@@ -180,11 +180,7 @@ export function SubirFactura({
     setPaso({ tipo: "listo", repetida: r.repetida, resumen, prueba: false });
   };
 
-  const volver = (
-    <a href={enlace(token, "/pastillas", escenario)} className="text-[17px] font-bold text-verde">
-      ← Pastillas de {nombre}
-    </a>
-  );
+  const volver = <Volver href={enlace(token, "/pastillas", escenario)}>Pastillas de {nombre}</Volver>;
 
   if (paso.tipo === "listo") {
     return (
@@ -231,7 +227,7 @@ export function SubirFactura({
             <FilaFactura key={i} fila={f} recipe={recipe} onCambio={(nueva) => cambiar(i, nueva)} />
           ))}
         </ul>
-        {error && <p className="text-base font-bold text-rojo">{error}</p>}
+        {error && <p role="alert" className="text-base font-bold text-rojo">{error}</p>}
         <div className="mt-auto flex flex-col gap-2.5 pt-2">
           <button
             type="button"
@@ -261,11 +257,17 @@ export function SubirFactura({
         Tómale una foto a la factura cuando compren las pastillas de {nombre}. La leemos, tú revisas, y
         sumamos al inventario lo que es del récipe. La foto no se guarda.
       </p>
-      {error && <p className="text-base font-bold text-rojo">{error}</p>}
+      {error && <p role="alert" className="text-base font-bold text-rojo">{error}</p>}
       <div className="mt-auto flex flex-col gap-2.5 pt-2">
         <label
-          className={`flex h-16 w-full cursor-pointer items-center justify-center rounded-[18px] bg-verde text-[21px] font-bold text-white transition-transform active:scale-[0.98] ${paso.tipo === "leyendo" ? "pointer-events-none opacity-60" : ""}`}
+          className={`flex h-16 w-full cursor-pointer items-center justify-center gap-3 rounded-[18px] bg-verde text-[21px] font-bold text-white transition-transform has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-verde active:scale-[0.98] ${paso.tipo === "leyendo" ? "pointer-events-none opacity-80" : ""}`}
         >
+          {paso.tipo === "leyendo" && (
+            <svg className="size-6 motion-safe:animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.3" strokeWidth="3" />
+              <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          )}
           {paso.tipo === "leyendo" ? "Leyendo la factura…" : "Tomar o elegir la foto"}
           <input
             type="file"

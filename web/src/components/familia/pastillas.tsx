@@ -17,7 +17,7 @@ import {
 } from "@/lib/familia/inventario";
 import { ajustarPastillas } from "@/lib/familia/supabase";
 import type { Medicamento } from "@/lib/familia/tipos";
-import { Boton, Pantalla } from "./pantallas";
+import { Boton, Pantalla, Volver } from "./pantallas";
 
 /** «/f/demo/pastillas?escenario=para-saber»: los simulados siguen siéndolo al navegar. */
 export function enlace(token: string, ruta: string, escenario: string | null): string {
@@ -62,7 +62,7 @@ function Corregir({ onGuardar }: { onGuardar: (n: number) => Promise<void> }) {
   const vale = valor !== "" && Number.isFinite(n) && n >= 0 && n <= 5000;
   return (
     <details className="group">
-      <summary className="cursor-pointer list-none text-[15px] font-bold text-verde underline underline-offset-4 group-open:mb-2">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center self-start text-[15px] font-bold text-verde underline underline-offset-4 [&::-webkit-details-marker]:hidden">
         Las conté y son otras
       </summary>
       <form
@@ -89,7 +89,7 @@ function Corregir({ onGuardar }: { onGuardar: (n: number) => Promise<void> }) {
           disabled={!vale || guardando}
           className="h-12 rounded-xl bg-verde px-4 text-[17px] font-bold text-white disabled:opacity-40"
         >
-          {guardando ? "Guardando" : "Guardar"}
+          {guardando ? "Guardando…" : "Guardar"}
         </button>
       </form>
     </details>
@@ -129,9 +129,7 @@ export function Pastillas({
 
   return (
     <Pantalla>
-      <a href={enlace(token, "", escenario)} className="text-[17px] font-bold text-verde">
-        ← Casa de {nombre}
-      </a>
+      <Volver href={enlace(token, "", escenario)}>Casa de {nombre}</Volver>
       <h1 className="text-[30px] leading-tight font-bold">Sus pastillas</h1>
       <p className="text-[17px] leading-[1.4] text-texto">
         Cada vez que {nombre} toca «Ya me la tomé», descontamos una. Te avisamos cuando queden para menos
@@ -149,20 +147,24 @@ export function Pastillas({
           key={c.medicamento.id}
           className="flex flex-col gap-2.5 rounded-[18px] border-[1.5px] border-borde bg-white px-[18px] py-4"
         >
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="text-[21px] font-bold">{nombreCompleto(c.medicamento)}</span>
-            {c.quedan !== null && <span className="shrink-0 text-[21px] font-bold">{c.quedan.toLocaleString("es-VE")}</span>}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <span className="text-[21px] leading-tight font-bold">{nombreCompleto(c.medicamento)}</span>
+              <span className="text-[15px] text-gris">{cuantasAlDia(c)}</span>
+            </div>
+            {c.quedan !== null && (
+              <span className="flex shrink-0 flex-col items-end" aria-label={quedanTexto(c.quedan)}>
+                <span className="text-[30px] leading-none font-bold tabular-nums">{c.quedan.toLocaleString("es-VE")}</span>
+                <span className="mt-1 text-[13px] text-gris">quedan</span>
+              </span>
+            )}
           </div>
-          <span className="text-[15px] text-gris">
-            {cuantasAlDia(c)}
-            {c.quedan !== null && ` · ${quedanTexto(c.quedan).toLowerCase()}`}
-          </span>
           <Estado c={c} ahora={ahora} />
           <Corregir onGuardar={(n) => corregir(c.medicamento.id, n)} />
         </article>
       ))}
 
-      {error && <p className="text-base font-bold text-rojo">{error}</p>}
+      {error && <p role="alert" className="text-base font-bold text-rojo">{error}</p>}
 
       <div className="mt-auto flex flex-col gap-2.5 pt-2">
         {cuentas.length > 0 && (

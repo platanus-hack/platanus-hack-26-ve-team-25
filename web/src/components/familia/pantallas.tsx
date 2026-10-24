@@ -1,7 +1,10 @@
+"use client";
+
 // Las tres pantallas de la familia, como en el lienzo de mockups. No deciden nada: reciben la
 // vista ya derivada (lib/familia/estado.ts) y la pintan.
-import type { ReactNode } from "react";
-import { fecha, haceCuanto, hora, quien, type Vista } from "@/lib/familia/estado";
+import { type ReactNode, useEffect } from "react";
+import { APP } from "@/lib/app";
+import { duracion, fecha, haceCuanto, hora, quien, type Vista } from "@/lib/familia/estado";
 import type { Casa, Contacto } from "@/lib/familia/tipos";
 
 const CONDICION: Record<string, string> = {
@@ -13,7 +16,8 @@ const CONDICION: Record<string, string> = {
 
 const tel = (numero?: string) => `tel:${numero ?? ""}`;
 const mayuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const minuscula = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+// «TV o radio» se queda igual: una sigla no se baja a minúscula.
+const minuscula = (s: string) => (/^\p{Lu}{2}/u.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
 
 function segundoContacto(casa: Casa): Contacto | undefined {
   return [...casa.contactos].sort((a, b) => a.orden - b.orden)[1];
@@ -75,6 +79,40 @@ function IconoTelefono() {
   );
 }
 
+export function IconoFlecha({ hacia, className = "" }: { hacia: "derecha" | "abajo" | "izquierda"; className?: string }) {
+  const giro = { derecha: "", abajo: "rotate-90", izquierda: "rotate-180" }[hacia];
+  return (
+    <svg className={`size-5 shrink-0 ${giro} ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m9 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+/** El regreso a la pantalla anterior, arriba a la izquierda, con un área de toque cómoda. */
+export function Volver({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a href={href} className="-ml-1 flex min-h-11 items-center gap-1.5 self-start rounded-lg pr-2 text-[17px] font-bold text-verde">
+      <IconoFlecha hacia="izquierda" />
+      {children}
+    </a>
+  );
+}
+
+/** Mientras hay alerta, la barra del navegador y el título de la pestaña también la dicen. */
+function useBarraDeAlerta(nombre: string) {
+  useEffect(() => {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const color = meta?.content;
+    const titulo = document.title;
+    if (meta) meta.content = APP.colorAlerta;
+    document.title = `Urgente · Casa de ${nombre}`;
+    return () => {
+      if (meta && color) meta.content = color;
+      document.title = titulo;
+    };
+  }, [nombre]);
+}
+
 export function AlertaUrgente({
   casa,
   vista,
@@ -86,10 +124,15 @@ export function AlertaUrgente({
 }) {
   const vecino = segundoContacto(casa);
   const condiciones = mayuscula(casa.condiciones.map((c) => CONDICION[c] ?? c).join(" · "));
+  useBarraDeAlerta(casa.nombre);
   return (
-    <div className="flex flex-1 flex-col bg-rojo text-white" role="alert">
+    <div className="flex flex-1 flex-col bg-rojo text-white [--anillo:white]" role="alert">
       <Pantalla>
-        <span className="self-start rounded-full bg-white px-3 py-1.5 text-[15px] font-bold text-rojo">
+        <span className="flex items-center gap-2 self-start rounded-full bg-white py-1.5 pr-3 pl-2.5 text-[15px] font-bold text-rojo">
+          <span className="relative flex size-2.5" aria-hidden="true">
+            <span className="absolute inset-0 rounded-full bg-rojo opacity-60 motion-safe:animate-ping" />
+            <span className="relative size-2.5 rounded-full bg-rojo" />
+          </span>
           URGENTE · {hora(vista.alerta.escaladaEn ?? vista.alerta.creada)}
         </span>
         <h1 className="text-[36px] leading-[1.1] font-bold">{vista.titular}</h1>
@@ -140,8 +183,8 @@ export function SinSenal({
           <span className="text-[28px] leading-tight font-bold">Sin señal desde las {hora(vista.desde)}</span>
         </div>
         <span className="text-[17px] leading-[1.4] text-pizarra-texto">
-          El teléfono de la casa dejó de reportar hace {vista.minutos} minutos. Mientras no vuelva,
-          no podemos oír lo que pasa.
+          El teléfono de la casa dejó de reportar hace {duracion(vista.minutos)}. Mientras no
+          vuelva, no podemos oír lo que pasa.
         </span>
       </section>
       <section className="flex flex-col gap-2 rounded-[18px] border-[1.5px] border-borde bg-white px-[18px] py-4">
@@ -193,7 +236,7 @@ export function TodoBien({
           key={e.id}
           className={`flex gap-3.5 py-3 text-[17px] ${i < vista.dia.length - 1 ? "border-b border-linea" : ""}`}
         >
-          <span className="w-12 shrink-0 text-gris">{hora(e.hora)}</span>
+          <span className="w-12 shrink-0 text-gris tabular-nums">{hora(e.hora)}</span>
           <span className={e.tipo === "estoy_bien" ? "font-bold text-verde" : ""}>{e.descripcion}</span>
         </li>
       ))}
@@ -233,10 +276,10 @@ export function TodoBien({
       {pastillas && (
         <a
           href={pastillas.href}
-          className="flex items-center justify-between gap-2.5 rounded-[14px] border-[1.5px] border-borde bg-white px-3.5 py-3 text-[15px] text-texto"
+          className="flex items-center justify-between gap-2.5 rounded-[14px] border-[1.5px] border-borde bg-white px-3.5 py-3 text-[15px] text-texto transition-colors active:bg-linea"
         >
           <span>{pastillas.texto}</span>
-          <span aria-hidden="true" className="text-[19px] font-bold text-verde">›</span>
+          <IconoFlecha hacia="derecha" className="text-verde" />
         </a>
       )}
 
@@ -266,9 +309,10 @@ export function TodoBien({
 
       {hayAvisos ? (
         <details className="group">
-          <summary className="flex h-14 cursor-pointer list-none items-center justify-center rounded-2xl border-2 border-verde text-[19px] font-bold text-verde group-open:mb-3">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between rounded-[14px] border-[1.5px] border-borde bg-white px-3.5 py-3 text-[17px] font-bold text-verde transition-colors group-open:mb-2.5 active:bg-linea [&::-webkit-details-marker]:hidden">
             <span className="group-open:hidden">Ver todo su día</span>
             <span className="hidden group-open:inline">Su día</span>
+            <IconoFlecha hacia="abajo" className="transition-transform group-open:-rotate-90" />
           </summary>
           {dia}
         </details>

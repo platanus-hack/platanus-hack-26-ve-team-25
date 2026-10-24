@@ -7,4 +7,6 @@ export const APP = {
   descripcion: "Saber cada día que tu familiar está bien, y enterarte en segundos si algo pasa.",
   colorFondo: "#ffffff",
   colorTema: "#14532d",
+  /** La barra del navegador mientras hay una alerta: el mismo --color-rojo de globals.css. */
+  colorAlerta: "#b01d16",
 } as const;
