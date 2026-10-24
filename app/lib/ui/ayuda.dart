@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../datos/llamadas.dart';
 import '../dominio/alerta.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
@@ -86,7 +87,11 @@ class Ayuda extends StatelessWidget {
                                   ),
                                   Text(
                                     conNumero
-                                        ? 'Llamada desde las $hora'
+                                        ? '${switch (c.viaLlamada) {
+                                            ViaLlamada.whatsapp => 'Por WhatsApp',
+                                            ViaLlamada.telefono => 'Llamada telefónica',
+                                            null => 'Llamando',
+                                          }} desde las $hora'
                                         : 'Sin número',
                                     style: const TextStyle(
                                       fontSize: 17,

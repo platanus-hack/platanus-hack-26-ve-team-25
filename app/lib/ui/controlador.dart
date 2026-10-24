@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../datos/llamadas.dart';
 import '../dominio/alerta.dart';
 import '../dominio/pastillas.dart';
 import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
 
-/// Cómo se llama a un número. En la app es una llamada directa; en las pruebas, una falsa.
-typedef Llamar = Future<void> Function(String numero);
+/// Cómo se llama a un número y por dónde salió. En la app, WhatsApp primero y si no, una llamada
+/// telefónica normal; en las pruebas, una falsa.
+typedef Llamar = Future<ViaLlamada> Function(String numero);
 
 /// El estado de la casa que ven las pantallas: la hora, lo último que oyó y la alerta abierta.
 class Controlador extends ChangeNotifier {
@@ -38,6 +40,9 @@ class Controlador extends ChangeNotifier {
   Pastilla? _forzada;
   final DateTime Function() _reloj;
   final Llamar? llamar;
+
+  /// Por dónde salió la última llamada de emergencia, para decirlo en pantalla.
+  ViaLlamada? viaLlamada;
   late final Timer _tic;
   StreamSubscription<Escucha>? _oyendo;
   Alerta? _alerta;
@@ -100,7 +105,10 @@ class Controlador extends ChangeNotifier {
   Future<void> llamarPrimerContacto() async {
     final numero = primerContacto.telefono;
     if (numero.isEmpty) return;
-    await llamar?.call(numero);
+    final llamar = this.llamar;
+    if (llamar == null) return;
+    viaLlamada = await llamar(numero);
+    notifyListeners();
   }
 
   void _alOir(Escucha escucha) {

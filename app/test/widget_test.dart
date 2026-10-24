@@ -1,3 +1,4 @@
+import 'package:casa/datos/llamadas.dart';
 import 'package:casa/datos/simulado.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:casa/main.dart';
@@ -71,7 +72,10 @@ void main() {
         ],
       ),
       reloj: temprano,
-      llamar: (numero) async => llamadas.add(numero),
+      llamar: (numero) async {
+        llamadas.add(numero);
+        return ViaLlamada.whatsapp;
+      },
     );
     await tester.pumpWidget(AppCasa(controlador: c));
 
@@ -79,6 +83,7 @@ void main() {
     await tester.pump();
     expect(find.text('Estamos llamando a Josuep'), findsOneWidget);
     expect(llamadas, ['04120000000']);
+    expect(find.textContaining('Por WhatsApp'), findsOneWidget);
 
     await tester.pump(
       const Duration(seconds: 3),

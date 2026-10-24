@@ -19,7 +19,7 @@
 | **Push nativo** además de Telegram | No depender de que la familia tenga Telegram | Cuenta de Apple y Firebase Cloud Messaging |
 | **SMS automático cumpliendo la política de Play** | Avisar sin internet | Que la app sea la de SMS predeterminada del teléfono de la casa, que es un teléfono dedicado |
 | **Llamada en altavoz al vecino** | El vecino oye la sala y puede hablar con la persona | Permiso de llamadas y pruebas por marca |
-| **Llamada por WhatsApp como primera opción** | Los hijos suelen estar fuera del país, y WhatsApp es la primera forma de comunicarse con ellos: una llamada normal al exterior cuesta y muchas veces no entra. Hoy la casa hace una llamada telefónica normal al primer contacto | Que la llamada salga sola sin que nadie toque: WhatsApp no ofrece una forma oficial de iniciar llamadas desde otra app, así que hay que evaluar accesibilidad de Android o la API de WhatsApp Business |
+| **Llamada de WhatsApp por la vía oficial** | Hoy la casa ya llama primero por WhatsApp, pero por una vía no oficial: abre la fila de «llamada de voz» que WhatsApp crea en la agenda de Android. Depende de que el contacto esté guardado y de que WhatsApp no cambie esa fila | Una integración oficial, si WhatsApp la ofrece, o la API de WhatsApp Business |
 | **WhatsApp para los mensajes** | Es lo que más se usa en Venezuela | WhatsApp Business API, que se paga por conversación |
 | **Pasarela de SMS o llamadas** | Avisar al exterior aunque el chip de la casa no pueda | Twilio o similar, cuando haya ingresos |
 

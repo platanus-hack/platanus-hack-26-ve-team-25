@@ -11,8 +11,12 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
 - **Las pastillas del día:** el reloj muestra cuál le toca y «Ya la tomé». A la hora, una pantalla
   verde la recuerda («Es hora de la losartán») con la pastilla dibujada en sus colores. Se puede
   posponer 10 minutos; pasadas 2 horas sin tomarla queda como olvidada.
-- **La llamada de emergencia:** al escalar, la casa hace una llamada telefónica normal y directa al
-  primer contacto, una sola vez. WhatsApp queda como opción futura ([futuro.md](../docs/futuro.md)).
+- **La llamada de emergencia:** al escalar, la casa llama al primer contacto, una sola vez,
+  **primero por WhatsApp**, porque los hijos suelen estar fuera del país. Si no se puede, hace una
+  llamada telefónica normal. WhatsApp no tiene una vía oficial para esto: la app abre la fila de
+  «llamada de voz» que WhatsApp crea en la agenda, así que **el contacto tiene que estar guardado
+  en los contactos del teléfono de la casa** y la app pide permiso para leerlos
+  ([futuro.md](../docs/futuro.md)).
 
 Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y cargar las pastillas desde
 la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).
