@@ -27,7 +27,14 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   entiende, sigue la cuenta regresiva y la llamada sale igual: el botón sigue estando. Usa el
   reconocimiento de voz del teléfono, sin internet si tiene descargado el paquete de español.
 
-Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y cargar las pastillas desde
+- **Le cuenta a Supabase lo que pasa** ([`nube.dart`](lib/datos/nube.dart)): cada alerta manda
+  su evento y la alerta (`casa_evento`, `casa_alerta`), cada cambio de estado la respuesta
+  (`casa_responder`) y cada 90 s un latido con la batería y si está enchufado (`casa_latido`). Si
+  no hay internet, lo guarda en orden y reintenta cada 10 s, con la hora real del evento. La cola
+  vive en memoria: si la app se cierra sin internet, se pierde. Necesita `SUPABASE_URL`,
+  `SUPABASE_PUBLISHABLE_KEY` y `CASA_CLAVE` en `config/local.json`; sin eso no escribe.
+
+Falta el aviso por WhatsApp a la familia, el tono de 520 Hz, la vibración y cargar las pastillas desde
 la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).
 
 ## Correrla en un Android

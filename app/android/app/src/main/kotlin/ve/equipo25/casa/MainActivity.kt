@@ -3,9 +3,11 @@ package ve.equipo25.casa
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -28,6 +30,24 @@ class MainActivity : FlutterActivity() {
                 }
             }
         }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/energia").setMethodCallHandler { call, result ->
+            if (call.method == "leer") result.success(leerEnergia()) else result.notImplemented()
+        }
+    }
+
+    /**
+     * Si hay fuente de alimentación y cuánta batería queda, para el latido. `EXTRA_PLUGGED` dice si
+     * hay corriente; `isCharging()` no sirve, porque se apaga al 100 % o con el límite de carga
+     * (docs/investigacion-carga.md). `ACTION_BATTERY_CHANGED` es sticky: devuelve el estado actual
+     * sin registrar nada.
+     */
+    private fun leerEnergia(): Map<String, Any> {
+        val bateria = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val enchufado = (bateria?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
+        val nivel = bateria?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val escala = bateria?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+        val porcentaje = if (nivel >= 0 && escala > 0) nivel * 100 / escala else 100
+        return mapOf("enchufado" to enchufado, "bateria" to porcentaje)
     }
 
     /**

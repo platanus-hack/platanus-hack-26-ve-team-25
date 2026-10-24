@@ -14,7 +14,8 @@ y lo tache al terminar. Las preguntas de investigación por persona siguen en
   en un teléfono real con sonidos, llamadas o voz de verdad.**
 - **Web de la familia:** las cuatro pantallas, la invitación y `/demo` con el QR, con datos
   simulados (sábado 08:50).
-- **Supabase:** esquema, funciones y casa de demo listos; falta que la app de la casa escriba.
+- **Supabase:** esquema, funciones y casa de demo listos. La app de la casa ya escribe
+  (sábado, mediodía), sin probar todavía contra la base real.
 - **WhatsApp:** nada todavía.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
@@ -78,12 +79,19 @@ pruebas contra la base real corren con `cd web && bun run test:integracion`.
       guardados como hash SHA-256. El token `demo` es público a propósito: es el del QR.
 - [x] Casa de demo creada (Carmen, token `demo`). Su clave la tiene Rogelio; va en
       `app/config/local.json` (ver [`local.example.json`](../app/config/local.example.json)).
-- [ ] **La app de la casa llama a las funciones** (`POST {SUPABASE_URL}/rest/v1/rpc/<nombre>` con
+- [x] **La app de la casa llama a las funciones** (`POST {SUPABASE_URL}/rest/v1/rpc/<nombre>` con
       el header `apikey`): `casa_latido(p_clave, p_enchufado, p_bateria)` cada 90 s,
       `casa_evento(p_clave, p_tipo, p_descripcion)` → id, `casa_alerta(p_clave, p_evento,
       p_espera_s, p_urgente)` → id, `casa_responder(p_clave, p_alerta, 'cancelar' | 'escalar' |
       'atender')`. Ejemplos de uso: [`supabase.integracion.test.ts`](../web/src/lib/familia/supabase.integracion.test.ts).
-- [ ] La app de la casa manda eventos, alertas y el latido, con una cola local si no hay internet.
+- [x] La app de la casa manda eventos, alertas y el latido, con una cola en memoria si no hay
+      internet ([`nube.dart`](../app/lib/datos/nube.dart), 8 pruebas con una base falsa). El
+      latido lee `EXTRA_PLUGGED` en [`MainActivity.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/MainActivity.kt),
+      como pide [investigacion-carga.md](investigacion-carga.md).
+- [ ] **Probarlo contra la base real:** poner `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` y
+      `CASA_CLAVE` en `app/config/local.json`, `make run`, disparar una alarma (toque largo en el
+      reloj) y ver que aparece en `/f/demo`. Todavía no se ha probado con la base de verdad.
+- [ ] Guardar la cola en disco: hoy, si la app se cierra sin internet, lo que esperaba se pierde.
 - [ ] Decidir el latido y quién declara «sin señal»
       ([investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)).
 

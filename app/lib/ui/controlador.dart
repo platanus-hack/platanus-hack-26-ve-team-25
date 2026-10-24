@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../datos/llamadas.dart';
+import '../datos/nube.dart';
 import '../datos/voz.dart';
 import '../dominio/alerta.dart';
 import '../dominio/pastillas.dart';
@@ -20,6 +21,7 @@ class Controlador extends ChangeNotifier {
     this.telefono,
     this.voz,
     this.microfono,
+    this.nube,
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
        plan = PlanDelDia(pastillas) {
@@ -54,6 +56,9 @@ class Controlador extends ChangeNotifier {
 
   /// El oído, que se pausa mientras la voz escucha.
   final Microfono? microfono;
+
+  /// Supabase, para que la familia vea lo que pasa. Null sin configurar (y en la web).
+  final Nube? nube;
 
   /// True mientras el reconocimiento de voz escucha la respuesta.
   bool escuchandoVoz = false;
@@ -106,11 +111,16 @@ class Controlador extends ChangeNotifier {
   /// ignora: no se pregunta dos veces a la vez.
   void oirEvento(TipoEvento tipo) {
     if (alerta != null) return;
-    _cambiar(Alerta.preguntar(tipo, ahora));
+    _nacer(Alerta.preguntar(tipo, ahora));
   }
 
   /// El pánico y los reportes de la persona avisan a la familia sin esperar.
-  void pedirAyuda(TipoEvento motivo) => _cambiar(Alerta.urgente(motivo, ahora));
+  void pedirAyuda(TipoEvento motivo) => _nacer(Alerta.urgente(motivo, ahora));
+
+  void _nacer(Alerta a) {
+    nube?.nuevaAlerta(a);
+    _cambiar(a, naciendo: true);
+  }
 
   void estoyBien() => _cambiar(_alerta?.cancelar(ahora));
 
@@ -216,9 +226,13 @@ class Controlador extends ChangeNotifier {
     _cambiar(_alerta?.revisar(ahora));
   }
 
-  void _cambiar(Alerta? nueva) {
+  void _cambiar(Alerta? nueva, {bool naciendo = false}) {
     final antes = _alerta?.estado;
     _alerta = nueva;
+    // La base hace las mismas transiciones que Alerta: se le cuenta cada cambio de estado.
+    if (!naciendo && nueva != null && nueva.estado != antes) {
+      nube?.cambioDeEstado(nueva.estado);
+    }
     // Si la alerta se cerró, ya no hay nada que preguntar ni llamada que esperar.
     if (!(nueva?.abierta ?? false)) {
       _preguntaHasta = null;

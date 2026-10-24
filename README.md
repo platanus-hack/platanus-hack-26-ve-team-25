@@ -30,9 +30,9 @@ casa en el navegador: https://platanus-hack-26-ve-team-25-casa.vercel.app
 | Vibración del piso con el acelerómetro | Por hacer |
 | Alarma de confirmación de 60 s, botón de pánico y reportes de la persona | Por hacer |
 | Perfil de salud y niveles de aviso (🔴 🟡 🟢) | Por hacer |
-| App del teléfono de la casa en Flutter | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono. 35 pruebas: [`app/`](app/README.md). Falta Supabase, WhatsApp, sonido y vibración |
+| App del teléfono de la casa en Flutter | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono y le manda a Supabase los eventos, las alertas y el latido, con cola si no hay internet. 59 pruebas: [`app/`](app/README.md). Falta el aviso por WhatsApp, sonido y vibración |
 | La app de la casa en el navegador | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app para probar las pantallas sin Android. Sin oído ni llamadas: [cómo y por qué](app/README.md#verla-en-el-navegador) |
-| Alertas con vencimiento y escalamiento (Supabase) | Hecho, con 6 pruebas contra la base real: [`supabase/migrations/`](supabase/migrations/). Falta que la app de la casa escriba |
+| Alertas con vencimiento y escalamiento (Supabase) | Hecho, con 6 pruebas contra la base real: [`supabase/migrations/`](supabase/migrations/). La app de la casa ya escribe: [`nube.dart`](app/lib/datos/nube.dart) |
 | Web de la familia instalable (PWA) | Alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR, leyendo de Supabase; con datos simulados en [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta) |
 | Aviso real por WhatsApp (Kapso) | Decidido el sábado; la invitación ya abre WhatsApp, falta el envío |
 

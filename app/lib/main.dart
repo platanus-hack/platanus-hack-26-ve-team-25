@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'datos/llamadas.dart';
+import 'datos/nube.dart';
 import 'datos/voz.dart';
 import 'datos/simulado.dart';
 import 'oido/oido.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
   ]);
 
   final oido = Oido();
+  final nube = _nube();
   final controlador = Controlador(
     casa: casaSimulada,
     pastillas: pastillasSimuladas,
@@ -29,11 +31,14 @@ Future<void> main() async {
     telefono: kIsWeb ? null : TelefonoAndroid(),
     voz: kIsWeb ? null : VozAndroid(),
     microfono: oido,
+    nube: nube,
   );
   runApp(AppCasa(controlador: controlador));
 
   // La web es la vista previa de las pantallas: sin oído ni llamadas (ver oido/tflite_web.dart).
   if (kIsWeb) return;
+
+  nube?.iniciar();
 
   // Los permisos se piden con la app ya en pantalla: Android solo los muestra así.
   await [Permission.phone, Permission.contacts].request();
@@ -43,6 +48,27 @@ Future<void> main() async {
     await Permission.systemAlertWindow.request();
   }
   await oido.iniciar();
+}
+
+/// Supabase, si local.json trae la URL, la llave pública y la clave de la casa. La web de la casa
+/// se compila sin local.json: es una vista previa y no escribe en la base.
+Nube? _nube() {
+  const url = String.fromEnvironment('SUPABASE_URL');
+  const llave = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
+  const clave = String.fromEnvironment('CASA_CLAVE');
+  if (kIsWeb || url.isEmpty || llave.isEmpty || clave.isEmpty) return null;
+  const canal = MethodChannel('casa/energia');
+  return Nube(
+    Supabase(url: url, llave: llave),
+    clave: clave,
+    energia: () async {
+      final m = await canal.invokeMapMethod<String, Object?>('leer');
+      return (
+        enchufado: m?['enchufado'] as bool? ?? true,
+        bateria: m?['bateria'] as int? ?? 100,
+      );
+    },
+  );
 }
 
 class AppCasa extends StatelessWidget {
