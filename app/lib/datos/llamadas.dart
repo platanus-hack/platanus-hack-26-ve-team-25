@@ -15,6 +15,10 @@ abstract interface class Telefono {
   /// Una llamada telefónica normal y directa.
   Future<void> llamar(String numero);
 
+  /// Una llamada normal en altavoz y con el volumen al máximo: para emergencias, o cuando la
+  /// persona la pidió en voz alta y puede estar lejos del teléfono. False si no se pudo.
+  Future<bool> llamarEnAltavoz(String numero);
+
   /// Cada vez que termina una llamada de WhatsApp, cuántos segundos duró, timbre incluido.
   /// Android no dice si la contestaron.
   Stream<int> get finDeWhatsApp;
@@ -53,6 +57,11 @@ class TelefonoAndroid implements Telefono {
   @override
   Future<void> llamar(String numero) async =>
       FlutterPhoneDirectCaller.callNumber(numero);
+
+  @override
+  Future<bool> llamarEnAltavoz(String numero) async =>
+      await _canal.invokeMethod<bool>('llamarEnAltavoz', {'numero': numero}) ??
+      false;
 
   @override
   Stream<int> get finDeWhatsApp => _fin.stream;

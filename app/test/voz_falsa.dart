@@ -38,7 +38,8 @@ class MicrofonoFalso implements Microfono {
 class FrasesFalsas implements Frases {
   FrasesFalsas(this.oye);
 
-  final List<String> oye;
+  /// Lo que contesta la próxima vez; la prueba lo cambia entre una frase y otra.
+  List<String> oye;
   final audios = <int>[];
 
   @override

@@ -11,6 +11,7 @@ class TelefonoFalso implements Telefono {
   final bool whatsappFalla;
   final porWhatsApp = <String>[];
   final porTelefono = <String>[];
+  final enAltavoz = <String>[];
   final _fin = StreamController<int>.broadcast();
 
   void terminarWhatsApp(int segundos) => _fin.add(segundos);
@@ -24,6 +25,12 @@ class TelefonoFalso implements Telefono {
 
   @override
   Future<void> llamar(String numero) async => porTelefono.add(numero);
+
+  @override
+  Future<bool> llamarEnAltavoz(String numero) async {
+    enAltavoz.add(numero);
+    return true;
+  }
 
   @override
   Stream<int> get finDeWhatsApp => _fin.stream;

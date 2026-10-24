@@ -19,7 +19,13 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   deslizando. El modelo chico de español de Vosk (Apache 2.0, ~40 MB) no va en git: lo baja
   `make deps` con [`tool/descargar_vosk.sh`](tool/descargar_vosk.sh). El lado nativo está en
   [`Frases.kt`](android/app/src/main/kotlin/ve/equipo25/casa/Frases.kt).
-- **El recordatorio de la pastilla:** en toda la pantalla, y solo se quita con «Ya me la tomé».
+- **Órdenes por voz:** «Lucero, llama a mi hijo», «… al vecino» o «… a emergencias». La pantalla
+  cuenta 5 s y se cancela con «No llamar» o diciendo «no». Al hijo lo llama por WhatsApp primero;
+  al vecino y a emergencias, por llamada normal en altavoz y con el volumen al máximo. Sin
+  «Lucero» no llama: puede ser la TV. Los números van en `config/local.json`
+  (`TELEFONO_VECINO`, `NUMERO_EMERGENCIAS`); para probar, nunca el 911 de verdad.
+- **El recordatorio de la pastilla:** en toda la pantalla, y solo se quita con «Ya me la tomé»,
+  con el botón o en voz alta.
   Si pasan 2 horas se va solo y queda como olvidada, para no empujar a tomar dos dosis.
 - **Las pastillas del día:** a la hora, una pantalla verde la recuerda («Es hora de la losartán»)
   con la pastilla dibujada en sus colores. Pasadas 2 horas sin tomarla queda como olvidada.
@@ -104,6 +110,7 @@ El oído ya escucha. Además hay dos toques largos de prueba:
 | Mantener presionado «Pastillas de hoy» | Recuerda ya la próxima pastilla, sin esperar a su hora |
 | Tocar «Pedir ayuda» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
 | Decir «me huele a gas», «me siento mal» o «ayuda» | Abre «¿Está bien?» con ese motivo, 1,5 s después de terminar la frase |
+| Decir «Lucero, llama a mi hijo» (o «al vecino», «a emergencias») | Cuenta 5 s y llama. «No» lo cancela |
 
 Si la cuenta regresiva llega a cero, la alerta escala sola y **la casa llama de verdad** al número
 configurado. En modo debug, debajo de la fecha se ve lo que oye el modelo y su puntaje.

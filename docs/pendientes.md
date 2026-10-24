@@ -35,41 +35,6 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
 
 ## P0: sin esto no hay demo
 
-### 1. Probar la app en el teléfono real · *quien tenga el Android*
-
-Se instala con `make run` desde la raíz. Antes hay que copiar
-`app/config/local.example.json` a `app/config/local.json` y poner el número de emergencia: ese
-archivo no se sube, porque el repo es público.
-
-**Por qué está sin empezar:** nadie ha hecho la prueba en un teléfono real. El número de
-emergencia vive en `app/config/local.json`, que solo está en la máquina de Abrahan, y la app no se
-ha instalado todavía en el teléfono que va a la tarima. Mientras esto siga abierto, todo lo demás
-está probado solo con pruebas automáticas.
-
-- [ ] Aceptar los permisos al abrir: micrófono, llamadas, contactos y «Mostrar sobre otras apps».
-      El último abre una pantalla de ajustes aparte.
-- [ ] **El oído:** alarma de humo (un video de YouTube), un vaso que se rompe, un golpe, un grito
-      y la TV. En modo debug, debajo de la fecha se ve qué oye y con qué puntaje.
-- [ ] **WhatsApp:** guardar el número de emergencia en los contactos del teléfono, con WhatsApp.
-      Tocar «Pedir ayuda»: tiene que abrirse una llamada de voz de WhatsApp, no el chat. Avisarle
-      antes a la persona a la que se llama.
-- [ ] **Si no contestan:** dejar timbrar sin contestar. Al terminar, la app tiene que volver sola
-      al frente con «¿Pudo hablar con…?» y, a los 15 s, llamar por teléfono normal.
-      **Es lo más incierto:** Android 16 restringe que una app se abra sola desde segundo plano,
-      y no se ha comprobado. Si no vuelve, revisar `terminar()` en
-      [`MainActivity.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/MainActivity.kt).
-- [ ] **Si WhatsApp falla:** borrar el contacto de la agenda y repetir. Tiene que llamar por
-      teléfono directo.
-- [ ] **Por voz:** en «¿Pudo hablar con…?», decir «sí» (cierra) y «no» (llama por teléfono). Probar
-      con wifi y sin wifi.
-- [ ] **Pastillas:** mantener presionado «Pastillas de hoy» para forzar el recordatorio, y probar
-      «Ya me la tomé», que es la única forma de quitarlo.
-- [ ] **Que la toma descuente** · *Abrahan*: «Ya me la tomé» llama `casa_tomar` (ver «Inventario
-      de pastillas» en el P1) y en `/f/demo/pastillas` el losartán baja de 8 a 7. Es el momento 1
-      del demo. La casa de demo arranca con 8 losartán (4 días, sale «Hay que comprar») y 40
-      metformina; para volver a eso, «Las conté y son otras» en esa misma página.
-- [ ] Anotar aquí lo que falló, con el modelo del teléfono y su versión de Android.
-
 ### 2. El reposo nuevo · *Abrahan*
 
 Decidido por Abrahan el sábado 24: **«Pedir ayuda» ocupa el panel derecho** de arriba abajo, las
@@ -89,6 +54,9 @@ Decidido por Abrahan el sábado 24: **«Pedir ayuda» ocupa el panel derecho** d
       *Sin hacer: depende de tener la app instalada, y eso no ha pasado (punto 1).*
 - [ ] Probar el banco con voces mayores reales (ver «Probar con voces mayores»).
       *Sin hacer: hacen falta personas mayores grabando y no se ha conseguido ninguna todavía.*
+- [x] Órdenes por voz con «Lucero»: «llama a emergencias», «a mi hijo», «al vecino», con 5 s para
+      decir «no»; y «ya me la tomé» en el recordatorio (ver
+      [por-planificar.md](por-planificar.md#8-comandos-de-voz)).
 - [ ] «Leer récipe» abre una pantalla que dice que todavía no está lista: falta la cámara y el
       OCR (ver P1, «Las pastillas desde la foto del récipe»).
       *Sin hacer: la lectura terminó resolviéndose subiendo la foto por la web (la factura), y el
@@ -329,6 +297,44 @@ viejo para medir. Ninguna de las dos cosas está disponible hoy.
 - [ ] Medir en el teléfono viejo cuánto tarda YAMNet por ventana, y cuánta batería y calor gasta.
 - [ ] Si sobra tiempo: probar sherpa-onnx CED con ventanas de 5 s, que en la comparación acertó
       más ([experimentos/modelos-audio](../experimentos/modelos-audio/README.md)).
+
+## Casi al final: probar todo en el teléfono real · *quien tenga el Android*
+
+Abrahan lo pasó casi al final el sábado 24 a las 13:30: primero se planifica y se construye
+([por-planificar.md](por-planificar.md)), y después se prueba todo junto.
+
+Se instala con `make run` desde la raíz. Antes hay que copiar
+`app/config/local.example.json` a `app/config/local.json` y poner el número de emergencia: ese
+archivo no se sube, porque el repo es público.
+
+**Por qué está sin empezar:** nadie ha hecho la prueba en un teléfono real. El número de
+emergencia vive en `app/config/local.json`, que solo está en la máquina de Abrahan, y la app no se
+ha instalado todavía en el teléfono que va a la tarima. Mientras esto siga abierto, todo lo demás
+está probado solo con pruebas automáticas.
+
+- [ ] Aceptar los permisos al abrir: micrófono, llamadas, contactos y «Mostrar sobre otras apps».
+      El último abre una pantalla de ajustes aparte.
+- [ ] **El oído:** alarma de humo (un video de YouTube), un vaso que se rompe, un golpe, un grito
+      y la TV. En modo debug, debajo de la fecha se ve qué oye y con qué puntaje.
+- [ ] **WhatsApp:** guardar el número de emergencia en los contactos del teléfono, con WhatsApp.
+      Tocar «Pedir ayuda»: tiene que abrirse una llamada de voz de WhatsApp, no el chat. Avisarle
+      antes a la persona a la que se llama.
+- [ ] **Si no contestan:** dejar timbrar sin contestar. Al terminar, la app tiene que volver sola
+      al frente con «¿Pudo hablar con…?» y, a los 15 s, llamar por teléfono normal.
+      **Es lo más incierto:** Android 16 restringe que una app se abra sola desde segundo plano,
+      y no se ha comprobado. Si no vuelve, revisar `terminar()` en
+      [`MainActivity.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/MainActivity.kt).
+- [ ] **Si WhatsApp falla:** borrar el contacto de la agenda y repetir. Tiene que llamar por
+      teléfono directo.
+- [ ] **Por voz:** en «¿Pudo hablar con…?», decir «sí» (cierra) y «no» (llama por teléfono). Probar
+      con wifi y sin wifi.
+- [ ] **Pastillas:** mantener presionado «Pastillas de hoy» para forzar el recordatorio, y probar
+      «Ya me la tomé», que es la única forma de quitarlo.
+- [ ] **Que la toma descuente** · *Abrahan*: «Ya me la tomé» llama `casa_tomar` (ver «Inventario
+      de pastillas» en el P1) y en `/f/demo/pastillas` el losartán baja de 8 a 7. Es el momento 1
+      del demo. La casa de demo arranca con 8 losartán (4 días, sale «Hay que comprar») y 40
+      metformina; para volver a eso, «Las conté y son otras» en esa misma página.
+- [ ] Anotar aquí lo que falló, con el modelo del teléfono y su versión de Android.
 
 ## Para el pitch y el jurado
 

@@ -9,14 +9,14 @@
 
 | # | Punto | Tipo | Estado |
 |---|---|---|---|
-| 1 | [Proyección: seguros, ficha médica, farmacia, 911 y ambulancia](#1-proyección-para-el-pitch) | Pitch | En futuro.md; falta que el equipo apruebe el orden |
+| 1 | [Proyección: seguros, ficha médica, farmacia, 911 y ambulancia](#1-proyección-para-el-pitch) | Pitch | Va al cierre del demo; se habla después |
 | 2 | [Tres vistas: de mesa, personal y familia](#2-tres-vistas-y-cómo-se-conectan) | Producto | Por decidir |
 | 3 | [Mejorar los mockups de la vista de mesa](#3-mejorar-los-mockups-de-mesa) | Diseño | Por hacer |
 | 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Decidido que sí; falta el cómo |
 | 5 | [Altavoz y volumen al máximo en la llamada](#5-altavoz-y-volumen-al-máximo-en-la-llamada) | Técnico | Decidido; se puede probar ya |
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
 | 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |
-| 8 | [Comandos de voz: «llama a emergencias», «llama a mi hijo»](#8-comandos-de-voz) | Producto | Propuesta lista |
+| 8 | [Comandos de voz: «llama a emergencias», «llama a mi hijo»](#8-comandos-de-voz) | Producto | Hecho: emergencias, hijo, vecino y «ya me la tomé» |
 
 ## 1. Proyección para el pitch
 
@@ -34,6 +34,8 @@ pueda usar. Queda como proyección, no como demo.
 
 - [x] Agregar a futuro.md lo de Farmatodo y Yummy, y que el 911 y la ambulancia salgan **en una
       sola acción** cuando la emergencia es grave (sábado 24).
+- [ ] Es el **cierre de la exposición**, después del demo: se conversa más adelante. A Abrahan le
+      gustó el orden de abajo (sábado 24).
 - [ ] Que el equipo apruebe el orden del pitch de abajo. La venta (precio, quién paga) sigue en
       [plan.md](plan.md#la-venta-para-el-pitch).
 
@@ -284,10 +286,18 @@ en una novela, la casa llamaría. Por eso propongo dos reglas:
 | «Contesta» | Contesta una llamada que entra | Permiso `ANSWER_PHONE_CALLS`. Sirve si el hijo devuelve la llamada y ella está en el suelo |
 | «Cuelga» | Termina la llamada | Mismo permiso, o ser la app de teléfono predeterminada |
 | «¿Qué hora es?», «¿Qué pastilla me toca?» | La casa lo dice en voz alta | Acompaña sin pantalla; usa la voz del teléfono (TTS) |
-| «Ya me la tomé» | Marca la pastilla | Cómodo, pero se puede decir sin haberla tomado. Propongo dejarlo solo con el botón |
+| «Ya me la tomé» | Marca la pastilla | **Hecho.** Abrahan lo quiso por voz: así no tiene que pararse de donde esté. Es muy raro que la TV diga justo eso mientras suena el recordatorio |
 | «Estoy bien» en «¿Está bien?» | Apagaría la alarma | Propongo que no: la alarma se apaga deslizando justo para que no se apague por reflejo ni por la TV |
 
-- [ ] Elegir el nombre de la casa para las órdenes.
-- [ ] Elegir qué órdenes entran en el hackatón. Propuesta: emergencias, hijo y vecino, con los
-      5 s para arrepentirse. Son las que se ven bien en el demo.
+- [x] El nombre de la casa: **«Lucero»** (sábado 24). Por ahora fijo en
+      [`comandos.dart`](../app/lib/dominio/comandos.dart); a futuro lo elige la familia.
+- [x] Entran emergencias, hijo y vecino, con los 5 s para arrepentirse y «no» por voz, y «ya me
+      la tomé» en el recordatorio. Hechos el sábado 24: [`comandos.dart`](../app/lib/dominio/comandos.dart),
+      `_reconocerVoz` en el [controlador](../app/lib/ui/controlador.dart) y
+      [`llamada_por_voz.dart`](../app/lib/ui/llamada_por_voz.dart). Al hijo, WhatsApp primero;
+      al vecino y a emergencias, llamada normal en altavoz con el volumen al máximo.
+- [ ] Los números del vecino y de emergencias van en `app/config/local.json`
+      (`TELEFONO_VECINO`, `NUMERO_EMERGENCIAS`). Para probar, el de alguien del equipo: **nunca el
+      911 de verdad**.
+- [ ] Ver en el teléfono si Vosk conoce «Lucero» y si la marca respeta el altavoz.
 - [ ] Probar en el teléfono si Vosk oye durante una llamada.

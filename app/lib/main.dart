@@ -34,6 +34,7 @@ Future<void> main() async {
     voz: kIsWeb ? null : VozAndroid(),
     microfono: oido,
     frases: frases,
+    numeroEmergencias: numeroEmergencias,
     nube: nube,
   );
   runApp(AppCasa(controlador: controlador));

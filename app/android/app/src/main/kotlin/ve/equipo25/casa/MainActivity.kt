@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.ContactsContract
+import android.telecom.TelecomManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -26,6 +27,7 @@ class MainActivity : FlutterActivity() {
             setMethodCallHandler { call, result ->
                 when (call.method) {
                     "whatsapp" -> result.success(llamarPorWhatsApp(call.argument<String>("numero").orEmpty()))
+                    "llamarEnAltavoz" -> result.success(llamarEnAltavoz(call.argument<String>("numero").orEmpty()))
                     else -> result.notImplemented()
                 }
             }
@@ -34,6 +36,37 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/energia").setMethodCallHandler { call, result ->
             if (call.method == "leer") result.success(leerEnergia()) else result.notImplemented()
         }
+    }
+
+    /**
+     * Una llamada telefónica normal, en altavoz y con el volumen de llamada al máximo: quien
+     * llama puede estar en el suelo, lejos del teléfono. Es la de emergencias.
+     *
+     * El altavoz se pide con `EXTRA_START_CALL_WITH_SPEAKERPHONE`, pero quien decide es la app de
+     * teléfono de cada marca. Por si lo ignora, se insiste cuando la llamada ya está en curso.
+     * Devuelve false si falta el permiso de llamadas.
+     */
+    private fun llamarEnAltavoz(numero: String): Boolean {
+        if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) return false
+        val audio = getSystemService(AUDIO_SERVICE) as AudioManager
+        fun alMaximo() {
+            val maximo = audio.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
+            audio.setStreamVolume(AudioManager.STREAM_VOICE_CALL, maximo, 0)
+        }
+        alMaximo()
+        startActivity(
+            Intent(Intent.ACTION_CALL, Uri.fromParts("tel", numero, null))
+                .putExtra(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+        )
+        reloj.postDelayed({
+            if (audio.mode == AudioManager.MODE_IN_CALL) {
+                @Suppress("DEPRECATION")
+                audio.isSpeakerphoneOn = true
+                alMaximo()
+            }
+        }, 3000)
+        return true
     }
 
     /**

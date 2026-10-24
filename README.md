@@ -27,6 +27,7 @@ Track: 🚨 Emergencias
 TELÉFONO DE LA CASA · Flutter en Android
   micrófono ─► buffer de 5 s en memoria ─┬─► compuerta de dB ─► YAMNet (TFLite) ─► alarma, vidrio, golpe, grito
                                          └─► Vosk, sin internet ─► «¡ayuda!», «me siento mal», ~70 frases
+                                                                    «Lucero, llama a mi hijo»: 5 s para decir «no»
                                                     │
                                                     ▼
   «¿Está bien?» ─► casa_alerta(vence en 60 s) ──────────────────────────────────┐
@@ -87,7 +88,7 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 |---|---|---|
 | Web: estado de la familia, audio, inventario y factura | 51 | `cd web && bun test` |
 | Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
-| App de la casa: alerta, pastillas, pedidos por voz, nube con cola | 81 | `make test` |
+| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 91 | `make test` |
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
 | Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
 | Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |

@@ -9,7 +9,7 @@ import 'controlador.dart';
 
 /// «Es hora de la losartán»: verde, tranquila y en toda la pantalla. La pastilla se dibuja con
 /// sus colores para reconocerla sin leer. Solo se quita con «Ya me la tomé», que ocupa todo el
-/// lado derecho: no hay «más tarde». Si pasan 2 horas sin tomarla, se va sola y queda como
+/// lado derecho, o diciéndolo en voz alta: no hay «más tarde». Si pasan 2 horas sin tomarla, se va sola y queda como
 /// olvidada (PlanDelDia.ventana): así nunca empuja a tomar dos dosis seguidas.
 ///
 /// Abajo queda «Pedir ayuda», más chico: mientras la pantalla está, el reposo no se ve, y la
@@ -92,7 +92,13 @@ class HoraPastilla extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 14),
+                      // Para no tener que pararse si está lejos del teléfono.
+                      const Text(
+                        'O diga «ya me la tomé».',
+                        style: TextStyle(fontSize: 20, color: Color(0xFFD7EBDD)),
+                      ),
+                      const SizedBox(height: 18),
                       SizedBox(
                         width: 220,
                         child: BotonGrande(

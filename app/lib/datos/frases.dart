@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../dominio/comandos.dart';
 import '../dominio/pedidos.dart';
 
 /// Lo que se dijo en voz alta en la casa, reconocido sin internet. En la app es Vosk (el lado
@@ -39,7 +40,7 @@ class FrasesVosk implements Frases {
     try {
       _listo =
           await _canal.invokeMethod<bool>('iniciar', {
-            'frases': [...todasLasFrases, '[unk]'],
+            'frases': [...todasLasFrases, ...frasesDeOrdenes, '[unk]'],
           }) ??
           false;
     } on PlatformException catch (e) {

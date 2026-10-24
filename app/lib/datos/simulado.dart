@@ -7,6 +7,11 @@ import '../dominio/tipos.dart';
 // El número de emergencia NO va en el código: el repo es público. Se pasa al correr la app,
 // desde config/local.json, que no se sube (ver config/local.example.json y el README).
 const telefonoEmergencia = String.fromEnvironment('TELEFONO_EMERGENCIA');
+const telefonoVecino = String.fromEnvironment('TELEFONO_VECINO');
+
+/// El número al que llama «Lucero, llama a emergencias». En Venezuela es el 911, pero no viene
+/// puesto: para probar se usa el de alguien del equipo, nunca el 911 de verdad.
+const numeroEmergencias = String.fromEnvironment('NUMERO_EMERGENCIAS');
 
 const casaSimulada = Casa(
   id: 'demo',
@@ -27,6 +32,7 @@ const casaSimulada = Casa(
       canal: Canal.llamada,
       orden: 2,
       donde: 'En Caracas',
+      telefono: telefonoVecino,
     ),
   ],
 );

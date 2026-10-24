@@ -354,6 +354,134 @@ void main() {
     });
   });
 
+  group('órdenes por voz: «Lucero, llama…»', () {
+    late DateTime ahora;
+    late TelefonoFalso t;
+    late FrasesFalsas frases;
+    late StreamController<Escucha> oido;
+    late Controlador c;
+
+    const voz = Escucha(
+      db: -40,
+      fondo: -50,
+      compuerta: false,
+      top: [Clase('Speech', 0.8)],
+    );
+
+    Future<void> abrir(
+      WidgetTester tester, {
+      DateTime? hora,
+      Casa casa = casaConNumero,
+    }) async {
+      comoRelojDeMesa(tester);
+      ahora = hora ?? temprano();
+      t = TelefonoFalso();
+      frases = FrasesFalsas([]);
+      oido = StreamController<Escucha>();
+      c = Controlador(
+        casa: casa,
+        pastillas: pastillasSimuladas,
+        reloj: () => ahora,
+        escuchas: oido.stream,
+        frases: frases,
+        microfono: MicrofonoFalso(),
+        telefono: t,
+        numeroEmergencias: '04120000911',
+      );
+      await tester.pumpWidget(AppCasa(controlador: c));
+    }
+
+    Future<void> decir(WidgetTester tester, List<String> texto) async {
+      frases.oye = texto;
+      oido.add(voz);
+      await tester.pump();
+      await tester.pump(Controlador.finDeFrase);
+      await tester.pump();
+    }
+
+    Future<void> pasan(WidgetTester tester, int segundos) async {
+      for (var i = 0; i < segundos; i++) {
+        ahora = ahora.add(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
+      }
+      await tester.pump();
+    }
+
+    testWidgets('«Lucero, llama a mi hijo» espera 5 s y llama por WhatsApp', (
+      tester,
+    ) async {
+      await abrir(tester);
+      await decir(tester, ['lucero llama a mi hijo']);
+      expect(find.text('Llamando a Josuep'), findsOneWidget);
+      expect(t.porWhatsApp, isEmpty);
+
+      await pasan(tester, 5);
+      expect(t.porWhatsApp, ['04120000000']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('decir «no» en esos 5 s no llama', (tester) async {
+      await abrir(tester);
+      await decir(tester, ['lucero llama a mi hijo']);
+      await pasan(tester, 2);
+      await decir(tester, ['no']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+
+      await pasan(tester, 5);
+      expect(t.porWhatsApp, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('el botón «No llamar» tampoco llama', (tester) async {
+      await abrir(tester);
+      await decir(tester, ['lucero llama a mi hijo']);
+      await tester.tap(find.text('No llamar'));
+      await pasan(tester, 5);
+      expect(t.porWhatsApp, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('emergencias: llamada normal en altavoz', (tester) async {
+      await abrir(tester);
+      await decir(tester, ['lucero llama a emergencias']);
+      expect(find.text('Llamando a emergencias'), findsOneWidget);
+      await pasan(tester, 5);
+      expect(t.enAltavoz, ['04120000911']);
+      expect(t.porWhatsApp, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('sin número del vecino lo dice y no promete la llamada', (
+      tester,
+    ) async {
+      await abrir(tester, casa: casaSimulada);
+      await decir(tester, ['lucero llama al vecino']);
+      expect(find.text('No tengo el número de Pedro'), findsOneWidget);
+      await pasan(tester, 5);
+      expect(t.enAltavoz, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('sin «Lucero», la TV no hace llamar', (tester) async {
+      await abrir(tester);
+      await decir(tester, ['llama a tu hijo']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«ya me la tomé» quita el recordatorio de la pastilla', (
+      tester,
+    ) async {
+      await abrir(tester, hora: DateTime(2026, 10, 24, 8, 2));
+      expect(find.text('Es hora de la losartán'), findsOneWidget);
+      await decir(tester, ['ya me la tomé']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(c.plan.tomada(pastillasSimuladas.first), isTrue);
+      await _cerrar(tester, c);
+    });
+  });
+
   testWidgets('«Leer récipe» dice que todavía no está lista y vuelve', (
     tester,
   ) async {

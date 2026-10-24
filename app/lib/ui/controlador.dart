@@ -7,6 +7,7 @@ import '../datos/llamadas.dart';
 import '../datos/nube.dart';
 import '../datos/voz.dart';
 import '../dominio/alerta.dart';
+import '../dominio/comandos.dart';
 import '../dominio/pastillas.dart';
 import '../dominio/pedidos.dart';
 import '../dominio/respuesta.dart';
@@ -25,6 +26,7 @@ class Controlador extends ChangeNotifier {
     this.microfono,
     this.frases,
     this.nube,
+    this.numeroEmergencias = '',
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
        plan = PlanDelDia(pastillas) {
@@ -53,6 +55,9 @@ class Controlador extends ChangeNotifier {
   static const audioDelPedido = Duration(seconds: 5);
   static const repetirPedido = Duration(seconds: 4);
 
+  /// Cuánto se espera antes de una llamada pedida en voz alta, para decir «no».
+  static const esperaLlamada = Duration(seconds: 5);
+
   final Casa casa;
 
   /// Las pastillas del día y cuáles ya tomó.
@@ -66,6 +71,9 @@ class Controlador extends ChangeNotifier {
 
   /// El oído, que se pausa mientras la voz escucha y guarda lo último que oyó.
   final Microfono? microfono;
+
+  /// Al que llama «Lucero, llama a emergencias». Vacío si no está configurado.
+  final String numeroEmergencias;
 
   /// Las frases de ayuda dichas en voz alta, reconocidas con Vosk sobre el audio del oído.
   final Frases? frases;
@@ -226,7 +234,7 @@ class Controlador extends ChangeNotifier {
         oirEvento(evento);
       }
     }
-    if (_hablanEnLaCasa(escucha)) unawaited(_reconocerPedido());
+    if (_hablanEnLaCasa(escucha)) unawaited(_reconocerVoz());
     notifyListeners();
   }
 
@@ -240,18 +248,26 @@ class Controlador extends ChangeNotifier {
       return false;
     }
     final antes = _ultimoPedido;
-    if (antes != null && ahora.difference(antes) < repetirPedido) return false;
+    // Mientras corren los 5 s antes de una llamada, el «no» tiene que llegar a tiempo.
+    if (porLlamar == null &&
+        antes != null &&
+        ahora.difference(antes) < repetirPedido) {
+      return false;
+    }
     double puntaje(String clase) =>
         e.top.where((c) => c.nombre == clase).firstOrNull?.puntaje ?? 0;
     final tv = puntaje('Television') + puntaje('Radio');
     return puntaje('Speech') >= 0.4 && tv < 0.2;
   }
 
-  /// Busca las frases del banco (pedidos.dart) en los últimos segundos que oyó la casa. Vosk lee
-  /// el mismo anillo que YAMNet, así que el oído nunca se pausa y la frase que despertó al
-  /// reconocedor también cuenta. Lo que se pide pasa por «¿Está bien?» y no llama directo: si la
-  /// voz era de la TV o se entendió mal, la persona lo apaga deslizando; si no responde, escala.
-  Future<void> _reconocerPedido() async {
+  /// Busca en los últimos segundos que oyó la casa una orden (comandos.dart) o un pedido de
+  /// ayuda (pedidos.dart). Vosk lee el mismo anillo que YAMNet, así que el oído nunca se pausa y
+  /// la frase que despertó al reconocedor también cuenta.
+  ///
+  /// Un pedido pasa por «¿Está bien?» y no llama directo: si la voz era de la TV o se entendió
+  /// mal, la persona lo apaga deslizando; si no responde, escala. Una orden de llamar sí llama,
+  /// pero solo si empezó con el nombre de la casa y después de 5 s para decir «no».
+  Future<void> _reconocerVoz() async {
     final frases = this.frases;
     final microfono = this.microfono;
     if (frases == null || microfono == null) return;
@@ -260,17 +276,110 @@ class Controlador extends ChangeNotifier {
     try {
       // Que la frase termine de entrar al anillo antes de leerlo.
       await Future<void>.delayed(finDeFrase);
-      final versiones = await frases.reconocer(
-        microfono.ultimoAudio(audioDelPedido),
-      );
+      // Durante los 5 s antes de una llamada, solo lo que se dijo desde que empezaron: si no, la
+      // orden misma volvería a leerse.
+      final llamada = porLlamar;
+      var cuanto = audioDelPedido;
+      if (llamada != null) {
+        final desde = ahora.difference(llamada.desde);
+        if (desde < cuanto) cuanto = desde;
+      }
+      final versiones = await frases.reconocer(microfono.ultimoAudio(cuanto));
+      final orden = ordenPorVoz(versiones);
+      if (orden != null && _obedecer(orden)) return;
       final pedido = pedidoPorVoz(versiones);
       if (pedido != null) oirEvento(pedido);
     } finally {
       _reconociendo = false;
+      notifyListeners();
+    }
+  }
+
+  /// True si la orden se cumplió; false si no venía al caso (un «no» sin llamada por salir).
+  bool _obedecer(Orden orden) {
+    switch (orden) {
+      case Orden.cancelar:
+        if (porLlamar == null) return false;
+        noLlamar();
+      case Orden.yaMeLaTome:
+        final p = recordatorio;
+        if (p == null) return false;
+        yaLaTome(p);
+      case Orden.llamarEmergencias:
+        _prepararLlamada(
+          LlamadaPorVoz(
+            quien: 'emergencias',
+            numero: numeroEmergencias,
+            emergencias: true,
+            desde: ahora,
+          ),
+        );
+      case Orden.llamarHijo || Orden.llamarVecino:
+        final relaciones = orden == Orden.llamarHijo
+            ? const {'hijo', 'hija'}
+            : const {'vecino', 'vecina'};
+        final contacto =
+            ([...casa.contactos]..sort((a, b) => a.orden.compareTo(b.orden)))
+                .where((c) => relaciones.contains(c.relacion))
+                .firstOrNull;
+        if (contacto == null) return false;
+        _prepararLlamada(
+          LlamadaPorVoz(
+            quien: contacto.nombre,
+            numero: contacto.telefono,
+            porWhatsApp: contacto.relacion.startsWith('hij'),
+            desde: ahora,
+          ),
+        );
+    }
+    return true;
+  }
+
+  /// La llamada que se pidió en voz alta y sale cuando pasen [esperaLlamada], o null.
+  LlamadaPorVoz? porLlamar;
+
+  /// Lo que falta para que salga la llamada pedida en voz alta.
+  Duration get porLlamarRestante {
+    final l = porLlamar;
+    if (l == null) return Duration.zero;
+    final hasta = l.desde.add(esperaLlamada);
+    return ahora.isBefore(hasta) ? hasta.difference(ahora) : Duration.zero;
+  }
+
+  void _prepararLlamada(LlamadaPorVoz llamada) {
+    if (alerta != null) return; // la alerta ya tiene su propia llamada
+    porLlamar = llamada;
+    notifyListeners();
+  }
+
+  /// «No llamar», con el botón o diciendo «no».
+  void noLlamar() {
+    porLlamar = null;
+    notifyListeners();
+  }
+
+  Future<void> _llamarYa(LlamadaPorVoz l) async {
+    porLlamar = null;
+    notifyListeners();
+    final t = telefono;
+    if (t == null || l.numero.isEmpty) return;
+    if (l.emergencias) {
+      // La familia también se entera, como un pedido de ayuda ya escalado. No se cambia la
+      // alerta de la casa: si no, la casa llamaría además al primer contacto encima del 911.
+      nube?.nuevaAlerta(Alerta.urgente(TipoEvento.panico, ahora));
+    }
+    if (l.porWhatsApp) {
+      await llamarPrimeroPorWhatsApp(l.numero, t);
+    } else if (!await t.llamarEnAltavoz(l.numero)) {
+      await t.llamar(l.numero);
     }
   }
 
   void _alPasarUnSegundo() {
+    final llamada = porLlamar;
+    if (llamada != null && porLlamarRestante == Duration.zero) {
+      unawaited(_llamarYa(llamada));
+    }
     final hasta = _preguntaHasta;
     if (hasta != null && !ahora.isBefore(hasta)) unawaited(llamarPorTelefono());
     _cambiar(_alerta?.revisar(ahora));
@@ -304,4 +413,27 @@ class Controlador extends ChangeNotifier {
     _finDeWhatsApp?.cancel();
     super.dispose();
   }
+}
+
+/// Una llamada pedida en voz alta («Lucero, llama a mi hijo») que espera sus 5 s.
+class LlamadaPorVoz {
+  const LlamadaPorVoz({
+    required this.quien,
+    required this.numero,
+    required this.desde,
+    this.emergencias = false,
+    this.porWhatsApp = false,
+  });
+
+  /// Cómo se dice en pantalla: «emergencias» o el nombre del contacto.
+  final String quien;
+
+  /// Vacío si no hay número configurado: la pantalla lo dice y no llama.
+  final String numero;
+  final DateTime desde;
+  final bool emergencias;
+
+  /// Al hijo, WhatsApp primero (suele estar afuera); al vecino y a emergencias, llamada normal
+  /// en altavoz.
+  final bool porWhatsApp;
 }
