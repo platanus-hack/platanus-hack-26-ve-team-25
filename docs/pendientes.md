@@ -26,8 +26,9 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
   (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
 - **Telegram:** hecho, **desplegado y con el webhook registrado** (sábado, tarde). Es el canal
   general. Probado a mano de punta a punta contra la base real: suscripción, cola, envío con
-  enlace y sello que evita repetir. **Falta el cron** que llame a `/api/vigilar` y la prueba desde
-  un segundo teléfono.
+  enlace y sello que evita repetir. **El vigilante corre desde las 16:21:** la base llama a
+  `/api/vigilar` cada 5 s con pg_cron ([`20261024200000_vigilante.sql`](../supabase/migrations/20261024200000_vigilante.sql))
+  y recibe 200. Falta la prueba de punta a punta con el teléfono de la casa y un segundo teléfono.
 - **Alcance congelado el sábado 14:30:** lo que se presenta y quién hace qué está en
   [plan.md](plan.md#alcance-congelado-lo-que-se-presenta). Lo que no está ahí no se construye.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
@@ -187,7 +188,9 @@ Telegram**: el camino de WhatsApp sigue sin ejecutarse ni una vez.
 ### 4b. El mismo aviso por Telegram · *Josuep*
 
 **Hecho el sábado 15:25** (`5ad9671`, `24a0bd8`), **desplegado y con el webhook registrado**.
-Falta el proceso que llame a `/api/vigilar`: sin él, la cola se llena y nadie manda nada.
+El vigilante corre desde las 16:21: pg_cron llama a `/api/vigilar` cada 5 s, con el secreto en
+Vault (`cron_secret`, el mismo valor de `CRON_SECRET` en Vercel). Si responde 401, los dos
+secretos no coinciden: `select status_code, content from net._http_response order by created desc limit 5;`
 
 El sandbox no sirve para «que le llegue a todos»: cada teléfono necesita sesión activa y la
 apelación de Meta tarda 24-48 h. **Telegram sí llega a cualquiera sin verificación de negocio**, y

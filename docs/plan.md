@@ -72,7 +72,7 @@ Todo esto ya está escrito. Falta probarlo en el teléfono y conectarlo:
 | 1 | Instalar la app en el teléfono de la tarima y pasar la lista de prueba ([pendientes.md](pendientes.md), punto 1) | Abrahan | 17:00 | Nada se ha probado en un teléfono real. Sin esto no hay demo |
 | 2 | Que «¿Está bien?» suene (520 Hz) y vibre | Abrahan | 17:00 | Hoy solo se ve. Una alarma muda no convence en la tarima |
 | 3 | El ciclo casa → Supabase → `/f/demo` abierta en 5 a 10 teléfonos a la vez | Rogelio | 17:00 | Es lo que vive el público |
-| 4 | Avisos: un proceso que llame `/api/vigilar` cada pocos segundos, el `setWebhook` de Telegram y el webhook de Kapso apuntando a `/api/kapso/webhook` | Josuep | 17:00 | Sin el proceso no sale ningún aviso: la alerta escala y nadie se entera. Es la integración real que ven los jueces |
+| 4 | Avisos: ~~el vigilante cada 5 s~~ (16:21, en pg_cron), ~~el `setWebhook` de Telegram~~, y el webhook de Kapso apuntando a `/api/kapso/webhook` | Josuep | 17:00 | Es la integración real que ven los jueces. Falta probarla de punta a punta con el teléfono |
 | 5 | Pastillas: migración, `ANTHROPIC_API_KEY` en Vercel y `casa_tomar` desde la app | Abrahan y Rogelio | 20:00 | La web está hecha, falta conectarla |
 | 6 | Nombre del producto, README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
 
@@ -161,7 +161,8 @@ Lo que ya hay, sin costo:
 
 > **Cómo quedó el sábado en la tarde:** Meta restringió la cuenta de WhatsApp y solo funciona el
 > sandbox de Kapso, con cada teléfono activado a mano, y Telegram pasó a ser el canal general. El
-> vigilante quedó como `/api/vigilar` en la web y le falta el proceso que lo llame. De Claude se usa la lectura de la factura de la farmacia; el
+> vigilante quedó como `/api/vigilar` en la web, y desde las 16:21 lo llama la base cada 5 s con
+> pg_cron: Render no hizo falta. De Claude se usa la lectura de la factura de la farmacia; el
 > resumen de la mañana y las preguntas por WhatsApp van como proyección.
 
 ### Propuesta: qué hace cada crédito
