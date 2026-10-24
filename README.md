@@ -13,6 +13,7 @@ Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.verc
 - Por qué, lo que ya existe y las decisiones de diseño: [docs/contexto.md](docs/contexto.md)
 - Dónde puede fallar y cómo lo evitamos: [docs/riesgos.md](docs/riesgos.md)
 - Las preguntas abiertas de cada uno: [docs/investigacion.md](docs/investigacion.md)
+- Lo que va después del hackatón: [docs/futuro.md](docs/futuro.md)
 
 ## Estado
 
@@ -59,6 +60,7 @@ docs/plan.md               el plan, los roles y el demo
 docs/contexto.md           el porqué, la competencia y las decisiones
 docs/riesgos.md            los muros, los huecos y cómo hacer que sume y no reste
 docs/investigacion.md      las preguntas abiertas de cada uno
+docs/futuro.md             las mejoras a futuro
 web/src/app/escucha/       la página de prueba del oído
 web/src/lib/escucha/       lógica pura con pruebas: nivel y compuerta, buffer circular, clases de YAMNet
 ```

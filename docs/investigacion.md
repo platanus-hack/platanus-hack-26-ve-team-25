@@ -83,6 +83,9 @@ Detalle de las frecuencias de la voz, los modelos candidatos y la personalizaci�
 - [ ] Apagones en Venezuela: frecuencia y duración por región
 - [ ] Pacientes que dependen de equipos eléctricos (oxígeno) en casa
 - [ ] Qué parte de los teléfonos en Venezuela son Android
+- [ ] Cuánto cuesta un SMS y una llamada local desde un chip venezolano, y si un SMS al exterior
+  llega
+- [ ] Cuántas horas aguantan las antenas de telefonía en un apagón largo
 - [ ] Cuánto paga hoy la diáspora por cuidar a sus padres (cuidadoras, CareBridge y similares)
 - [ ] **Usuarios reales para el pitch:** dos o tres emigrados del entorno que digan cuántas veces
   llaman a sus padres al día. Un testimonio vale más que una cifra. Se cuenta con su permiso y sin

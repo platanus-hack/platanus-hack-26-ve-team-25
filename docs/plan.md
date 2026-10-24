@@ -3,10 +3,15 @@
 > Decidido el sábado 24-oct a las 00:30 y validado con el mentor. Si cambia, se reescribe aquí.
 > El porqué, lo que ya existe y las decisiones de diseño están en [contexto.md](contexto.md).
 > Lo que puede fallar: [riesgos.md](riesgos.md). Las preguntas de cada uno: [investigacion.md](investigacion.md).
+> Lo que no hacemos ahora pero sí en el producto: [futuro.md](futuro.md).
 
-## Decisiones del equipo (sábado 24-oct, 01:00)
+## Decisiones del equipo (sábado 24-oct)
 
-- **Flutter** para la app. Rogelio publica en iOS con su Mac.
+- **Para el hackatón, una app y una web.** El teléfono de la casa usa una app **Flutter en
+  Android**. La familia entra por **web**, con un enlace o un QR, para que el público la pruebe en
+  el pitch sin instalar nada.
+- **La versión final es una sola app para todos**, con dos roles: la casa y la familia
+  ([futuro.md](futuro.md)).
 - **Supabase** para la base de datos, por ahora.
 - **Lo que se pueda, en el teléfono** y en caché. A la base solo va lo relevante: eventos,
   alertas, latidos y el perfil de la casa.
@@ -16,15 +21,15 @@
 - **El perfil de salud cambia las reglas.** Un apagón no es igual para una persona hipertensa que
   para una que usa oxígeno. Reglas generales por condición más calibración por casa
   ([investigacion.md](investigacion.md#el-perfil-de-salud)).
-
-⚠️ **Por cerrar ya:** Flutter para el teléfono de la casa (Android) y la app de la familia en web,
-para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-técnicos).
+- **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
+  porque su familia confía.
+- **Aviso real por Telegram:** es gratis y suena en iOS y en Android.
 
 ## Reloj (hora de Caracas)
 
 | Cuándo | Qué |
 |---|---|
-| Sáb 12:00 | Núcleo desplegado y funcionando |
+| Sáb 12:00 | P0 desplegado y funcionando |
 | Sáb 20:00 | Taller «Cómo hacer un buen demo» (va todo el equipo) |
 | Sáb 24:00 | Alcance congelado y video de respaldo grabado |
 | **Dom 08:30** | **Fin del hacking. Lo que no esté pusheado no existe.** |
@@ -34,37 +39,53 @@ para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-t
 
 1. El teléfono de la casa oye (y siente el piso) un posible evento: alarma de humo, vidrio roto,
    golpe con vibración, grito.
-2. Suena una alarma fuerte en la casa: «¿Está bien? Toque la pantalla para apagar». La pantalla
-   destella y vibra.
-3. Si nadie la apaga en 60 s, se avisa al contacto de emergencia: en la app de la familia y por un
-   canal real.
+2. Suena una alarma fuerte en la casa: «¿Está bien?», con dos botones grandes: **Estoy bien** y
+   **Necesito ayuda**. La pantalla destella y vibra.
+3. Si nadie responde en 60 s, se avisa al contacto de emergencia: en la web de la familia y por
+   Telegram.
 4. Cada alarma que la persona apaga queda anotada como falsa alarma de esa casa y ajusta sus
    umbrales.
 
-## Núcleo (meta: sábado 12:00, desplegado)
+## Prioridades
 
-1. **El oído.** Micrófono → compuerta de dB → YAMNet en el navegador (ya existe como prueba en
-   `/escucha`). Se suma el acelerómetro para la vibración del piso y se combinan las dos señales
-   en un evento con su confianza.
-2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s y dos botones grandes:
-   «Estoy bien» y «Necesito ayuda». Siempre en pantalla: el **botón de pánico** (🔴 directo) y
-   los reportes de la persona («huele a gas», «me siento mal»).
+Se trabaja de arriba hacia abajo. Nada de P1 hasta que P0 esté desplegado.
+
+### P0 · El núcleo (meta: sábado 12:00, desplegado)
+
+1. **El oído.** Micrófono → compuerta de dB → YAMNet en la app de la casa. Se suma el
+   acelerómetro para la vibración del piso y se combinan las dos señales en un evento con su
+   confianza. La prueba en web ya existe en `/escucha`.
+2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s, «Estoy bien» y «Necesito
+   ayuda». Siempre en pantalla: el **botón de pánico** (🔴 directo, sin los 60 s).
 3. **El escalamiento que no depende de un solo teléfono.** La casa registra la alerta con su hora
    de vencimiento. Si nadie la cancela, el primero que vea el vencimiento (la casa o cualquier
-   teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico. Si la casa
-   deja de reportar, la familia ve «sin señal desde las 14:05».
-4. **La app de la familia.** Estado de la casa en vivo (última actividad, TV, luz), alertas e
-   historial del día. Sin login: se entra con un enlace de invitación, que en el demo es un QR.
-5. **El perfil de salud.** Una condición inventada por casa que cambia el nivel de los avisos.
-6. **La rutina.** «Se levantó a las 7:12» y aviso si a la hora de siempre no hubo actividad. Si no
-   llega al sábado 12:00, va después.
+   teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico.
+4. **El latido.** La casa reporta cada pocos minutos. Si deja de hacerlo, la familia ve «sin
+   señal desde las 14:05».
+5. **El aviso real por Telegram.**
+6. **La web de la familia.** Estado de la casa en vivo, alertas e historial del día. Sin login: se
+   entra con un enlace de invitación, que en el demo es un QR.
 
-## Extras (solo si el núcleo está listo)
+### P1 · Si P0 está listo (sábado en la tarde)
 
-- Voz: «Carmen, ¿está bien?», y que pueda responder hablando.
-- El vecino de confianza como segundo escalón.
+- **Perfil de salud y apagón.** Se detecta el apagón porque el teléfono deja de cargar, y el
+  perfil decide si es 🔴 o 🟡. Es el paso 5 del demo.
+- **Los tres niveles de aviso** con su tope diario.
+- **La persona como sensor:** «Huele a gas», «Huele a quemado», «Me siento mal».
+- **Modo kiosco nivel 1:** la app como pantalla de inicio, con servicio en primer plano
+  ([riesgos.md](riesgos.md#3-el-modo-kiosco-que-la-app-no-se-muera)).
+- **Sin conexión:** cola local que se reenvía al volver la señal, y aviso de batería baja y de
+  temperatura.
+- **La rutina:** conteos por franja del día, y aviso si falta lo de siempre.
+
+### P2 · Solo si sobra tiempo antes de las 24:00
+
 - Palabra clave por voz («¡auxilio!») con el reconocimiento del sistema, sin conexión.
-- SMS desde el chip del teléfono cuando no hay internet (Android).
+- Llamada en altavoz o SMS al vecino desde el chip cuando no hay internet (APK fuera de Play).
+- El resumen 🟢 de cada mañana.
+- Voz: «Carmen, ¿está bien?», y que pueda responder hablando.
+
+Todo lo demás está en [futuro.md](futuro.md).
 
 ## Demo
 
@@ -72,11 +93,11 @@ para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-t
    y su teléfono pasa a ser la familia.
 2. Suena una alarma de humo. En la tarima suena la alarma de confirmación, nadie la apaga y a los
    60 s (15 s en modo demo) les llega el aviso a todos los teléfonos.
-3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» apaga la alarma y se ve
-   que no escala.
+3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» toca «Estoy bien» y se
+   ve que no escala.
 4. Se prende la TV con una escena de gritos: no dispara, porque el piso no tembló.
-5. Se desenchufa el teléfono: «se fue la luz». En la casa de Carmen, que usa oxígeno, es 🔴. En
-   otra casa del demo es solo 🟡. El mismo evento, dos avisos.
+5. *(P1)* Se desenchufa el teléfono: «se fue la luz». En la casa de Carmen, que usa oxígeno, es
+   🔴. En otra casa del demo es solo 🟡. El mismo evento, dos avisos.
 
 ## Roles
 
@@ -85,16 +106,25 @@ para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-t
 | Detección e IA | Modelo local o nube, YAMNet en Flutter, vibración, fusión, umbrales por casa, la persona como sensor | Abrahan |
 | Alertas y conexión | Pánico, «¿Está bien?», filtro de falsos positivos, niveles, escalamiento, aviso sin señal o sin luz | Josuep |
 | Datos y usuarios | Cifras con fuente, diáspora, usuarios potenciales, testimonios, competencia | Anttony |
-| Orquestación, UX/UI y riesgos | Organización, experiencia de las dos pantallas, huecos y muros, viabilidad, deploy, pitch | Rogelio |
+| Orquestación, UX/UI y riesgos | Organización, huecos y muros, viabilidad, deploy, pitch. Programa la UI con el equipo | Rogelio |
+
+**Quién construye qué:**
+
+| Pieza | Quién |
+|---|---|
+| App Flutter de la casa | Los dos con experiencia en Flutter *(nombres por confirmar)* |
+| Web de la familia y UI/UX de las dos pantallas | Rogelio |
+| Supabase y Telegram | *(por confirmar)* |
 
 ## Infra (presupuesto cero)
 
-- **Web:** Next.js en Vercel, plan gratis. Producción:
+- **Web de la familia:** Next.js en Vercel, plan gratis. Producción:
   https://platanus-hack-26-ve-team-25.vercel.app. Por ahora el deploy es manual desde la cuenta
   de Rogelio (`vercel --prod` en `web/`).
+- **App de la casa:** Flutter, APK para Android instalado a mano.
 - **Estado y tiempo real:** Supabase, plan gratis.
 - **Detección:** corre en el teléfono, sin costo por uso. El audio nunca sale del teléfono.
-- **Aviso real:** correo o Telegram, que son gratis. El SMS cuesta: se decide si hay presupuesto.
+- **Aviso real:** bot de Telegram, gratis.
 
 ## Cómo trabajamos
 
@@ -105,7 +135,10 @@ para que el público entre con el QR. Detalle en [riesgos.md](riesgos.md#muros-t
 
 ## Pendiente
 
-- [ ] **Cerrar el reparto Flutter / web** (ver arriba)
-- [ ] Probar `/escucha` con micrófono real: alarma de humo, golpe, grito, TV
+- [ ] Nombres de quién construye cada pieza
+- [ ] **Volver a probar `/escucha` con la música alta de la oficina, ya con las clases nuevas.**
+  Ojo: el clasificador devuelve solo las 10 clases más probables (`maxResults: 10`). Con música
+  fuerte, las 10 pueden ser todas de música y la alarma de humo quedar fuera aunque suene. Si
+  pasa, se filtra por nuestras clases (`categoryAllowlist`) en vez de pedir el top 10
+- [ ] Probar la vibración en piso de cerámica o concreto, que es el de las casas venezolanas
 - [ ] Cifras con fuente: ver [investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)
-- [ ] Elegir el canal real de aviso: Telegram (recomendado) o correo

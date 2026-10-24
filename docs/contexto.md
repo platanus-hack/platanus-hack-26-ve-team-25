@@ -54,6 +54,9 @@ Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 | La persona también es sensor | «Huele a gas» o «me siento mal» lo confirma un humano: no hay falso positivo. Y cubre lo que el teléfono no puede oler |
 | Todo lo posible en el teléfono | Sin luz ni internet, que en Venezuela es lo normal, la alarma local sigue funcionando y los eventos esperan en cola |
 | Flutter, Supabase y Telegram | Flutter da micrófono en segundo plano, batería y SMS en el teléfono de la casa. Telegram suena en cualquier teléfono sin pagar cuentas de desarrollador |
+| El cliente es el que cuida | Paga, configura y recibe los avisos el hijo o el familiar lejos. El adulto mayor confía porque su familia confía |
+| En el hackatón, app para la casa y web para la familia | El público prueba con un QR sin instalar nada. La versión final es una sola app con los dos roles |
+| Lo que no cabe ahora va a [futuro.md](futuro.md) | Dejarlo para después no es descartarlo |
 | Una sola app con dos roles: la casa y la familia | El mismo instalable sirve para el teléfono viejo del abuelo y para el del familiar que recibe el aviso |
 | La rutina de cada casa se cuenta, no se entrena | Conteos de qué suena en cada franja del día. Lo que más dice que algo pasó es que falte lo de siempre, y eso cubre las caídas silenciosas |
 | El demo muestra dos momentos | A la casa le pasa algo en la tarima, y a alguien del público le llega el aviso en su teléfono |
