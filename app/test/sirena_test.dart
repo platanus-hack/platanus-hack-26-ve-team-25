@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:casa/datos/simulado.dart';
 import 'package:casa/datos/sirena.dart';
+import 'package:casa/dominio/alerta.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:casa/oido/oido.dart';
 import 'package:casa/oido/sonidos.dart';
@@ -12,7 +13,10 @@ class SirenaFalsa implements Sirena {
   final pasos = <String>[];
 
   @override
-  Future<void> sonar() async => pasos.add('sonar');
+  Future<void> sonar(String frase) async => pasos.add('sonar: $frase');
+
+  @override
+  Future<void> decir(String frase) async => pasos.add('decir: $frase');
 
   @override
   Future<void> callar() async => pasos.add('callar');
@@ -51,15 +55,17 @@ void main() {
 
   test('«¿Está bien?» suena mientras espera y se calla con «Estoy bien»', () {
     c.oirEvento(TipoEvento.alarma);
-    expect(sirena.pasos, ['sonar']);
+    expect(sirena.pasos, [
+      'sonar: Carmen, ¿está bien? Si está bien, deslice el botón.',
+    ]);
     c.estoyBien();
-    expect(sirena.pasos, ['sonar', 'callar']);
+    expect(sirena.pasos.last, 'callar');
   });
 
   test('se calla al escalar: ya no pregunta, avisa', () {
     c.oirEvento(TipoEvento.golpe);
     c.necesitoAyuda();
-    expect(sirena.pasos, ['sonar', 'callar']);
+    expect(sirena.pasos.last, 'callar');
   });
 
   test('el pánico no suena: nace escalado', () {
@@ -76,5 +82,24 @@ void main() {
     ahora = ahora.add(Controlador.sordoTrasLaAlarma);
     oido.add(alarma); // pasado ese tiempo, una alarma de verdad sí pregunta
     expect(c.alerta?.motivo, TipoEvento.alarma);
+  });
+
+  testWidgets('a 20 s del final dice a quién va a llamar, una sola vez', (
+    tester,
+  ) async {
+    // El reloj del controlador tiene que nacer dentro del tiempo falso de la prueba.
+    final c = Controlador(
+      casa: casaSimulada,
+      reloj: () => ahora,
+      sirena: sirena,
+    );
+    c.oirEvento(TipoEvento.alarma);
+    ahora = ahora.add(esperaConfirmacion - Controlador.avisoFinal);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(sirena.pasos.where((p) => p.startsWith('decir')), [
+      'decir: Carmen, si no responde, voy a avisar a su familia.',
+    ]);
+    c.dispose();
   });
 }

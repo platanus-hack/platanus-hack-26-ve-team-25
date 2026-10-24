@@ -25,8 +25,10 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   «Lucero» no llama: puede ser la TV. Los números van en `config/local.json`
   (`TELEFONO_VECINO`, `NUMERO_EMERGENCIAS`); para probar, nunca el 911 de verdad.
 - **La alarma de «¿Está bien?»:** un tono de 520 Hz en onda cuadrada, que las personas mayores
-  oyen mejor que un pitido agudo, con el ritmo de las alarmas de humo, y vibración. Suena por el
-  canal de alarma, aunque el teléfono esté en silencio.
+  oyen mejor que un pitido agudo, con el ritmo de las alarmas de humo, y vibración. Cada dos
+  ciclos la voz del teléfono dice «Carmen, ¿está bien? Si está bien, deslice el botón», y a 20 s
+  del final, a quién va a llamar. Suena por el canal de alarma, aunque el teléfono esté en
+  silencio.
 - **El recordatorio de la pastilla:** en toda la pantalla, y solo se quita con «Ya me la tomé»,
   con el botón o en voz alta.
   Si pasan 2 horas se va solo y queda como olvidada, para no empujar a tomar dos dosis.

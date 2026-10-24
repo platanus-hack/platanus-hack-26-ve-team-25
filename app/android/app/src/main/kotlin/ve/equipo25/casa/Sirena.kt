@@ -6,15 +6,23 @@ import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
+import java.util.Locale
 
 /**
- * La alarma de «¿Está bien?»: un tono de 520 Hz en onda cuadrada y vibración, en bucle.
+ * La alarma de «¿Está bien?»: un tono de 520 Hz en onda cuadrada y vibración, en bucle, y cada dos
+ * ciclos una frase fija con la voz del teléfono («Carmen, ¿está bien?…»). Frases fijas y no una IA
+ * que responda: en la alarma la voz tiene que ser predecible y funcionar sin internet
+ * (docs/por-planificar.md, punto 9). La voz es grave y lenta, como pide la investigación de audio.
  *
  * 520 Hz y no un pitido agudo porque con la edad se oyen peor los agudos: en las pruebas de la
  * NFPA, ese tono despertó al 92% de las personas con pérdida auditiva, contra el 56% del de
@@ -28,15 +36,61 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     private val audio = contexto.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var pista: AudioTrack? = null
     private var volumenAntes: Int? = null
+    private val reloj = Handler(Looper.getMainLooper())
+    private var voz: TextToSpeech? = null
+    private var vozLista = false
+
+    /** Lo que dice en el próximo turno de voz. Dart lo cambia cerca del final. */
+    private var frase = ""
 
     init {
         MethodChannel(mensajero, "casa/sirena").setMethodCallHandler { call, result ->
             when (call.method) {
-                "sonar" -> { sonar(); result.success(null) }
+                "sonar" -> { frase = call.argument<String>("frase").orEmpty(); sonar(); result.success(null) }
+                "decir" -> { frase = call.argument<String>("frase").orEmpty(); result.success(null) }
                 "callar" -> { callar(); result.success(null) }
                 else -> result.notImplemented()
             }
         }
+        voz = TextToSpeech(contexto) { estado ->
+            val v = voz ?: return@TextToSpeech
+            if (estado != TextToSpeech.SUCCESS) return@TextToSpeech
+            // El español del teléfono, prefiriendo el latinoamericano.
+            val idioma = listOf(Locale("es", "VE"), Locale("es", "US"), Locale("es", "MX"), Locale("es", "ES"), Locale("es"))
+                .firstOrNull { v.isLanguageAvailable(it) >= TextToSpeech.LANG_AVAILABLE }
+                ?: return@TextToSpeech
+            v.language = idioma
+            v.setPitch(0.8f)
+            v.setSpeechRate(0.85f)
+            v.setAudioAttributes(atributos())
+            v.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(id: String?) {}
+                override fun onDone(id: String?) { reloj.post { volverAlTono() } }
+                @Deprecated("Deprecated in Java")
+                override fun onError(id: String?) { reloj.post { volverAlTono() } }
+            })
+            vozLista = true
+        }
+    }
+
+    // Dos ciclos del tono (8 s), la frase, y otra vez el tono.
+    private val turnoDeVoz: Runnable = Runnable {
+        val p = pista ?: return@Runnable
+        val v = voz
+        if (!vozLista || v == null || frase.isEmpty()) {
+            programarVoz()
+            return@Runnable
+        }
+        p.pause()
+        v.speak(frase, TextToSpeech.QUEUE_FLUSH, null, "frase")
+    }
+
+    private fun programarVoz(): Boolean = reloj.postDelayed(turnoDeVoz, CICLOS_ENTRE_FRASES * 4000L)
+
+    private fun volverAlTono() {
+        val p = pista ?: return
+        p.play()
+        programarVoz()
     }
 
     private fun sonar() {
@@ -62,6 +116,7 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
                 setLoopPoints(0, muestras.size, -1)
                 play()
             }
+        programarVoz()
 
         // El mismo ritmo en la vibración: espera, pulso, pausa… y se repite desde el principio.
         val patron = longArrayOf(0, 500, 500, 500, 500, 500, 1500)
@@ -75,6 +130,8 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     }
 
     private fun callar() {
+        reloj.removeCallbacks(turnoDeVoz)
+        voz?.stop()
         pista?.run {
             stop()
             release()
@@ -118,5 +175,6 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         const val FRECUENCIA = 520.0
         // No a tope: una cuadrada al máximo satura el parlante de un teléfono viejo y suena rota.
         const val AMPLITUD = 26000
+        const val CICLOS_ENTRE_FRASES = 2
     }
 }

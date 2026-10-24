@@ -17,7 +17,7 @@
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
 | 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |
 | 8 | [Comandos de voz: «llama a emergencias», «llama a mi hijo»](#8-comandos-de-voz) | Producto | Hecho: emergencias, hijo, vecino y «ya me la tomé» |
-| 9 | [La voz de «¿Está bien?»](#9-la-voz-de-está-bien) | Producto | Propuesta, esperando a Abrahan |
+| 9 | [La voz de «¿Está bien?»](#9-la-voz-de-está-bien) | Producto | Hecho: frases fijas con la voz del teléfono |
 
 ## 1. Proyección para el pitch
 
@@ -53,6 +53,13 @@ el anterior:
 3. **«¿Quién paga?»** El hijo, y también los seguros, que ya venden ambulancia y médico a
    domicilio a la diáspora pero se enteran tarde. Nosotros somos el aviso que dispara su
    respuesta.
+
+**También para el speech** (Abrahan, sábado 24), como lo que viene y no como algo hecho:
+
+- **La app como pantalla de inicio del teléfono de mesa:** al encender, el teléfono abre la casa y
+  vuelve a oír sola después de un apagón. Hoy hay que abrirla.
+- **La voz del hijo en la alarma:** «Mamá, soy Josuep, ¿estás bien?», grabada al configurar. Hoy
+  habla la voz del teléfono.
 
 Lo que hay que decir con honestidad: nada de esto está integrado. Ni el 911 ni Venemergencia ni
 las farmacias tienen una API pública: son acuerdos, no código.
@@ -322,4 +329,9 @@ puede tardar, inventar o quedarse sin internet justo en la emergencia.
 Una IA que habla sí sirve en otros momentos: describir la foto de la emergencia (punto 4) o
 acompañar en el día.
 
-- [ ] Que Abrahan elija: frases fijas con texto a voz, la voz del hijo grabada, o las dos.
+- [x] **Decidido por Abrahan el sábado 24:** frases fijas con la voz del teléfono. Hecho en
+      [`Sirena.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Sirena.kt): cada dos ciclos
+      del tono dice «Carmen, ¿está bien? Si está bien, deslice el botón», y a 20 s del final, «si no
+      responde, voy a llamar a Josuep».
+- [ ] La voz del hijo grabada al configurar queda **para el futuro y para el speech**
+      ([futuro.md](futuro.md#la-app)).

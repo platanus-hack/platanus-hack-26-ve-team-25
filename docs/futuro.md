@@ -31,6 +31,8 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 
 | Mejora | Por qué | Qué hace falta |
 |---|---|---|
+| **La voz del hijo en «¿Está bien?»** | Una voz conocida se atiende más que la del teléfono: «Mamá, soy Josuep, ¿estás bien?». Para el speech | Grabarla al configurar la casa. Queda solo en el teléfono, nunca en el repo. Hoy habla la voz del teléfono con frases fijas ([`Sirena.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Sirena.kt)) |
+| **La app como pantalla de inicio** | Al encender, el teléfono abre la casa y vuelve a oír solo después de un apagón. Para el speech | Declararla como *launcher* y elegirla al configurar el teléfono de mesa ([riesgos.md §3](riesgos.md)) |
 | **Una sola app para todos**, con dos roles: la casa y la familia | Un instalable para el teléfono del abuelo y para el del hijo. Hoy la familia entra por web para que el público pruebe con un QR | Pasar la web de la familia a Flutter |
 | **iOS completo** | Push nativo, TestFlight y App Store. Muchos emigrados usan iPhone | Cuenta de Apple Developer ($99/año) |
 | **Publicar en Google Play** | Instalar sin APK a mano | Cuenta de Play ($25 una vez) y la declaración de permisos |

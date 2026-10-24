@@ -57,6 +57,9 @@ class Controlador extends ChangeNotifier {
   static const audioDelPedido = Duration(seconds: 5);
   static const repetirPedido = Duration(seconds: 4);
 
+  /// Cuando falta esto para avisar, la voz de la alarma dice a quién va a llamar.
+  static const avisoFinal = Duration(seconds: 20);
+
   /// Cuánto se ignoran los sonidos después de callar la alarma: el anillo es de 5 s.
   static const sordoTrasLaAlarma = Duration(seconds: 5);
 
@@ -391,7 +394,25 @@ class Controlador extends ChangeNotifier {
     }
   }
 
+  /// Lo que dice la voz del teléfono entre los tonos de «¿Está bien?».
+  String get fraseDeLaAlarma =>
+      '${casa.nombre}, ¿está bien? Si está bien, deslice el botón.';
+
+  /// Lo que dice cuando quedan [avisoFinal]: lo mismo que promete la pantalla.
+  String get fraseDelFinal => primerContacto.telefono.isNotEmpty
+      ? '${casa.nombre}, si no responde, voy a llamar a ${primerContacto.nombre}.'
+      : '${casa.nombre}, si no responde, voy a avisar a su familia.';
+
+  bool _dijoElFinal = false;
+
   void _alPasarUnSegundo() {
+    final pendiente = _alerta;
+    if (!_dijoElFinal &&
+        pendiente?.estado == EstadoAlerta.pendiente &&
+        pendiente!.restante(ahora) <= avisoFinal) {
+      _dijoElFinal = true;
+      unawaited(sirena?.decir(fraseDelFinal));
+    }
     final llamada = porLlamar;
     if (llamada != null && porLlamarRestante == Duration.zero) {
       unawaited(_llamarYa(llamada));
@@ -407,7 +428,8 @@ class Controlador extends ChangeNotifier {
     // Suena mientras pregunta; al responder, vencer o escalar, se calla.
     final ahoraPendiente = nueva?.estado == EstadoAlerta.pendiente;
     if (ahoraPendiente && (naciendo || antes != EstadoAlerta.pendiente)) {
-      unawaited(sirena?.sonar());
+      _dijoElFinal = false;
+      unawaited(sirena?.sonar(fraseDeLaAlarma));
     } else if (!ahoraPendiente && antes == EstadoAlerta.pendiente) {
       unawaited(sirena?.callar());
       _sordoHasta = ahora.add(sordoTrasLaAlarma);

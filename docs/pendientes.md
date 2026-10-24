@@ -227,13 +227,16 @@ pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)
       esté en silencio) y con su volumen al máximo mientras dura; la vibración sigue el mismo
       ritmo. En Kotlin, sin paquetes: [`Sirena.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Sirena.kt).
       Después de callarse, el oído ignora los sonidos 5 s, para no oír su propio tono.
+      Cada dos ciclos dice una frase fija con la voz del teléfono, grave y lenta: «Carmen, ¿está
+      bien? Si está bien, deslice el botón», y a 20 s del final, a quién va a llamar.
       Falta oírlo en el teléfono: si satura el parlante, bajar `AMPLITUD`.
 - [x] **Que la app no se muera** (sábado 24, nivel 1 de [riesgos.md §3](riesgos.md)): servicio
       en primer plano de tipo `microphone` en Kotlin, sin paquetes
       ([`Guardia.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Guardia.kt)), con su
       aviso fijo; Atrás ya no cierra la app; la pantalla queda encendida mientras está enchufado
       y se deja apagar en un apagón; y pide salir de la optimización de batería.
-- [ ] Que la app sea la **pantalla de inicio** del teléfono de mesa, para que vuelva sola tras un
+- [ ] ~~Que la app sea la **pantalla de inicio** del teléfono de mesa~~: Abrahan lo dejó para el
+      speech como lo que viene ([futuro.md](futuro.md#la-app)), sábado 24. Antes decía: que vuelva sola tras un
       reinicio. No se hizo en el teléfono de prueba de Abrahan porque es su teléfono personal:
       cada vez que tocara Inicio le preguntaría cuál usar. Va en el teléfono de mesa de verdad.
 - [ ] **Prueba en el teléfono:** apagar la pantalla 1 hora y comprobar que sigue oyendo; y
