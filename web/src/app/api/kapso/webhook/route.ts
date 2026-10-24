@@ -17,8 +17,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 // Regex tolerante: acepta "Quiero cuidar a Carmen (casa demo)" y variantes con espacios o
 // mayúsculas en "casa". El token puede tener letras, números, guiones y guiones bajos.

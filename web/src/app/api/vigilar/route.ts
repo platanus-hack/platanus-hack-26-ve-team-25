@@ -14,8 +14,6 @@
 import { NextResponse } from "next/server";
 import { enviarTexto, textoDeAlerta } from "@/lib/kapso";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 type AlertaEscalada = {
   id: string;
