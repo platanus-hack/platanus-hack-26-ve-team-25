@@ -86,6 +86,7 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 
 | Mejora | Por qué | Qué hace falta |
 |---|---|---|
+| **La pastilla olvidada** | Si pasan 2 horas sin «Ya me la tomé», un aviso 🟡 a la familia. La lógica ya está en la app (`EstadoToma.olvidada` en [`pastillas.dart`](../app/lib/dominio/pastillas.dart)); falta mandarlo como evento. Se sacó del demo el sábado 24 por tiempo | Un evento de rutina con `distinto`, como el silencio de [`rutina.dart`](../app/lib/dominio/rutina.dart) |
 | **Más condiciones en el perfil** | Más reglas por condición, validadas con médicos | Asesoría médica |
 | **El apagón según el perfil de salud** | Un apagón no es igual para quien usa oxígeno: para ella es 🔴, para otra casa 🟡 | El perfil en la web. El latido ya manda si el teléfono está enchufado |
 | **El récipe desde la foto** | Hoy se lee la factura; el récipe se carga con un script | El mismo flujo de la factura, guardando con `familia_recetar` |

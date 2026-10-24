@@ -8,7 +8,7 @@ CONFIG := $(if $(wildcard $(APP)/config/local.json),--dart-define-from-file=conf
 BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
 .DEFAULT_GOAL := ayuda
-.PHONY: ayuda devices deps run run-demo debug profile release test test-integracion analyze format \
+.PHONY: ayuda devices deps run run-demo demo debug profile release test test-integracion analyze format \
 	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
 	web-deps web-dev web-test web-lint web-build
 
@@ -28,6 +28,14 @@ run: deps ## Corre la app en el teléfono conectado (r recarga, q sale)
 
 run-demo: deps ## Corre la app con la cuenta regresiva de 15 s del demo
 	cd $(APP) && flutter run $(CONFIG) --dart-define=DEMO=true
+
+# Para ensayar el demo: la web de la familia en la laptop y la app en el teléfono, conectadas por
+# la misma base de Supabase. `adb reverse` deja que el teléfono abra la web local en
+# http://localhost:3000. Al salir de la app (q), se apaga también la web.
+demo: deps web-deps ## Ensaya el demo: la web local y la app en el teléfono, a la vez
+	adb reverse tcp:3000 tcp:3000
+	@echo "Familia: http://localhost:3000/f/demo · QR del público: http://localhost:3000/demo"
+	cd $(WEB) && $(BUN) run dev & trap 'kill $$!' EXIT; cd $(APP) && flutter run $(CONFIG)
 
 debug: run ## Igual que run: modo debug con recarga en caliente
 

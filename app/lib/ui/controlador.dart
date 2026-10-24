@@ -12,6 +12,7 @@ import '../dominio/comandos.dart';
 import '../dominio/pastillas.dart';
 import '../dominio/pedidos.dart';
 import '../dominio/respuesta.dart';
+import '../dominio/rutina.dart';
 import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
@@ -103,6 +104,9 @@ class Controlador extends ChangeNotifier {
   Escucha? _ultimaEscucha;
   final _ultimaVez = <TipoSonido, DateTime>{};
   DateTime? _ultimoPedido;
+
+  /// Lo de siempre que suena en la casa, y el silencio de día que no es normal.
+  final rutina = Rutina();
 
   /// Hasta cuándo no se hace caso a los sonidos: justo después de callar la alarma, el oído
   /// todavía tiene el tono de 520 Hz en el anillo y abriría otro «¿Está bien?».
@@ -246,6 +250,12 @@ class Controlador extends ChangeNotifier {
         ? null
         : escucha.sonido;
     final evento = sonido == null ? null : eventoDeSonido(sonido.tipo);
+    // Lo que no es alerta (la cocina, la puerta, la TV) cuenta como rutina.
+    if (sonido != null && evento == null) {
+      for (final e in rutina.oir(sonido.clase.nombre, ahora)) {
+        nube?.rutina(e);
+      }
+    }
     if (sonido != null && evento != null) {
       final antes = _ultimaVez[sonido.tipo];
       if (antes == null || ahora.difference(antes) >= _repetir) {
@@ -426,6 +436,8 @@ class Controlador extends ChangeNotifier {
   bool _dijoElFinal = false;
 
   void _alPasarUnSegundo() {
+    final silencio = rutina.revisar(ahora);
+    if (silencio != null) nube?.rutina(silencio);
     final pendiente = _alerta;
     if (!_dijoElFinal &&
         pendiente?.estado == EstadoAlerta.pendiente &&

@@ -43,8 +43,8 @@ SUPABASE · Postgres
                                                                                  ▼
 FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
   /f/[token] lee familia_casa cada 5 s ─► 🔴 alerta · 🟡 para saber · 🟢 todo bien · sin señal
-  Telegram (/start <token>) y WhatsApp por Kapso ◄─ el aviso del vigilante
-  Pastillas: foto de la factura ─► Claude ─► se cruza con el récipe ─► la familia confirma
+  Telegram (/start <token>) ◄─ el aviso del vigilante
+  Pastillas: foto del récipe ─► Claude ─► la familia confirma · «Ya me la tomé» descuenta
 ```
 
 ## Las decisiones, y por qué
@@ -79,9 +79,9 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 - **El inventario de pastillas es un libro de movimientos:** la factura suma, cada «Ya me la tomé»
   resta y el conteo a mano ajusta. El conteo vive en la base, para que la casa y la web no tengan
   dos números; la web calcula cuántos días alcanzan ([`inventario.ts`](web/src/lib/familia/inventario.ts)).
-- **Telegram es el canal general** porque llega a cualquiera sin verificación de negocio. WhatsApp
-  por Kapso está desplegado, pero solo puede usar el sandbox, con cada teléfono activado a mano,
-  porque Meta restringió la cuenta.
+- **Los avisos van por Telegram,** que llega a cualquiera sin verificación de negocio. Los
+  mensajes por WhatsApp con Kapso se sacaron: Meta restringió la cuenta. La casa sí llama al hijo
+  por WhatsApp, desde el teléfono.
 - **La casa es Android:** iOS no deja escuchar todo el día en segundo plano.
 
 ## Las pruebas
@@ -90,7 +90,7 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 |---|---|---|
 | Web: estado de la familia, audio, inventario, factura y el tope de lecturas | 56 | `cd web && bun test` |
 | Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
-| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 104 | `make test` |
+| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 110 | `make test` |
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
 | Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
 | Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |
@@ -108,8 +108,6 @@ La carga se midió el sábado 24-oct contra producción, desde una laptop en Car
   pregunta «¿Pudo hablar con…?» y llama por teléfono normal.
 - Si se cierra la app sin internet, se pierde lo que esperaba en la cola: vive en memoria.
 - No se ha probado con voces de personas mayores reales.
-- El aviso por WhatsApp con Kapso no se ha probado de punta a punta. El circuito completo (escalar,
-  mandar y sellar) se probó con Telegram.
 
 Hacia dónde va el producto, en tres pasos: [futuro.md](docs/futuro.md#hacia-dónde-va).
 
@@ -150,6 +148,6 @@ docs/investigacion-*.md       alertas y apagones, audio y sensores, cómo saber 
 | Quién | Qué hizo |
 |---|---|
 | Abrahan David Quintero Teran ([@abrahanq](https://github.com/abrahanq)) | La app de la casa: el oído, la voz, las llamadas y las pastillas |
-| Josuep Simon Turmero Brito ([@jkou02](https://github.com/jkou02)) | Los avisos: Telegram, WhatsApp con Kapso y el vigilante |
+| Josuep Simon Turmero Brito ([@jkou02](https://github.com/jkou02)) | Los avisos: Telegram y el vigilante |
 | Anttonny Rodelo ([@rodeloa](https://github.com/rodeloa)) | Las cifras con fuente y la investigación del problema |
 | Luis Rogelio Gomez Montes ([@rogelio-electronic](https://github.com/rogelio-electronic)) | La web de la familia, la base, la orquestación y el pitch |

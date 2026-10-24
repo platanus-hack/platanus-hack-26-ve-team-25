@@ -262,10 +262,8 @@ ajuste, no de construir de cero.
 | Claude: leer la factura | `web/` (lo hizo la sesión de facturas) | Facturas de verdad de Farmatodo y Locatel, fotos torcidas o con poca luz |
 | Claude: leer el récipe | Por hacer: hoy se carga con un script | Letra de médico a mano |
 
-- [ ] Medir cada una con un conjunto chico de pruebas propio (por ejemplo, 20 frases dichas por
-      personas mayores y 10 facturas), anotando aciertos y errores. Nada de eso va al repo:
-      es público y son voces y datos reales.
-- [ ] Con voces mayores de verdad, como pide [pendientes.md](pendientes.md#probar-con-voces-mayores--abrahan).
+- [ ] Medir cada una con un conjunto chico de pruebas propio (por ejemplo, 20 frases del equipo y
+      un récipe impreso), anotando aciertos y errores. Nada de eso va al repo.
 
 ## 8. Comandos de voz
 

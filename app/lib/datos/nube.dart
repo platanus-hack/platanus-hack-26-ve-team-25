@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../dominio/alerta.dart';
+import '../dominio/rutina.dart';
 import '../dominio/tipos.dart';
 
 /// Lo que la casa le cuenta a Supabase: el latido, los eventos y las alertas. Nunca audio.
@@ -78,10 +79,14 @@ String? respuestaEnLaBase(EstadoAlerta e) => switch (e) {
 sealed class _Envio {}
 
 class _Evento extends _Envio {
-  _Evento(this.local, this.tipo, this.hora);
+  _Evento(this.local, this.tipo, this.hora, {this.descripcion, this.distinto});
   final int local;
   final TipoEvento tipo;
   final DateTime hora;
+
+  /// Si es null, la frase del tipo («Oímos un golpe»).
+  final String? descripcion;
+  final String? distinto;
 }
 
 class _Alerta extends _Envio {
@@ -197,6 +202,18 @@ class Nube {
     _encolar(_Respuesta(alerta, respuesta));
   }
 
+  /// Lo de siempre que sonó en la casa, o el silencio que no es normal. Va como evento de rutina,
+  /// sin alerta: la familia lo ve en «Su día».
+  void rutina(EventoDeRutina e) => _encolar(
+    _Evento(
+      _siguiente++,
+      TipoEvento.rutina,
+      e.hora,
+      descripcion: e.descripcion,
+      distinto: e.distinto,
+    ),
+  );
+
   /// «Ya me la tomé»: la base descuenta una del inventario. Va con la hora de la toma, así la que
   /// sale tarde por falta de internet cuenta el día correcto, y repetida no descuenta dos veces.
   void tomada(String pastilla, DateTime hora) =>
@@ -233,12 +250,19 @@ class Nube {
 
   Future<void> _mandar(_Envio envio) async {
     switch (envio) {
-      case _Evento(:final local, :final tipo, :final hora):
+      case _Evento(
+        :final local,
+        :final tipo,
+        :final hora,
+        :final descripcion,
+        :final distinto,
+      ):
         final id = await _supabase.rpc('casa_evento', {
           'p_clave': clave,
           'p_tipo': tipoEnLaBase(tipo),
-          'p_descripcion': tipo.frase,
+          'p_descripcion': descripcion ?? tipo.frase,
           'p_hora': hora.toUtc().toIso8601String(),
+          'p_distinto': ?distinto,
         });
         _guardar(local, id, 'casa_evento');
       case _Alerta(:final local, :final evento, :final venceEn, :final urgente):

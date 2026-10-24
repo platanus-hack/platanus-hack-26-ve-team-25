@@ -29,6 +29,9 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   ciclos la voz del teléfono dice «Carmen, ¿está bien? Si está bien, deslice el botón», y a 20 s
   del final, a quién va a llamar. Suena por el canal de alarma, aunque el teléfono esté en
   silencio.
+- **La rutina:** cuenta lo de siempre que suena por franja del día (cocina, agua, puerta, baño,
+  TV, voces) y lo manda como «Su día» a la familia, una vez por hábito y franja. Si de día no suena
+  nada en 3 horas, avisa una vez como «día distinto» ([`rutina.dart`](lib/dominio/rutina.dart)).
 - **El recordatorio de la pastilla:** en toda la pantalla, y solo se quita con «Ya me la tomé»,
   con el botón o en voz alta.
   Si pasan 2 horas se va solo y queda como olvidada, para no empujar a tomar dos dosis.

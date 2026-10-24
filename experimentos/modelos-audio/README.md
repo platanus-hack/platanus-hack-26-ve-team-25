@@ -41,6 +41,5 @@ uv run comparar.py --ventana 5 --salida resultados-5s.md
 ## Límites de esta prueba
 
 - ESC-50 son grabaciones limpias y cercanas. Una casa real tiene TV, distancia y eco.
-- No hay voces de personas mayores: eso va con Common Voice (60+) y notas de voz donadas, que no
-  se suben al repo.
+- No hay voces de personas mayores: no se midieron.
 - La velocidad en el teléfono se mide aparte, con el teléfono conectado por USB.

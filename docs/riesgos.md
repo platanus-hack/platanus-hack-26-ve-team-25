@@ -217,7 +217,7 @@ Los jueces son técnicos y tienen un agente leyendo el repo. Una exageración qu
 más que una limitación que contemos nosotros.
 
 1. **Decir con qué se probó y cuánto.** Por ejemplo: «Probamos con 640 sonidos de casa del set
-   ESC-50 y con N voces de más de 60 años de Common Voice», no «detecta todo».
+   ESC-50», no «detecta todo». Y decir que no se probó con voces mayores.
 2. **Mostrar los números, también los malos.** Por ejemplo: «Reconoce la tos y el vidrio. Le
    cuesta el quejido débil: 6 de 10». Un número malo explicado da confianza.
 3. **Separar el demo de la realidad, en voz alta:**

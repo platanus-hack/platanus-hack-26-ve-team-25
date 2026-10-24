@@ -48,41 +48,12 @@ modelos de audio y de habla se entrenaron casi siempre con voces jóvenes.
 | **Voz aireada, ronca y temblorosa**, con menos armónicos | [Revisión 2022](https://doaj.org/article/bfbbbb4f9fa14377baedb0a1a9dc124d); [Beton et al., revisión 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC10339270) | La armonicidad sirve menos para reconocer su voz. Un umbral que funciona con voces jóvenes puede no verla |
 | **F0 distinta**: baja en las mujeres y sube un poco en los hombres | [Estudio de adultos jóvenes y mayores, 1991](https://www.ncbi.nlm.nih.gov/pubmed/1749230); [estudio de la vida entera, 2020](https://pmc.ncbi.nlm.nih.gov/articles/PMC7229708/) | Nada de umbrales fijos de tono. Se calibra con la voz de esa casa |
 | **Frases más cortas**, con menos aire al empezar a hablar | [Estudio preliminar registrado en ISRCTN](https://www.isrctn.com/editorial/retrieveFile/3284e1a9-a77a-46f2-b991-4dca5ad4e9c8/45985) | Un «¡ayuda!» puede ser corto y débil. Hay que buscar también las clases de quejido y llanto de YAMNet («Wail, moan», «Crying, sobbing»), no solo el grito |
-| **El reconocimiento de voz se equivoca más** con personas mayores, sobre todo con hombres | [Vipperla, tesis de Edimburgo, 2011](https://era.ed.ac.uk/handle/1842/5725); [JAMIA 2023, entrevistas en residencias](https://cris.maastrichtuniversity.nl/en/publications/the-development-of-an-automatic-speech-recognition-model-using-in/) | La palabra clave «¡auxilio!» se prueba con voces mayores reales antes de prometerla. Nunca es la única vía: la pantalla y los botones siguen |
+| **El reconocimiento de voz se equivoca más** con personas mayores, sobre todo con hombres | [Vipperla, tesis de Edimburgo, 2011](https://era.ed.ac.uk/handle/1842/5725); [JAMIA 2023, entrevistas en residencias](https://cris.maastrichtuniversity.nl/en/publications/the-development-of-an-automatic-speech-recognition-model-using-in/) | La palabra clave «¡auxilio!» no se promete como infalible. Nunca es la única vía: la pantalla y los botones siguen |
 | **Oye peor los agudos** (pérdida de audición con la edad) | En pruebas de la NFPA, el tono de 520 Hz en onda cuadrada despertó al 92% de las personas con pérdida auditiva, contra el 56% del tono de 3.100 Hz ([Wikipedia, con las pruebas de 1970](https://en.wikipedia.org/wiki/Fire_alarm_notification_appliance)) | **La alarma de confirmación de 60 s usa 520 Hz en onda cuadrada**, no un pitido agudo. La voz de «¿Está bien?» es grave, lenta y fuerte, y además la pantalla destella y el teléfono vibra |
 
-**Cómo lo probamos sin abuelos propios.** Ninguno del equipo tiene abuelos a mano, así que se
-combinan cuatro fuentes. Las grabaciones de personas reales nunca se suben al repo, que es público.
-
-| Fuente | Qué da | Cuidado |
-|---|---|---|
-| [Mozilla Common Voice](https://datacollective.mozillafoundation.org/datasets/cmn4z1n52000knv07h01532dd) (CC0, libre) | Miles de frases leídas, con la edad de quien habla por década. En español hay voces de sesenta años o más; los setenta y ochenta aparecen sobre todo en otros idiomas | Es voz leída y tranquila: sirve para medir si YAMNet ve la voz mayor, no para gritos ni quejidos. Para eventos que no son palabras, el idioma importa poco |
-| Notas de voz de WhatsApp | Abuelos de amigos y familiares diciendo cinco frases: «Estoy bien», un «¡ayuda!» débil, un quejido, una tos, «Huele a gas» | Pedir permiso explícito, explicar para qué es y borrarlas después del hackatón |
-| Personas mayores en el evento | Mentores, staff o personal del edificio, con su permiso | Lo mismo: permiso y nada al repo |
-| Voces del equipo envejecidas a propósito | Las mismas frases del equipo, con menos volumen (−10 a −20 dB), el tono corrido (más grave en mujeres, un poco más agudo en hombres), temblor y aire de fondo | Sirve para probar robustez, no como prueba de que funciona con voces mayores |
-
-En el pitch se dice tal cual: «Probado con voces mayores de Common Voice y voces reales donadas.
-La prueba en casas de verdad es el siguiente paso».
-
-**Cuántas notas de voz hacen falta.** Las usamos para medir, no para entrenar, así que importa
-más cuántas *personas* que cuántas notas.
-
-- **Meta: 10 personas de 60 años o más, 5 mujeres y 5 hombres, 5 notas cada una: 50 notas.**
-  Con 10 personas se puede decir «detectó a 9 de 10», que cualquiera entiende.
-- **Mínimo: 5 personas, 25 notas.** Con menos, cualquier resultado es anécdota.
-- **Las 5 notas:** «Estoy bien», un «¡ayuda!» débil, un quejido, una tos y «Huele a gas».
-  Que digan también su década de edad: sesenta, setenta u ochenta.
-- **Ojo con la distancia:** una nota de WhatsApp se graba con el teléfono pegado a la boca y
-  comprimida. En la casa, el abuelo estará a 3–4 m. Para simularlo, cada nota se reproduce desde
-  un parlante chico a 3–4 m del teléfono de prueba, en un cuarto tranquilo, y se graba de nuevo.
-
-Mensaje para pedirlas:
-
-> Hola, estamos en una hackatón haciendo una app que avisa a la familia si a un adulto mayor que
-> vive solo le pasa algo. Necesitamos probar si reconoce bien la voz de personas mayores. ¿Tu
-> abuela/abuelo nos ayudaría con 5 notas de voz cortas? Las frases son: «Estoy bien», «ayuda»
-> dicho bajito, un quejido como «ay», una tos y «huele a gas». Solo las usamos para medir este
-> fin de semana, no se publican y las borramos el lunes. ¿Nos dices su edad aproximada?
+**Lo que no se midió.** El equipo no tiene personas mayores cerca para grabar, así que el oído y
+las frases de voz no se probaron con voces mayores reales. Las decisiones de arriba se tomaron por
+la literatura, y se dice así en el pitch: «no está medido con voces mayores».
 
 ## 1.2 El audio llega crudo a YAMNet
 
@@ -128,7 +99,6 @@ micrófono ─► detectores clásicos (dB, alarma, aspereza)
 | 3 | ¿Los embeddings separan las falsas alarmas de una casa? | Grabar 20 sonidos reales por clase (ollas, puerta, TV, golpe, grito) y medir el kNN con validación cruzada | 1,5 h |
 | 4 | ¿El modelo de rutina detecta un día anómalo? | Simular 7 días de eventos con un generador y verificar que marca el día sin actividad matutina | 1 h |
 | 5 | ¿Los detectores clásicos aciertan? | Probar la alarma de 3.100 Hz y 520 Hz y gritos contra TV con gritos | 1 h |
-| 6 | ¿YAMNet ve las voces mayores? | Clips de Common Voice de sesenta años o más, contra clips de veinte. Comparar el puntaje en «Speech» a volumen normal y bajo | 1 h |
 | 7 | ¿Qué sienten los sensores de un teléfono de 2019? | Ver la sección 3: registrar cada sensor 10 min con la casa quieta, y luego con una caída simulada, una puerta y la luz | 1,5 h |
 
 ### Candidatos a comparar
@@ -194,7 +164,7 @@ puntos y el mismo paquete de Flutter trae la palabra clave y la detección de vo
 5 s tarda hasta 5 s más en avisar, y eso no importa si la alarma de la casa espera 60 s.
 
 **Límites:** ESC-50 son grabaciones limpias y cercanas, sin TV, sin distancia y sin voces de
-personas mayores. Falta medir con Common Voice 60+ y en el teléfono.
+personas mayores. Falta medir en el teléfono.
 
 ### Criterio de decisión
 

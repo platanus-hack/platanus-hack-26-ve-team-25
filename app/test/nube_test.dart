@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:casa/datos/nube.dart';
 import 'package:casa/datos/simulado.dart';
 import 'package:casa/dominio/alerta.dart';
+import 'package:casa/dominio/rutina.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -154,6 +155,29 @@ void main() {
     // Sin evento en la base, la alerta no tiene a qué colgarse y no se manda.
     expect(base.funciones, ['casa_evento']);
   });
+
+  test(
+    'la rutina va como evento, sin alerta, y el silencio con su porqué',
+    () async {
+      nube.rutina(EventoDeRutina(ahora, 'Oímos la cocina'));
+      nube.rutina(
+        EventoDeRutina(
+          ahora,
+          'No se oye movimiento',
+          distinto: 'Desde las 9:00',
+        ),
+      );
+      await nube.vaciar();
+      expect(base.funciones, ['casa_evento', 'casa_evento']);
+      expect(base.llamadas.first.$2, {
+        'p_clave': 'clave-casa',
+        'p_tipo': 'rutina',
+        'p_descripcion': 'Oímos la cocina',
+        'p_hora': '2026-10-24T14:05:00.000Z',
+      });
+      expect(base.ultima('casa_evento')['p_distinto'], 'Desde las 9:00');
+    },
+  );
 
   test('«Ya me la tomé» manda la toma con su hora', () async {
     nube.tomada('losartan-manana', ahora);

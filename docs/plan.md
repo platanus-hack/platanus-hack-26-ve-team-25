@@ -26,10 +26,10 @@
   no entra en el demo.)*
 - **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
   porque su familia confía.
-- **El aviso real sale por tres vías.** La casa llama por WhatsApp al primer contacto, con
-  respaldo por llamada normal. **Telegram es el canal general:** cualquiera se suscribe con un
-  toque desde el QR y recibe el aviso (Josuep, sábado 15:25). Kapso le manda el WhatsApp solo a los
-  teléfonos activados en su sandbox, porque Meta restringió la cuenta.
+- **El aviso real sale por dos vías.** La casa llama por WhatsApp al primer contacto, con
+  respaldo por llamada normal. **Telegram es el canal de avisos:** cualquiera se suscribe con un
+  toque desde el QR y recibe el aviso (Josuep, sábado 15:25). Los mensajes por WhatsApp con Kapso
+  se sacaron el sábado 18:00: Meta restringió la cuenta.
 - **Se vende como un acompañante del día a día, y el oído sigue siendo el centro.** El pitch abre
   con lo de todos los días (la pastilla, la llamada con un toque) y llega a la alarma. No es un
   asistente médico: ya hubo proyectos así en Platanus (Tata y Memo, PH25), el track es Emergencias
@@ -54,8 +54,7 @@
    frase de ayuda dicha en voz alta.
 2. Suena una alarma fuerte en la casa: «¿Está bien?». La pantalla destella y vibra.
 3. Si nadie responde en 60 s, la alerta escala: la web de la familia se pone roja, la casa llama
-   por WhatsApp al primer contacto, y el vigilante manda el Telegram a todos los suscritos y el
-   WhatsApp de Kapso.
+   por WhatsApp al primer contacto, y el vigilante manda el Telegram a todos los suscritos.
 4. Cada «Estoy bien» queda anotado en la base. Que ajuste los umbrales de esa casa es proyección.
 
 ## Alcance congelado: lo que se presenta
@@ -91,7 +90,7 @@ por foto.
    está bien y no escala. Es el filtro: despreocupar, no angustiar.
 4. **La alerta.** Otro golpe y nadie responde. Mientras corren los 60 s se cuenta el problema, con
    las cifras. Al vencer, se pone roja la web de todos los que escanearon, a cada uno le llega el
-   Telegram, la casa llama por WhatsApp al hijo y a la tarima le llega el WhatsApp de Kapso. Los tiempos son los del producto:
+   Telegram y la casa llama por WhatsApp al hijo. Los tiempos son los del producto:
    nada se acelera.
 
 Si algo falla en vivo, `/f/demo?escenario=alerta` muestra lo mismo con datos simulados, y queda el
