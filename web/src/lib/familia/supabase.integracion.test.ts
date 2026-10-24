@@ -1,6 +1,7 @@
 // Prueba las funciones de supabase/migrations/ contra la base de verdad: el recorrido completo de
 // una alerta y que los secretos no se crucen entre casas. Crea una casa de prueba y la borra al
-// final. Se salta sola si no están las llaves (bun las lee de .env.local).
+// final. Se salta sola si no están las llaves. `bun test` no lee .env.local: correr con
+// `bun run test:integracion`, que se lo pasa.
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { derivarVista } from "./estado";
 import type { DatosCasa } from "./tipos";
