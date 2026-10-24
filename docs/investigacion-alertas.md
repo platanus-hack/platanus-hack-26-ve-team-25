@@ -59,7 +59,7 @@ En Android Go, el daemon de memoria del kernel (`lmkd`) liquida procesos sin pre
 |---|---|---|
 | **Persistencia pre-envío** | SQLite plano o Room antes de tocar la radio de red | Si el SO mata el proceso durante la transmisión, el evento no se pierde |
 | **Idempotencia (Deduplicación)** | Cada evento genera un `UUIDv4` inmutable en el teléfono | Si se reintenta el POST mientras el escalamiento ya hizo la llamada o el SMS, el backend procesa el primero y descarta duplicados |
-| **Muerte del proceso y reinicio** | `RECEIVE_BOOT_COMPLETED` en el Manifest + `START_STICKY` en el `ForegroundService` | Al encender o reiniciar el teléfono tras agotamiento de batería, se barre la base local y se reintentan los `PENDING` |
+| **Muerte del proceso y reinicio** | Cola local en SQLite + `RECEIVE_BOOT_COMPLETED` que la barre al arrancar. La escucha **no** vuelve sola | Los `PENDING` se reintentan y nada se pierde. Pero `BOOT_COMPLETED` no puede levantar un servicio de micrófono: la app pide «Toque para volver a cuidar» y, mientras tanto, la familia ve el silencio |
 | **Reintentos con Backoff** | $t_{\text{espera}} = \min(60\text{ s}, 2^{\text{intentos}} \times 2\text{ s})$ | Evita saturar el canal de señalización o agotar el saldo de la SIM ante caídas de la antena |
 
 ---
@@ -216,7 +216,7 @@ Cinco cosas que hay que decir en voz alta durante el demo:
 | **Estado de carga** | `BatteryManager.EXTRA_PLUGGED` vía `EventChannel` nativo; `ACTION_BATTERY_CHANGED` en modo *sticky* para la lectura inicial ([`investigacion-carga.md`](investigacion-carga.md)) | Detección de apagón por pérdida de fuente. `isCharging()` está descartado: confunde «límite de carga» con «desenchufado» |
 | **Nivel de batería** | `battery_plus` 7.1.2 (Flutter) | Nivel (0–100) y `BatteryState` para el contrato; no sustituye a la señal nativa |
 | **Persistencia local** | SQLite / Room Database | Cola persistente transaccional con estados `PENDING` y `ACK` |
-| **Servicio continuo** | Android `ForegroundService` (`dataSync` / `specialUse`) | Ejecución continua inmune al cierre de interfaz de usuario |
+| **Servicio continuo** | `ForegroundService` tipo `microphone` (`FOREGROUND_SERVICE_MICROPHONE` + `RECORD_AUDIO`) sobre `flutter_foreground_task` 11.0.3 | Escucha continua con la pantalla apagada. `dataSync` y `specialUse` están descartados: Android 15 limita `dataSync` a **6 h por cada 24** y después mata el servicio ([`investigacion-audio.md`](investigacion-audio.md)) |
 
 ---
 
