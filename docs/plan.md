@@ -150,8 +150,8 @@ Lo básico, sin profundizar. Es la propuesta del sábado 14:30; el precio lo cie
 Lo que ya hay, sin costo:
 
 - **Web de la familia:** Next.js en Vercel, plan gratis. Producción:
-  https://platanus-hack-26-ve-team-25.vercel.app. El deploy es desde la cuenta de Rogelio
-  (`vercel --prod` en `web/`).
+  https://platanus-hack-26-ve-team-25.vercel.app. Se despliega sola con cada push a `main`, desde
+  la cuenta de Rogelio conectada al repo.
 - **App de la casa:** Flutter, APK para Android instalado a mano. La misma app en el navegador,
   sin oído: https://platanus-hack-26-ve-team-25-casa.vercel.app (`make casa-deploy`).
 - **Estado y tiempo real:** Supabase, plan gratis.

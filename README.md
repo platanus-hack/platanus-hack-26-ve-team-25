@@ -112,7 +112,8 @@ web/src/lib/escucha/             lógica pura con pruebas: nivel y compuerta, bu
 ## Cómo trabajamos
 
 - Commits chicos y push seguido: el repo es lo que se juzga.
-- El deploy lo hace Rogelio con `vercel --prod` desde `web/`.
+- Cada push a `main` despliega la web de la familia en Vercel (Root Directory = `web`). Si el build
+  falla, producción no cambia: antes de subir, `cd web && bun run build`.
 - Nada de llaves ni `.env` en el repo: es público.
 - Datos de prueba inventados. Nada real de nadie.
 
