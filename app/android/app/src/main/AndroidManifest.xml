@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- «¿Está bien?» vibra además de sonar: para quien oye poco -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Sin internet no se intenta WhatsApp: la llamada sale directo por la red de teléfono -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Que la app no se muera: servicio en primer plano de tipo micrófono (Guardia.kt) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />

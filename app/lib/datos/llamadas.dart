@@ -15,6 +15,9 @@ abstract interface class Telefono {
   /// Una llamada telefónica normal y directa.
   Future<void> llamar(String numero);
 
+  /// True si hay internet de verdad, por wifi o por datos. Sin internet, WhatsApp no puede llamar.
+  Future<bool> hayInternet();
+
   /// Una llamada normal en altavoz y con el volumen al máximo: para emergencias, o cuando la
   /// persona la pidió en voz alta y puede estar lejos del teléfono. False si no se pudo.
   Future<bool> llamarEnAltavoz(String numero);
@@ -25,11 +28,14 @@ abstract interface class Telefono {
 }
 
 /// WhatsApp primero: los hijos suelen estar fuera del país, y una llamada normal al exterior
-/// cuesta y muchas veces no entra. Si WhatsApp no se puede (no está instalado, el contacto no
-/// está en la agenda o falta el permiso), cae a la llamada telefónica normal.
+/// cuesta y muchas veces no entra. Si no hay internet, ni se intenta: WhatsApp timbraría sin
+/// salir y se perderían segundos. Si WhatsApp no se puede (no está instalado, el contacto no está
+/// en la agenda o falta el permiso), también cae a la llamada telefónica normal.
 Future<ViaLlamada> llamarPrimeroPorWhatsApp(String numero, Telefono t) async {
   try {
-    if (await t.whatsapp(numero)) return ViaLlamada.whatsapp;
+    if (await t.hayInternet() && await t.whatsapp(numero)) {
+      return ViaLlamada.whatsapp;
+    }
   } on PlatformException {
     // Cualquier falla de WhatsApp termina en la llamada normal: lo importante es que salga.
   }
@@ -57,6 +63,10 @@ class TelefonoAndroid implements Telefono {
   @override
   Future<void> llamar(String numero) async =>
       FlutterPhoneDirectCaller.callNumber(numero);
+
+  @override
+  Future<bool> hayInternet() async =>
+      await _canal.invokeMethod<bool>('hayInternet') ?? true;
 
   @override
   Future<bool> llamarEnAltavoz(String numero) async =>

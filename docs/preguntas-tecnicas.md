@@ -9,7 +9,7 @@ respuesta dice en qué estado está:
 - ❌ **No se hizo**, y se dice.
 
 Al sábado 24-oct-2026, 18:30. **Lo de la app de la casa está probado con pruebas automáticas
-(116) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
+(117) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
 repitió desde los últimos cambios.**
 
 ## El audio y la privacidad
@@ -132,7 +132,9 @@ apague en plena alarma.
 
 ✅ **Por Telegram y por una llamada.** Cuando la alerta escala, el vigilante manda un Telegram con
 el enlace a la web a todos los que se suscribieron desde la invitación, y la casa llama al hijo:
-primero por WhatsApp (suele estar fuera del país) y, si no contestan, por teléfono normal. Las
+primero por WhatsApp (suele estar fuera del país) y, si no contestan, por teléfono normal. Si no
+hay internet de verdad (una red que Android comprobó, no un wifi pegado a un router sin servicio),
+ni intenta WhatsApp: llama directo por teléfono. Las
 llamadas a emergencias y al vecino salen por teléfono normal, en altavoz y con el volumen al
 máximo.
 
@@ -204,7 +206,7 @@ contactos, condición de salud), nunca audio. Para el demo, todos los datos son 
 ## Cómo comprobarlo
 
 ```bash
-make test                # 116 pruebas de la app de la casa
+make test                # 117 pruebas de la app de la casa
 make test-integracion    # la app contra la base real, con una casa que se crea y se borra
 cd web && bun test       # la web: estado de la familia, audio, inventario
 cd experimentos/modelos-audio && uv sync && ./descargar.sh && uv run comparar.py

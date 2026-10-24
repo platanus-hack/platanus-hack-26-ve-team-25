@@ -5,10 +5,15 @@ import 'package:flutter/services.dart';
 
 /// Un teléfono falso: anota las llamadas y deja simular el fin de un WhatsApp.
 class TelefonoFalso implements Telefono {
-  TelefonoFalso({this.whatsappFunciona = true, this.whatsappFalla = false});
+  TelefonoFalso({
+    this.whatsappFunciona = true,
+    this.whatsappFalla = false,
+    this.conInternet = true,
+  });
 
   final bool whatsappFunciona;
   final bool whatsappFalla;
+  final bool conInternet;
   final porWhatsApp = <String>[];
   final porTelefono = <String>[];
   final enAltavoz = <String>[];
@@ -25,6 +30,9 @@ class TelefonoFalso implements Telefono {
 
   @override
   Future<void> llamar(String numero) async => porTelefono.add(numero);
+
+  @override
+  Future<bool> hayInternet() async => conInternet;
 
   @override
   Future<bool> llamarEnAltavoz(String numero) async {

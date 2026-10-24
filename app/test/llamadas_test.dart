@@ -36,4 +36,14 @@ void main() {
     );
     expect(t.porTelefono, hasLength(1));
   });
+
+  test('sin internet ni se intenta WhatsApp: llamada normal directa', () async {
+    final t = TelefonoFalso(conInternet: false);
+    expect(
+      await llamarPrimeroPorWhatsApp('04120000000', t),
+      ViaLlamada.telefono,
+    );
+    expect(t.porWhatsApp, isEmpty);
+    expect(t.porTelefono, ['04120000000']);
+  });
 }

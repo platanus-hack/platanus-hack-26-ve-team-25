@@ -28,6 +28,7 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "whatsapp" -> result.success(llamarPorWhatsApp(call.argument<String>("numero").orEmpty()))
                     "llamarEnAltavoz" -> result.success(llamarEnAltavoz(call.argument<String>("numero").orEmpty()))
+                    "hayInternet" -> result.success(hayInternet())
                     else -> result.notImplemented()
                 }
             }
@@ -77,6 +78,18 @@ class MainActivity : FlutterActivity() {
         } else {
             window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+    }
+
+    /**
+     * Si hay internet de verdad, por wifi o por datos: una red que Android ya comprobó que sale a
+     * internet (`VALIDATED`), no solo un wifi conectado a un router sin servicio, que en un apagón
+     * de la CANTV es lo normal.
+     */
+    private fun hayInternet(): Boolean {
+        val red = getSystemService(android.net.ConnectivityManager::class.java)
+        val capacidades = red.getNetworkCapabilities(red.activeNetwork) ?: return false
+        return capacidades.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capacidades.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 
     /**
