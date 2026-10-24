@@ -34,6 +34,7 @@ La raíz del sitio desplegado todavía es la plantilla de Next.js. La prueba est
 README.md                         presentación, estado y cómo correrlo
 docs/preguntas-tecnicas.md        preguntas técnicas frecuentes, con la evidencia de cada respuesta
 docs/plan.md                      decisiones del equipo, prioridades P0–P2, demo y roles
+docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
 docs/contexto.md                  el problema, la competencia y las decisiones de diseño
 docs/riesgos.md                   muros técnicos (kiosco, apagones, batería), riesgos del demo
 docs/investigacion-audio.md       voz del adulto mayor, modelos, sensores y paquetes de Flutter

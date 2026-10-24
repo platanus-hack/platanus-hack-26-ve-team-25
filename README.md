@@ -10,6 +10,7 @@ avisa a la familia, esté donde esté. El audio se procesa en el teléfono y nun
 Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.vercel.app
 
 - El plan, los roles y el demo: [docs/plan.md](docs/plan.md)
+- De los mockups al código, pantalla por pantalla: [docs/pantallas.md](docs/pantallas.md)
 - Por qué, lo que ya existe y las decisiones de diseño: [docs/contexto.md](docs/contexto.md)
 - Dónde puede fallar y cómo lo evitamos: [docs/riesgos.md](docs/riesgos.md)
 - Las preguntas abiertas de cada uno: [docs/investigacion.md](docs/investigacion.md)
