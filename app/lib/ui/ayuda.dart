@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../datos/llamadas.dart';
 import '../dominio/alerta.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
@@ -18,9 +17,6 @@ class Ayuda extends StatelessWidget {
   Widget build(BuildContext context) {
     final contacto = c.primerContacto;
     final conNumero = contacto.telefono.isNotEmpty;
-    final escalada = alerta.escaladaEn ?? alerta.creada;
-    final hora =
-        '${escalada.hour}:${escalada.minute.toString().padLeft(2, '0')}';
 
     return Scaffold(
       backgroundColor: Colores.rojoOscuro,
@@ -85,19 +81,14 @@ class Ayuda extends StatelessWidget {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  Text(
-                                    conNumero
-                                        ? '${switch (c.viaLlamada) {
-                                            ViaLlamada.whatsapp => 'Por WhatsApp',
-                                            ViaLlamada.telefono => 'Llamada telefónica',
-                                            null => 'Llamando',
-                                          }} desde las $hora'
-                                        : 'Sin número',
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      color: Colores.rojoTexto,
+                                  if (!conNumero)
+                                    const Text(
+                                      'Sin número',
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        color: Colores.rojoTexto,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

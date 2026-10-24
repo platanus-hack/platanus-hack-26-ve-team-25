@@ -83,7 +83,7 @@ void main() {
     await tester.pump();
     expect(find.text('Estamos llamando a Josuep'), findsOneWidget);
     expect(llamadas, ['04120000000']);
-    expect(find.textContaining('Por WhatsApp'), findsOneWidget);
+    expect(find.textContaining('WhatsApp'), findsNothing);
 
     await tester.pump(
       const Duration(seconds: 3),
