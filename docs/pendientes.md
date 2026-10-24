@@ -56,6 +56,13 @@ webhook y el vigilante están hechos y verificados.
       Está en la web ([`web/src/lib/app.ts`](../web/src/lib/app.ts)), la app, el README y el
       `platanus-hack-project.jsonc`.
 - [ ] **El guion del demo** en [plan.md](plan.md#demo), con lo que se decidió el sábado.
+- [ ] **El hijo tiene dos nombres.** En el guion del pitch es Pedro, en Madrid; en el teléfono de
+      la casa es Josuep, y la voz lo dice en alto («Llamando a Josuep»). O se guarda el Samsung como
+      «Pedro» en el Infinix, o se cambia el guion. Pedro también es el vecino en
+      [armar-demo.md](armar-demo.md).
+- [ ] **La llamada a emergencias ya existe** (`257160e`: si el hijo no contesta, la casa llama a
+      emergencias), pero el guion todavía la cuenta como lo que sigue. Decidir entre todos si entra en
+      el demo y ajustar el guion.
 - [ ] **Ensayar las limitaciones en voz alta** ([riesgos.md](riesgos.md#cómo-contar-la-verdad)).
 - [ ] **En el pitch se dice «golpe», no «caída».** El oído reconoce un golpe y por eso pregunta.
 - [ ] Video de respaldo.
