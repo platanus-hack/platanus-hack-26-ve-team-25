@@ -6,6 +6,10 @@ conexión a Supabase y los sensores todavía no están: ver [docs/pantallas.md](
 
 ## Correrla en un Android
 
+Desde la raíz del repo hay atajos: `make` muestra todos. Los más usados son `make run`,
+`make run-demo`, `make test` y `make build-appbundle`. El App Bundle de release se firma por ahora
+con la llave de debug: para subirlo a Google Play hace falta una llave propia.
+
 1. En el teléfono: Ajustes → Acerca del teléfono → tocar 7 veces «Número de compilación». Luego,
    en Opciones de desarrollador, activar «Depuración USB».
 2. Conectarlo por USB, aceptar el aviso de depuración y comprobar que aparece:
