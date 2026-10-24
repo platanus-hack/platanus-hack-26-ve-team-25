@@ -24,6 +24,10 @@
 - **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
   porque su familia confía.
 - **Aviso real por Telegram:** es gratis y suena en iOS y en Android.
+- **Se vende como un acompañante del día a día, y el oído sigue siendo el centro.** El pitch abre
+  con lo de todos los días (la pastilla, la llamada con un toque) y llega a la alarma. No es un
+  asistente médico: ya hubo proyectos así en Platanus (Tata y Memo, PH25), el track es Emergencias
+  y lo original es el oído. No se construye nada nuevo hasta que P0 esté desplegado.
 
 ## Reloj (hora de Caracas)
 
@@ -72,6 +76,8 @@ Se trabaja de arriba hacia abajo. Nada de P1 hasta que P0 esté desplegado.
   perfil decide si es 🔴 o 🟡. Es el paso 5 del demo.
 - **Los tres niveles de aviso** con su tope diario.
 - **La persona como sensor:** «Huele a gas», «Huele a quemado», «Me siento mal».
+- **El recordatorio de pastillas:** la misma pregunta y los mismos botones de la alarma («¿Ya se
+  tomó la de las 8?»). Sin respuesta, aviso 🟡. Cada respuesta cuenta como señal de que está bien.
 - **Modo kiosco nivel 1:** la app como pantalla de inicio, con servicio en primer plano
   ([riesgos.md](riesgos.md#3-el-modo-kiosco-que-la-app-no-se-muera)).
 - **Sin conexión:** cola local que se reenvía al volver la señal, y aviso de batería baja y de
@@ -137,6 +143,7 @@ Todo lo demás está en [futuro.md](futuro.md).
 ## Pendiente
 
 - [ ] Nombres de quién construye cada pieza
+- [ ] Contarle a Víctor el enfoque del día a día
 - [ ] **Volver a probar `/escucha` con la música alta de la oficina, ya con las clases nuevas.**
   Ojo: el clasificador devuelve solo las 10 clases más probables (`maxResults: 10`). Con música
   fuerte, las 10 pueden ser todas de música y la alarma de humo quedar fuera aunque suene. Si
