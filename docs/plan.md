@@ -23,7 +23,9 @@
   ([investigacion.md](investigacion.md#el-perfil-de-salud)).
 - **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
   porque su familia confía.
-- **Aviso real por Telegram:** es gratis y suena en iOS y en Android.
+- **Aviso real por Telegram:** es gratis y suena en iOS y en Android. *(Propuesta del sábado
+  06:00: WhatsApp por Kapso con los créditos nuevos, y Telegram de respaldo. Ver
+  [créditos](#propuesta-qué-hace-cada-crédito).)*
 - **Se vende como un acompañante del día a día, y el oído sigue siendo el centro.** El pitch abre
   con lo de todos los días (la pastilla, la llamada con un toque) y llega a la alarma. No es un
   asistente médico: ya hubo proyectos así en Platanus (Tata y Memo, PH25), el track es Emergencias
@@ -66,7 +68,8 @@ Se trabaja de arriba hacia abajo. Nada de P1 hasta que P0 esté desplegado.
    teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico.
 4. **El latido.** La casa reporta cada pocos minutos. Si deja de hacerlo, la familia ve «sin
    señal desde las 14:05».
-5. **El aviso real por Telegram.**
+5. **El aviso real:** WhatsApp por Kapso si pasa la prueba de las 08:00; si no, Telegram
+   ([créditos](#propuesta-qué-hace-cada-crédito)).
 6. **La web de la familia.** Estado de la casa en vivo, alertas e historial del día. Sin login: se
    entra con un enlace de invitación, que en el demo es un QR.
 
@@ -123,15 +126,59 @@ Todo lo demás está en [futuro.md](futuro.md).
 | Web de la familia y UI/UX de las dos pantallas | Rogelio |
 | Supabase y Telegram | *(por confirmar)* |
 
-## Infra (presupuesto cero)
+## Infra y créditos de los patrocinantes
+
+> Créditos desbloqueados el sábado 24-oct a las 06:00. Lo que dice «propuesta» falta decidirlo con
+> el equipo. La regla: **Claude redacta y lee; las reglas deciden quién recibe un 🔴.** El camino
+> de la alarma (oír, preguntar, escalar, avisar) nunca depende de un modelo de lenguaje.
+
+| Patrocinante | Por hacker | Equipo (4) | Para qué |
+|---|---|---|---|
+| Anthropic | $50 | $200 | Claude: el resumen de la mañana, las preguntas por WhatsApp y las pastillas desde la foto del récipe |
+| Render | $50 | $200 | El vigilante: un proceso siempre encendido que escala alertas, vigila latidos y recibe webhooks |
+| Kapso | $22 | $88 | El aviso a la familia por WhatsApp, con botones |
+| ElevenLabs | por confirmar | — | La voz de la casa, pregrabada |
+
+Lo que ya hay, sin costo:
 
 - **Web de la familia:** Next.js en Vercel, plan gratis. Producción:
-  https://platanus-hack-26-ve-team-25.vercel.app. Por ahora el deploy es manual desde la cuenta
-  de Rogelio (`vercel --prod` en `web/`).
-- **App de la casa:** Flutter, APK para Android instalado a mano.
+  https://platanus-hack-26-ve-team-25.vercel.app. El deploy es desde la cuenta de Rogelio
+  (`vercel --prod` en `web/`).
+- **App de la casa:** Flutter, APK para Android instalado a mano. La misma app en el navegador,
+  sin oído: https://platanus-hack-26-ve-team-25-casa.vercel.app (`make casa-deploy`).
 - **Estado y tiempo real:** Supabase, plan gratis.
 - **Detección:** corre en el teléfono, sin costo por uso. El audio nunca sale del teléfono.
-- **Aviso real:** bot de Telegram, gratis.
+- **Aviso de respaldo:** bot de Telegram, gratis.
+
+### Propuesta: qué hace cada crédito
+
+1. **WhatsApp por Kapso (P0, reemplaza a Telegram si pasa la prueba).** La familia venezolana vive
+   en WhatsApp; Telegram le pide instalar algo y unirse a un bot. En el demo, el QR abre WhatsApp
+   con un mensaje listo («Quiero cuidar a Carmen»). Ese mensaje registra el teléfono y abre la
+   ventana de 24 h de Meta, en la que se puede escribir sin plantillas aprobadas. Cuando la alerta
+   escala, a todos les llega un WhatsApp con botones: «Ya hablé con ella» y «Llamar a Pedro».
+   **Prueba antes de las 08:00:** que un segundo teléfono se sume y reciba desde el número de
+   prueba de Kapso. Si falla, se queda Telegram.
+2. **El vigilante en Render (P0).** Es la pieza de servidor de los puntos 3 y 4 del P0: un proceso
+   siempre encendido que cada pocos segundos escala la alerta vencida que nadie canceló (cambio
+   atómico en Supabase), marca «sin señal» cuando falta el latido y manda el WhatsApp o el
+   Telegram. También recibe los webhooks de Kapso. Así el aviso no depende del teléfono de la casa
+   ni de que alguien tenga la web abierta. Una instancia Starter (unos $7 al mes) no se duerme.
+3. **Claude (P1).** Tres usos, ninguno en el camino de la alarma:
+   - **El 🟢 de cada mañana**, por WhatsApp: dos o tres frases a partir de los eventos del día.
+     Solo con eventos que existen; si no hay, un texto fijo.
+   - **Preguntar por WhatsApp:** «¿Cómo amaneció mi mamá?», y Claude responde leyendo los eventos
+     de hoy. En el demo, el público le puede escribir.
+   - **Las pastillas desde la foto del récipe**, que la familia revisa antes de guardar.
+
+   Con Claude Opus 5.5 ($4 por millón de tokens de entrada y $20 por millón de salida), cada
+   llamada cuesta entre 2 y 4 centavos: los $200 alcanzan para miles.
+4. **ElevenLabs (P2, si llegan los créditos).** Las frases fijas de la casa («Carmen, ¿está
+   bien?», el recordatorio de las pastillas) se generan una vez y van dentro de la app, así que
+   funcionan sin internet. Si no llegan, la voz del sistema de Android hace lo mismo.
+
+Cada uno canjea sus créditos en su cuenta, pero se usa una sola cuenta por servicio mientras
+alcance. Las llaves van en `web/.env.local` y en las variables de Vercel y Render, nunca en el repo.
 
 ## Cómo trabajamos
 
