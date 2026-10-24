@@ -25,6 +25,7 @@ class BaseFalsa {
       'casa_latido' => true,
       'casa_evento' || 'casa_alerta' => 'id-${++_id}',
       'casa_responder' => 'cancelada',
+      'casa_tomar' => {'medicamento': 'Losartán', 'quedan': 7},
       _ => null,
     };
     return http.Response(jsonEncode(respuesta), 200);
@@ -152,6 +153,30 @@ void main() {
     expect(mala.enCola, 0);
     // Sin evento en la base, la alerta no tiene a qué colgarse y no se manda.
     expect(base.funciones, ['casa_evento']);
+  });
+
+  test('«Ya me la tomé» manda la toma con su hora', () async {
+    nube.tomada('losartan-manana', ahora);
+    await nube.vaciar();
+    expect(base.ultima('casa_tomar'), {
+      'p_clave': 'clave-casa',
+      'p_pastilla': 'losartan-manana',
+      'p_hora': '2026-10-24T14:05:00.000Z',
+    });
+  });
+
+  test('una toma repetida en la casa se manda una sola vez', () async {
+    final c = Controlador(
+      casa: casaSimulada,
+      pastillas: pastillasSimuladas,
+      reloj: () => ahora,
+      nube: nube,
+    );
+    addTearDown(c.dispose);
+    c.yaLaTome(pastillasSimuladas.first);
+    c.yaLaTome(pastillasSimuladas.first);
+    await nube.vaciar();
+    expect(base.funciones, ['casa_tomar']);
   });
 
   test('el controlador le cuenta a la nube la alerta y cada cambio', () async {

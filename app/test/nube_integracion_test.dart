@@ -64,4 +64,34 @@ void main() {
     expect(alerta['estado'], 'atendida');
     expect(alerta['atendidaPor'], 'la casa');
   }, skip: !hayClaves);
+
+  test(
+    '«Ya me la tomé» descuenta una del inventario, una sola vez por día',
+    () async {
+      final losartan = await supabase.rpc('familia_recetar', {
+        'p_token': _token,
+        'p_nombre': 'Losartán',
+        'p_concentracion': '50 mg',
+        'p_tomas': [
+          {'clave': 'losartan-manana', 'hora': '08:00', 'cantidad': 1},
+        ],
+      });
+      await supabase.rpc('familia_ajustar', {
+        'p_token': _token,
+        'p_medicamento': losartan,
+        'p_quedan': 8,
+      });
+
+      nube.tomada('losartan-manana', DateTime.now());
+      nube.tomada('losartan-manana', DateTime.now());
+      await nube.vaciar();
+
+      final inventario = (await laFamiliaVe())['inventario'] as List;
+      final m = inventario.cast<Map<String, dynamic>>().firstWhere(
+        (m) => m['id'] == losartan,
+      );
+      expect(m['quedan'], 7);
+    },
+    skip: !hayClaves,
+  );
 }

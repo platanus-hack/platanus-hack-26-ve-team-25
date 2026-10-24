@@ -98,6 +98,12 @@ class _Respuesta extends _Envio {
   final String respuesta;
 }
 
+class _Toma extends _Envio {
+  _Toma(this.pastilla, this.hora);
+  final String pastilla;
+  final DateTime hora;
+}
+
 /// Manda a Supabase lo que pasa en la casa, en orden y con una cola en memoria: si no hay
 /// internet, lo guarda y reintenta cada [reintento]. Una alarma que la persona apagó sin
 /// internet llega igual cuando vuelve, con su hora real.
@@ -191,6 +197,11 @@ class Nube {
     _encolar(_Respuesta(alerta, respuesta));
   }
 
+  /// «Ya me la tomé»: la base descuenta una del inventario. Va con la hora de la toma, así la que
+  /// sale tarde por falta de internet cuenta el día correcto, y repetida no descuenta dos veces.
+  void tomada(String pastilla, DateTime hora) =>
+      _encolar(_Toma(pastilla, hora));
+
   void _encolar(_Envio envio) {
     _cola.add(envio);
     if (_cola.length > maximoEnCola) _cola.removeAt(0);
@@ -244,6 +255,14 @@ class Nube {
           'p_urgente': urgente,
         });
         _guardar(local, id, 'casa_alerta');
+      case _Toma(:final pastilla, :final hora):
+        // Devuelve null si la pastilla no está en el récipe de la base: no hay nada que reintentar.
+        final r = await _supabase.rpc('casa_tomar', {
+          'p_clave': clave,
+          'p_pastilla': pastilla,
+          'p_hora': hora.toUtc().toIso8601String(),
+        });
+        if (r == null) debugPrint('casa_tomar: $pastilla no está en el récipe');
       case _Respuesta(:final alerta, :final respuesta):
         final idAlerta = _ids[alerta];
         if (idAlerta == null) return;

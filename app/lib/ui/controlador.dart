@@ -115,6 +115,7 @@ class Controlador extends ChangeNotifier {
   }
 
   void yaLaTome(Pastilla p) {
+    if (!plan.tomada(p)) nube?.tomada(p.id, ahora);
     plan.marcarTomada(p, ahora);
     if (_forzada == p) _forzada = null;
     notifyListeners();

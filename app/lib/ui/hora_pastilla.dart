@@ -96,7 +96,10 @@ class HoraPastilla extends StatelessWidget {
                       // Para no tener que pararse si está lejos del teléfono.
                       const Text(
                         'O diga «ya me la tomé».',
-                        style: TextStyle(fontSize: 20, color: Color(0xFFD7EBDD)),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFFD7EBDD),
+                        ),
                       ),
                       const SizedBox(height: 18),
                       SizedBox(
