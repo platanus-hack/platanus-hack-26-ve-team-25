@@ -34,6 +34,7 @@ casa en el navegador: https://platanus-hack-26-ve-team-25-casa.vercel.app
 | La app de la casa en el navegador | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app para probar las pantallas sin Android. Sin oído ni llamadas: [cómo y por qué](app/README.md#verla-en-el-navegador) |
 | Alertas con vencimiento y escalamiento (Supabase) | Hecho, con 6 pruebas contra la base real: [`supabase/migrations/`](supabase/migrations/). La app de la casa ya escribe: [`nube.dart`](app/lib/datos/nube.dart) |
 | Web de la familia instalable (PWA) | Alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR, leyendo de Supabase; con datos simulados en [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta) |
+| Inventario de pastillas desde la factura | La familia sube la foto de la factura en `/f/[token]/pastillas/factura`, Claude la lee, se cruza con el récipe y la familia confirma antes de guardar. Cada toma descuenta una y con menos de 7 días sale el aviso «Hay que comprar». 26 pruebas del cálculo y el cruce; la migración [`20261024160000`](supabase/migrations/20261024160000_pastillas_e_inventario.sql) falta aplicarla en la base real. Pendientes: la casa llamando `casa_tomar` y el WhatsApp |
 | Aviso real por WhatsApp (Kapso) | Decidido el sábado; la invitación ya abre WhatsApp, falta el envío |
 
 ## Cómo está armado
@@ -72,8 +73,11 @@ latido periódico ───────────────────► s
 cd web
 bun install
 bun dev     # http://localhost:3000/escucha
-bun test    # pruebas de la lógica de audio
+bun test    # pruebas de la lógica de audio, de la web de la familia y de las pastillas
 ```
+
+Para leer facturas de verdad hace falta `ANTHROPIC_API_KEY` en `web/.env.local` y en Vercel. Sin
+ella, `/f/demo/pastillas/factura` funciona con la factura de ejemplo inventada.
 
 El micrófono de un teléfono solo funciona con HTTPS. Para probar desde el teléfono, usa la URL de
 producción o abre un túnel: `cloudflared tunnel --url http://localhost:3000`.

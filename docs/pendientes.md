@@ -144,7 +144,44 @@ Hecho con datos simulados: el estado se deriva en
       mandarlo.
 - [ ] **Las pastillas desde la foto del récipe:** la familia sube la foto en la web, Claude la lee
       y la familia confirma antes de guardar. Hoy las pastillas son datos inventados en
-      [`simulado.dart`](../app/lib/datos/simulado.dart).
+      [`simulado.dart`](../app/lib/datos/simulado.dart). Sigue el mismo patrón que la factura (abajo)
+      y guarda con `familia_recetar(p_token, p_nombre, p_concentracion, p_comerciales, p_tomas)`.
+- [ ] **Inventario de pastillas desde la factura** · *hecho en la web el sábado 24, falta conectarlo*.
+      La familia sube la foto en `/f/[token]/pastillas/factura`, Claude la lee
+      ([`route.ts`](../web/src/app/f/[token]/pastillas/factura/leer/route.ts)), `cruzar` la compara
+      con el récipe ([`factura.ts`](../web/src/lib/familia/factura.ts)) y la familia confirma: solo
+      se guarda lo del récipe. [`inventario.ts`](../web/src/lib/familia/inventario.ts) calcula
+      cuántos días alcanzan y, con **menos de 7 días** (`AVISO_DIAS`), sale el aviso 🟡 «Hay que
+      comprar» en `/f/[token]` con qué comprar para un mes. Para verlo: `/f/demo?escenario=para-saber`.
+      Lo que falta, en orden:
+  - [ ] **Aplicar la migración** [`20261024160000_pastillas_e_inventario.sql`](../supabase/migrations/20261024160000_pastillas_e_inventario.sql):
+        pegarla en el SQL Editor del proyecto en Supabase, como la primera. Después,
+        `cd web && bun run test:integracion` tiene que dar 11 pruebas en verde (6 de alertas y 5 de
+        pastillas), y `bun --env-file=.env.local scripts/recipe-demo.ts` carga el récipe inventado
+        de Carmen en la casa de demo.
+  - [ ] **`ANTHROPIC_API_KEY`** en Vercel y en `web/.env.local`. Sin ella la página dice que la
+        lectura no está activada y deja probar con la factura de ejemplo. Nunca en el repo.
+  - [ ] **La app de la casa llama `casa_tomar`** al tocar «Ya me la tomé» (no se tocó `app/`
+        porque otra sesión cambiaba esa pantalla): `POST {SUPABASE_URL}/rest/v1/rpc/casa_tomar`
+        con `{"p_clave": <clave de la casa>, "p_pastilla": <Pastilla.id>, "p_hora": <ISO de la
+        toma>}`. `p_pastilla` es el id de la pastilla en la app (`losartan-manana`,
+        `losartan-noche`, `metformina`), que en la base es `tomas.clave`. Devuelve
+        `{"medicamento": "Losartán", "quedan": 59}` (`quedan` es null si todavía no se cargó
+        ninguna factura) o null si la clave o la pastilla no existen. Puede ir por la misma cola de
+        [`nube.dart`](../app/lib/datos/nube.dart): una toma repetida el mismo día no descuenta otra
+        vez. **El descuento vive en la base y no en la app** para que la casa y la web no tengan dos
+        números.
+  - [ ] **El aviso de compra por WhatsApp** cuando esté Kapso: el texto ya lo arma
+        `mensajeDeCompra(nombre, inventario, ahora)` en [`inventario.ts`](../web/src/lib/familia/inventario.ts).
+        Mandarlo al primer contacto una vez al día como mucho, junto con los otros avisos 🟡.
+  - [ ] **Comprar por una farmacia con entrega** (Yummy, Farmatodo): el equipo está viendo si
+        tienen API. El punto de enganche es `pedido(inventario, ahora)`, que devuelve qué comprar
+        para un mes: genérico, concentración, nombres comerciales, cajas y pastillas por caja. No
+        hay nada integrado ni supuesto de ninguna API.
+  - [ ] El récipe se carga hoy con `familia_recetar` (el script de demo). Cuando exista la lectura
+        del récipe por foto, que llame a esa misma función después de que la familia confirme.
+  - [ ] El token `demo` es público: cualquiera puede gastar lecturas de Claude con él. Si se
+        abusa en el demo, poner un tope por minuto en el route handler.
 - [ ] **La rutina:** conteos de qué suena en cada franja del día, y aviso si falta lo de siempre.
 - [ ] **Configuración que guarde de verdad,** con el QR real de invitación.
 - [ ] Un `make demo` que levante la web y la conecte con el teléfono (`adb reverse tcp:3000
