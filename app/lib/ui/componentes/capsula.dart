@@ -20,7 +20,9 @@ class Capsula extends StatelessWidget {
       child: SizedBox(
         width: ancho,
         height: alto,
+        // Sin stretch, las franjas de color quedan de alto 0 y la cápsula no se ve.
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final c in colores)
               Expanded(child: ColoredBox(color: Color(c))),

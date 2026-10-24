@@ -87,4 +87,26 @@ void main() {
       expect(leerEtiquetas(csv), ['Speech', 'Child speech, kid speaking']);
     });
   });
+
+  group('LectorPcm16', () {
+    // 1, -1 y la mitad de la escala, en PCM de 16 bits little endian.
+    final pcm = Uint8List.fromList([1, 0, 0xFF, 0xFF, 0x00, 0x40]);
+
+    test('lee muestras de 16 bits con signo', () {
+      final m = LectorPcm16().leer(pcm);
+      expect(m, [1 / 32768, -1 / 32768, 0.5]);
+    });
+
+    test('un bloque que empieza en un byte impar no revienta', () {
+      final buffer = Uint8List(7)..setAll(1, pcm);
+      final m = LectorPcm16().leer(Uint8List.sublistView(buffer, 1));
+      expect(m, [1 / 32768, -1 / 32768, 0.5]);
+    });
+
+    test('una muestra partida entre dos bloques se arma con el siguiente', () {
+      final lector = LectorPcm16();
+      expect(lector.leer(Uint8List.sublistView(pcm, 0, 3)), [1 / 32768]);
+      expect(lector.leer(Uint8List.sublistView(pcm, 3)), [-1 / 32768, 0.5]);
+    });
+  });
 }

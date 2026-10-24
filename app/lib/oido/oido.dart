@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:record/record.dart';
@@ -48,6 +47,7 @@ class Oido implements Microfono {
   static const _cada = Duration(milliseconds: 500);
 
   final _recorder = AudioRecorder();
+  final _pcm = LectorPcm16();
   final _anillo = Anillo(_sr * 5);
   final _lineaBase = LineaBase();
   final _compuerta = Compuerta();
@@ -120,15 +120,7 @@ class Oido implements Microfono {
 
   // Lo barato corre con cada bloque de audio.
   void _alLlegarAudio(Uint8List bytes) {
-    final pcm = Int16List.view(
-      bytes.buffer,
-      bytes.offsetInBytes,
-      bytes.lengthInBytes ~/ 2,
-    );
-    final bloque = Float32List(pcm.length);
-    for (var i = 0; i < pcm.length; i++) {
-      bloque[i] = pcm[i] / 32768;
-    }
+    final bloque = _pcm.leer(bytes);
     _anillo.escribir(bloque);
     _db = rmsDb(bloque);
     _abierta = _compuerta.evaluar(
