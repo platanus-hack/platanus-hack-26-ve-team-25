@@ -39,6 +39,9 @@
 3. ¿Se entrena con la voz específica del usuario?
 4. ¿Cómo se usa a la persona como sensor?
 
+Detalle de las frecuencias de la voz, los modelos candidatos y la personalización por casa en
+[investigacion-audio.md](investigacion-audio.md).
+
 **Lo que ya sabemos:**
 
 - **Local, decidido:** el audio nunca sale del teléfono (privacidad), funciona sin internet (el
