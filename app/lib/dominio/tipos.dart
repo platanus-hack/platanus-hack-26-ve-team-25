@@ -10,6 +10,7 @@ class Contacto {
     required this.canal,
     required this.orden,
     this.donde = '',
+    this.telefono = '',
   });
 
   final String nombre;
@@ -17,6 +18,9 @@ class Contacto {
   final Canal canal;
   final int orden;
   final String donde;
+
+  /// Número para la llamada de emergencia. Vacío si no se configuró.
+  final String telefono;
 }
 
 class Casa {

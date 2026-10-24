@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../dominio/tipos.dart';
+import '../oido/oido.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
 import 'configurar.dart';
@@ -91,6 +93,18 @@ class Reposo extends StatelessWidget {
                           color: Colores.textoTenue,
                         ),
                       ),
+                      // Solo en debug: lo que oye el teléfono, para probar el modelo.
+                      if (kDebugMode) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          _diagnostico(c.ultimaEscucha),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            color: Colores.textoTenue,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -128,7 +142,7 @@ class Reposo extends StatelessWidget {
                       alTocar: () => ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
-                            'Gracias. Le avisamos a su familia que está bien.',
+                            'Gracias. Que tenga buen día.',
                             style: TextStyle(fontSize: 20),
                           ),
                         ),
@@ -192,4 +206,12 @@ class _BotonPersona extends StatelessWidget {
       alTocar: alTocar,
     );
   }
+}
+
+String _diagnostico(Escucha? e) {
+  if (e == null) return 'Oído: esperando el micrófono…';
+  final top = e.top
+      .map((c) => '${c.nombre} ${(c.puntaje * 100).round()}%')
+      .join(' · ');
+  return '${e.db.round()} dB (fondo ${e.fondo.round()})${e.compuerta ? ' · compuerta abierta' : ''}\n$top';
 }

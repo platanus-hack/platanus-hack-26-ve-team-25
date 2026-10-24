@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- El oído: el audio se procesa en el teléfono y nunca sale de él -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- La llamada de emergencia directa al primer contacto -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <application
         android:label="Casa"
         android:name="${applicationName}"

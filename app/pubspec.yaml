@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_phone_direct_caller: ^2.2.1
+  permission_handler: ^12.0.1
+  record: ^7.1.2
+  tflite_flutter: ^0.12.1
 
 dev_dependencies:
   flutter_test:
@@ -17,6 +21,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # YAMNet (Apache 2.0, de tensorflow/models) y sus 521 etiquetas
+  assets:
+    - assets/modelos/yamnet.tflite
+    - assets/modelos/yamnet_class_map.csv
 
   # La fuente va dentro de la app: tiene que verse bien sin internet.
   fonts:

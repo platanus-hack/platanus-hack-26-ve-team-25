@@ -2,6 +2,8 @@
 
 APP := app
 WEB := web
+# El número de emergencia vive en app/config/local.json, que no se sube (el repo es público).
+CONFIG := $(if $(wildcard $(APP)/config/local.json),--dart-define-from-file=config/local.json,)
 # Si bun no está instalado, se usa la versión del proyecto con npx.
 BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
@@ -22,18 +24,18 @@ deps: ## Baja las dependencias de la app
 	cd $(APP) && flutter pub get
 
 run: deps ## Corre la app en el teléfono conectado (r recarga, q sale)
-	cd $(APP) && flutter run
+	cd $(APP) && flutter run $(CONFIG)
 
 run-demo: deps ## Corre la app con la cuenta regresiva de 15 s del demo
-	cd $(APP) && flutter run --dart-define=DEMO=true
+	cd $(APP) && flutter run $(CONFIG) --dart-define=DEMO=true
 
 debug: run ## Igual que run: modo debug con recarga en caliente
 
 profile: deps ## Corre la app en modo profile, para medir rendimiento en el teléfono
-	cd $(APP) && flutter run --profile
+	cd $(APP) && flutter run $(CONFIG) --profile
 
 release: deps ## Corre la app en modo release, como la vería el usuario
-	cd $(APP) && flutter run --release
+	cd $(APP) && flutter run $(CONFIG) --release
 
 test: deps ## Corre las pruebas de la app
 	cd $(APP) && flutter test
@@ -45,13 +47,13 @@ format: ## Formatea el código de la app
 	cd $(APP) && dart format lib test
 
 build-apk-debug: deps ## Arma el APK de debug
-	cd $(APP) && flutter build apk --debug
+	cd $(APP) && flutter build apk $(CONFIG) --debug
 
 build-apk: deps ## Arma el APK de release, para instalar a mano
-	cd $(APP) && flutter build apk --release
+	cd $(APP) && flutter build apk $(CONFIG) --release
 
 build-appbundle: deps ## Arma el App Bundle (.aab) de release, para Google Play
-	cd $(APP) && flutter build appbundle --release
+	cd $(APP) && flutter build appbundle $(CONFIG) --release
 
 install: build-apk ## Instala el APK de release en el teléfono conectado
 	cd $(APP) && flutter install --release

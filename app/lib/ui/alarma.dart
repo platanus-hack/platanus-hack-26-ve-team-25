@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '../dominio/alerta.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
+import 'componentes/deslizador.dart';
 import 'controlador.dart';
 
 /// «¿Está bien?»: la casa pregunta antes de avisar. Nunca dice «ALERTA»: pregunta.
-/// Solo dos botones gigantes. Si nadie responde a tiempo, la alerta escala sola.
+/// Solo dos controles grandes. Si nadie responde a tiempo, la alerta escala sola.
 ///
-/// Por hacer: el tono de 520 Hz, la vibración y apagarla pasando la mano por encima
-/// (sensor de proximidad). Ver docs/pantallas.md.
+/// Por hacer: el tono de 520 Hz y la vibración. Ver docs/pantallas.md.
 class Alarma extends StatefulWidget {
   const Alarma({super.key, required this.c, required this.alerta});
 
@@ -125,14 +125,15 @@ class _AlarmaState extends State<Alarma> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-              BotonGrande(
-                texto: 'Estoy bien',
-                icono: Icons.check_rounded,
-                alto: 120,
-                tamano: 38,
+              // «Estoy bien» se desliza, no se toca: así no se apaga por reflejo.
+              // «Necesito ayuda» sí es un toque: pedir ayuda tiene que ser fácil.
+              Deslizador(
+                texto: 'Deslice si está bien',
+                alto: 112,
                 fondo: Colores.verde,
+                boton: Colors.white,
                 color: Colors.white,
-                alTocar: c.estoyBien,
+                alCompletar: c.estoyBien,
               ),
               const SizedBox(height: 16),
               BotonGrande(
