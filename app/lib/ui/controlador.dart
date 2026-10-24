@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../datos/llamadas.dart';
+import '../datos/voz.dart';
 import '../dominio/alerta.dart';
 import '../dominio/pastillas.dart';
+import '../dominio/respuesta.dart';
 import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
@@ -16,6 +18,8 @@ class Controlador extends ChangeNotifier {
     DateTime Function()? reloj,
     Stream<Escucha>? escuchas,
     this.telefono,
+    this.voz,
+    this.microfono,
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
        plan = PlanDelDia(pastillas) {
@@ -44,6 +48,15 @@ class Controlador extends ChangeNotifier {
   Pastilla? _forzada;
   final DateTime Function() _reloj;
   final Telefono? telefono;
+
+  /// Para responder «¿Pudo hablar con…?» por voz, además del botón.
+  final Voz? voz;
+
+  /// El oído, que se pausa mientras la voz escucha.
+  final Microfono? microfono;
+
+  /// True mientras el reconocimiento de voz escucha la respuesta.
+  bool escuchandoVoz = false;
   StreamSubscription<int>? _finDeWhatsApp;
   bool _esperandoWhatsApp = false;
   DateTime? _preguntaHasta;
@@ -150,6 +163,36 @@ class Controlador extends ChangeNotifier {
     } else {
       _preguntaHasta = ahora.add(esperaPregunta);
       notifyListeners();
+      unawaited(_preguntarPorVoz());
+    }
+  }
+
+  /// La respuesta también puede venir por voz: «sí» cierra la alerta y «no» llama por teléfono
+  /// ya. Si no se entiende, sigue la cuenta regresiva y la llamada sale igual.
+  Future<void> _preguntarPorVoz() async {
+    final voz = this.voz;
+    if (voz == null) return;
+    escuchandoVoz = true;
+    notifyListeners();
+    List<String> versiones = const [];
+    try {
+      await microfono?.pausar();
+      versiones = await voz.escuchar(
+        hasta: esperaPregunta - const Duration(seconds: 2),
+      );
+    } finally {
+      escuchandoVoz = false;
+      await microfono?.reanudar();
+    }
+    // Si ya se respondió con el botón o se llamó mientras escuchaba, no hay nada que hacer.
+    if (_preguntaHasta == null) return notifyListeners();
+    switch (interpretarRespuesta(versiones)) {
+      case Respuesta.si:
+        siHablamos();
+      case Respuesta.no:
+        await llamarPorTelefono();
+      case null:
+        notifyListeners();
     }
   }
 

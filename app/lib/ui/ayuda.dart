@@ -67,6 +67,30 @@ class Ayuda extends StatelessWidget {
                           color: Colores.rojoTexto,
                         ),
                       ),
+                      // Mientras escucha, se ve que puede contestar hablando.
+                      if (c.escuchandoVoz) ...[
+                        const SizedBox(height: 14),
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.mic_rounded,
+                              size: 34,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 10),
+                            Flexible(
+                              child: Text(
+                                'La escuchamos: diga «sí» o «no»',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.symmetric(

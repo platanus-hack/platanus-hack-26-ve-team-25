@@ -47,6 +47,10 @@
     <queries>
         <!-- La llamada de emergencia sale primero por WhatsApp -->
         <package android:name="com.whatsapp" />
+        <!-- El reconocimiento de voz que escucha «sí» o «no» -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

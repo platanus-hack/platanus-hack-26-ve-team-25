@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'telefono_falso.dart';
+import 'voz_falsa.dart';
 
 void main() {
   // Un teléfono acostado, como en los mockups: 844 × 390 puntos.
@@ -157,6 +158,79 @@ void main() {
         await _cerrar(tester, c);
       },
     );
+  });
+
+  group('respuesta por voz a «¿Pudo hablar con Josuep?»', () {
+    late DateTime ahora;
+    late TelefonoFalso t;
+    late VozFalsa voz;
+    late MicrofonoFalso mic;
+    late Controlador c;
+
+    Future<void> preguntar(WidgetTester tester) async {
+      comoRelojDeMesa(tester);
+      ahora = temprano();
+      t = TelefonoFalso();
+      voz = VozFalsa();
+      mic = MicrofonoFalso();
+      c = Controlador(
+        casa: casaConNumero,
+        reloj: () => ahora,
+        telefono: t,
+        voz: voz,
+        microfono: mic,
+      );
+      await tester.pumpWidget(AppCasa(controlador: c));
+      await tester.tap(find.text('Pedir ayuda'));
+      await tester.pump();
+      t.terminarWhatsApp(40);
+      await tester.pump();
+    }
+
+    testWidgets('pausa el oído y muestra que escucha', (tester) async {
+      await preguntar(tester);
+      expect(voz.escucho, isTrue);
+      expect(mic.pasos, ['pausar']);
+      expect(find.text('La escuchamos: diga «sí» o «no»'), findsOneWidget);
+      voz.responder([]);
+      await tester.pump();
+      expect(mic.pasos, ['pausar', 'reanudar']);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«sí» cierra la alerta sin llamar por teléfono', (
+      tester,
+    ) async {
+      await preguntar(tester);
+      voz.responder(['sí, ya hablamos']);
+      await tester.pump();
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(t.porTelefono, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«no» llama por teléfono sin esperar', (tester) async {
+      await preguntar(tester);
+      voz.responder(['no']);
+      await tester.pump();
+      expect(t.porTelefono, ['04120000000']);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('si no entiende, sigue la cuenta y llama a los 15 s', (
+      tester,
+    ) async {
+      await preguntar(tester);
+      voz.responder(['eh']);
+      await tester.pump();
+      expect(find.text('¿Pudo hablar con Josuep?'), findsOneWidget);
+      expect(t.porTelefono, isEmpty);
+
+      ahora = ahora.add(const Duration(seconds: 16));
+      await tester.pump(const Duration(seconds: 1));
+      expect(t.porTelefono, ['04120000000']);
+      await _cerrar(tester, c);
+    });
   });
 
   testWidgets('sin número configurado no promete una llamada', (tester) async {

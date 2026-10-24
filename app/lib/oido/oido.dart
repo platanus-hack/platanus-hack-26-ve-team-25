@@ -35,7 +35,14 @@ class Escucha {
 ///
 /// Por ahora YAMNet clasifica dos veces por segundo siempre, como en /escucha. Despertarlo
 /// solo cuando la compuerta se abre, para ahorrar batería, va después.
-class Oido {
+/// Algo que usa el micrófono y puede soltarlo un momento. El controlador lo pausa mientras el
+/// reconocimiento de voz escucha una respuesta.
+abstract interface class Microfono {
+  Future<void> pausar();
+  Future<void> reanudar();
+}
+
+class Oido implements Microfono {
   static const _sr = 16000;
   static const _muestrasYamnet = 15600; // 0,975 s: lo que YAMNet mira por vez
   static const _cada = Duration(milliseconds: 500);
@@ -71,6 +78,29 @@ class Oido {
     );
     _isolate = await IsolateInterpreter.create(address: _modelo!.address);
 
+    await _grabar();
+    return true;
+  }
+
+  /// Suelta el micrófono un momento, para que otro lo use: por ejemplo, el reconocimiento de voz
+  /// que escucha «sí» o «no». Dos usos del micrófono a la vez se pisan en Android.
+  @override
+  Future<void> pausar() async {
+    if (_audio == null) return;
+    _tic?.cancel();
+    await _audio?.cancel();
+    _audio = null;
+    await _recorder.stop();
+  }
+
+  /// Vuelve a oír después de una pausa.
+  @override
+  Future<void> reanudar() async {
+    if (_audio != null || _isolate == null) return;
+    await _grabar();
+  }
+
+  Future<void> _grabar() async {
     final audio = await _recorder.startStream(
       const RecordConfig(
         encoder: AudioEncoder.pcm16bits,
@@ -86,7 +116,6 @@ class Oido {
     );
     _audio = audio.listen(_alLlegarAudio);
     _tic = Timer.periodic(_cada, (_) => _clasificar());
-    return true;
   }
 
   // Lo barato corre con cada bloque de audio.

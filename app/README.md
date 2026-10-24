@@ -22,6 +22,10 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   teléfono de inmediato. Si duró más, la app vuelve sola al frente y pregunta «¿Pudo hablar con
   Josuep?»; si nadie toca «Sí, ya hablamos» en 15 s, llama por teléfono. Volver sola al frente
   necesita el permiso «Mostrar sobre otras apps», que la app pide al abrirse.
+- **Se puede contestar por voz:** mientras pregunta «¿Pudo hablar con Josuep?», la app pausa el
+  oído y escucha. «Sí» o «ya hablamos» cierra la alerta; «no» llama por teléfono sin esperar. Si no
+  entiende, sigue la cuenta regresiva y la llamada sale igual: el botón sigue estando. Usa el
+  reconocimiento de voz del teléfono, sin internet si tiene descargado el paquete de español.
 
 Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y cargar las pastillas desde
 la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).

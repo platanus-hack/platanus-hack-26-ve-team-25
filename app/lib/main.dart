@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'datos/llamadas.dart';
+import 'datos/voz.dart';
 import 'datos/simulado.dart';
 import 'oido/oido.dart';
 import 'tema.dart';
@@ -26,6 +27,8 @@ Future<void> main() async {
     // WhatsApp primero (los hijos suelen estar afuera); si no se puede o no contestan,
     // llamada telefónica normal. En la web no hay ni lo uno ni lo otro.
     telefono: kIsWeb ? null : TelefonoAndroid(),
+    voz: kIsWeb ? null : VozAndroid(),
+    microfono: oido,
   );
   runApp(AppCasa(controlador: controlador));
 
