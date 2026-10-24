@@ -17,6 +17,11 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   «llamada de voz» que WhatsApp crea en la agenda, así que **el contacto tiene que estar guardado
   en los contactos del teléfono de la casa** y la app pide permiso para leerlos
   ([futuro.md](../docs/futuro.md)).
+- **Si no contestan el WhatsApp:** Android no dice si contestaron, solo cuánto duró la llamada,
+  timbre incluido. Si terminó en menos de 10 s (rechazada o sin internet), la app llama por
+  teléfono de inmediato. Si duró más, la app vuelve sola al frente y pregunta «¿Pudo hablar con
+  Josuep?»; si nadie toca «Sí, ya hablamos» en 15 s, llama por teléfono. Volver sola al frente
+  necesita el permiso «Mostrar sobre otras apps», que la app pide al abrirse.
 
 Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y cargar las pastillas desde
 la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).

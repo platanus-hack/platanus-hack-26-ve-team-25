@@ -1,44 +1,39 @@
 import 'package:casa/datos/llamadas.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'telefono_falso.dart';
 
 void main() {
   test(
     'si WhatsApp puede, la llamada sale por WhatsApp y no por teléfono',
     () async {
-      final telefono = <String>[];
-      final via = await llamarPrimeroPorWhatsApp(
-        '04120000000',
-        whatsapp: (_) async => true,
-        telefono: (n) async => telefono.add(n),
+      final t = TelefonoFalso();
+      expect(
+        await llamarPrimeroPorWhatsApp('04120000000', t),
+        ViaLlamada.whatsapp,
       );
-      expect(via, ViaLlamada.whatsapp);
-      expect(telefono, isEmpty);
+      expect(t.porTelefono, isEmpty);
     },
   );
 
   test(
     'si WhatsApp no encuentra el contacto, cae a la llamada normal',
     () async {
-      final telefono = <String>[];
-      final via = await llamarPrimeroPorWhatsApp(
-        '04120000000',
-        whatsapp: (_) async => false,
-        telefono: (n) async => telefono.add(n),
+      final t = TelefonoFalso(whatsappFunciona: false);
+      expect(
+        await llamarPrimeroPorWhatsApp('04120000000', t),
+        ViaLlamada.telefono,
       );
-      expect(via, ViaLlamada.telefono);
-      expect(telefono, ['04120000000']);
+      expect(t.porTelefono, ['04120000000']);
     },
   );
 
   test('si WhatsApp falla, también cae a la llamada normal', () async {
-    final telefono = <String>[];
-    final via = await llamarPrimeroPorWhatsApp(
-      '04120000000',
-      whatsapp: (_) async => throw PlatformException(code: 'error'),
-      telefono: (n) async => telefono.add(n),
+    final t = TelefonoFalso(whatsappFalla: true);
+    expect(
+      await llamarPrimeroPorWhatsApp('04120000000', t),
+      ViaLlamada.telefono,
     );
-    expect(via, ViaLlamada.telefono);
-    expect(telefono, hasLength(1));
+    expect(t.porTelefono, hasLength(1));
   });
 }

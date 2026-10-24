@@ -9,17 +9,13 @@ import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
 
-/// Cómo se llama a un número y por dónde salió. En la app, WhatsApp primero y si no, una llamada
-/// telefónica normal; en las pruebas, una falsa.
-typedef Llamar = Future<ViaLlamada> Function(String numero);
-
 /// El estado de la casa que ven las pantallas: la hora, lo último que oyó y la alerta abierta.
 class Controlador extends ChangeNotifier {
   Controlador({
     required this.casa,
     DateTime Function()? reloj,
     Stream<Escucha>? escuchas,
-    this.llamar,
+    this.telefono,
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
        plan = PlanDelDia(pastillas) {
@@ -28,10 +24,18 @@ class Controlador extends ChangeNotifier {
       (_) => _alPasarUnSegundo(),
     );
     _oyendo = escuchas?.listen(_alOir);
+    _finDeWhatsApp = telefono?.finDeWhatsApp.listen(_alTerminarWhatsApp);
   }
 
   /// El mismo sonido no vuelve a preguntar «¿Está bien?» antes de este tiempo.
   static const _repetir = Duration(seconds: 3);
+
+  /// Una llamada de WhatsApp que terminó antes de esto no llegó a timbrar de verdad: rechazada,
+  /// sin internet o caída. Se llama por teléfono sin preguntar.
+  static const finCorto = Duration(seconds: 10);
+
+  /// Cuánto se espera a que la persona diga «Sí, ya hablamos» antes de llamar por teléfono.
+  static const esperaPregunta = Duration(seconds: 15);
 
   final Casa casa;
 
@@ -39,10 +43,10 @@ class Controlador extends ChangeNotifier {
   final PlanDelDia plan;
   Pastilla? _forzada;
   final DateTime Function() _reloj;
-  final Llamar? llamar;
-
-  /// Por dónde salió la última llamada de emergencia, para decirlo en pantalla.
-  ViaLlamada? viaLlamada;
+  final Telefono? telefono;
+  StreamSubscription<int>? _finDeWhatsApp;
+  bool _esperandoWhatsApp = false;
+  DateTime? _preguntaHasta;
   late final Timer _tic;
   StreamSubscription<Escucha>? _oyendo;
   Alerta? _alerta;
@@ -101,14 +105,52 @@ class Controlador extends ChangeNotifier {
 
   void fueSinQuerer() => _cambiar(_alerta?.atender(ahora, casa.nombre));
 
-  /// Llama al primer contacto. Sin número configurado no hace nada.
+  /// Después de una llamada de WhatsApp larga, lo que falta para llamar por teléfono si nadie
+  /// responde «Sí, ya hablamos». Null si no se está preguntando.
+  Duration? get preguntaRestante {
+    final hasta = _preguntaHasta;
+    if (hasta == null) return null;
+    return ahora.isBefore(hasta) ? hasta.difference(ahora) : Duration.zero;
+  }
+
+  /// «Sí, ya hablamos»: el contacto contestó, la alerta queda atendida.
+  void siHablamos() => _cambiar(_alerta?.atender(ahora, primerContacto.nombre));
+
+  /// Llama al primer contacto, WhatsApp primero. Sin número configurado no hace nada.
   Future<void> llamarPrimerContacto() async {
+    final t = telefono;
     final numero = primerContacto.telefono;
-    if (numero.isEmpty) return;
-    final llamar = this.llamar;
-    if (llamar == null) return;
-    viaLlamada = await llamar(numero);
+    if (t == null || numero.isEmpty) return;
+    _preguntaHasta = null;
+    final via = await llamarPrimeroPorWhatsApp(numero, t);
+    _esperandoWhatsApp = via == ViaLlamada.whatsapp;
     notifyListeners();
+  }
+
+  /// La llamada telefónica normal, sin pasar por WhatsApp.
+  Future<void> llamarPorTelefono() async {
+    final t = telefono;
+    final numero = primerContacto.telefono;
+    _preguntaHasta = null;
+    _esperandoWhatsApp = false;
+    notifyListeners();
+    if (t == null || numero.isEmpty) return;
+    await t.llamar(numero);
+  }
+
+  // Android no dice si contestaron el WhatsApp. Si terminó muy rápido, no timbró: se llama por
+  // teléfono ya. Si duró más, pudo haber timbrado sin respuesta o haber una conversación: se
+  // pregunta, y si nadie responde a tiempo, se llama por teléfono.
+  void _alTerminarWhatsApp(int segundos) {
+    if (!_esperandoWhatsApp) return;
+    _esperandoWhatsApp = false;
+    if (_alerta?.estado != EstadoAlerta.escalada) return;
+    if (Duration(seconds: segundos) < finCorto) {
+      unawaited(llamarPorTelefono());
+    } else {
+      _preguntaHasta = ahora.add(esperaPregunta);
+      notifyListeners();
+    }
   }
 
   void _alOir(Escucha escucha) {
@@ -126,12 +168,19 @@ class Controlador extends ChangeNotifier {
   }
 
   void _alPasarUnSegundo() {
+    final hasta = _preguntaHasta;
+    if (hasta != null && !ahora.isBefore(hasta)) unawaited(llamarPorTelefono());
     _cambiar(_alerta?.revisar(ahora));
   }
 
   void _cambiar(Alerta? nueva) {
     final antes = _alerta?.estado;
     _alerta = nueva;
+    // Si la alerta se cerró, ya no hay nada que preguntar ni llamada que esperar.
+    if (!(nueva?.abierta ?? false)) {
+      _preguntaHasta = null;
+      _esperandoWhatsApp = false;
+    }
     // Al escalar, una sola vez, la casa llama al primer contacto.
     if (antes != EstadoAlerta.escalada &&
         nueva?.estado == EstadoAlerta.escalada) {
@@ -145,6 +194,7 @@ class Controlador extends ChangeNotifier {
   void dispose() {
     _tic.cancel();
     _oyendo?.cancel();
+    _finDeWhatsApp?.cancel();
     super.dispose();
   }
 }

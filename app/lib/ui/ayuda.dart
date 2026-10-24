@@ -7,6 +7,10 @@ import 'controlador.dart';
 
 /// Después de escalar. Solo dice lo que de verdad pasó: la casa llama al primer contacto.
 /// No promete que «la ayuda viene en camino» ni muestra llamadas que todavía no existen.
+///
+/// Si la llamada de WhatsApp duró como para haber timbrado, la app vuelve aquí y pregunta si
+/// pudieron hablar, porque Android no dice si la contestaron. Si nadie responde, llama por
+/// teléfono.
 class Ayuda extends StatelessWidget {
   const Ayuda({super.key, required this.c, required this.alerta});
 
@@ -17,6 +21,21 @@ class Ayuda extends StatelessWidget {
   Widget build(BuildContext context) {
     final contacto = c.primerContacto;
     final conNumero = contacto.telefono.isNotEmpty;
+    final pregunta = c.preguntaRestante;
+
+    final String titulo;
+    final String detalle;
+    if (pregunta != null) {
+      titulo = '¿Pudo hablar con ${contacto.nombre}?';
+      detalle =
+          'Si no, lo llamamos por teléfono en 0:${pregunta.inSeconds.toString().padLeft(2, '0')}.';
+    } else if (conNumero) {
+      titulo = 'Estamos llamando a ${contacto.nombre}';
+      detalle = 'Si contesta, puede hablarle desde aquí.';
+    } else {
+      titulo = 'Pida ayuda a alguien cerca';
+      detalle = 'Este teléfono todavía no tiene un número de emergencia.';
+    }
 
     return Scaffold(
       backgroundColor: Colores.rojoOscuro,
@@ -31,9 +50,7 @@ class Ayuda extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        conNumero
-                            ? 'Estamos llamando a ${contacto.nombre}'
-                            : 'Pida ayuda a alguien cerca',
+                        titulo,
                         style: const TextStyle(
                           fontSize: 42,
                           height: 1.08,
@@ -43,7 +60,7 @@ class Ayuda extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        conNumero ? 'Si contesta, puede hablarle desde aquí.' : 'Este teléfono todavía no tiene un número de emergencia.',
+                        detalle,
                         style: const TextStyle(
                           fontSize: 22,
                           height: 1.35,
@@ -105,26 +122,48 @@ class Ayuda extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (conNumero) ...[
+                    if (pregunta != null) ...[
                       BotonGrande(
-                        texto: 'Volver a llamar',
+                        texto: 'Sí, ya hablamos',
+                        icono: Icons.check_rounded,
                         alto: 112,
                         tamano: 30,
                         fondo: Colors.white,
                         color: Colores.rojoOscuro,
-                        alTocar: c.llamarPrimerContacto,
+                        alTocar: c.siHablamos,
                       ),
                       const SizedBox(height: 16),
+                      BotonGrande(
+                        texto: 'Llamar por teléfono ya',
+                        alto: 72,
+                        tamano: 21,
+                        fondo: Colors.transparent,
+                        color: Colors.white,
+                        borde: const Color(0xFFF3B7B3),
+                        alTocar: c.llamarPorTelefono,
+                      ),
+                    ] else ...[
+                      if (conNumero) ...[
+                        BotonGrande(
+                          texto: 'Volver a llamar',
+                          alto: 112,
+                          tamano: 30,
+                          fondo: Colors.white,
+                          color: Colores.rojoOscuro,
+                          alTocar: c.llamarPrimerContacto,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      BotonGrande(
+                        texto: 'Fue sin querer, estoy bien',
+                        alto: 72,
+                        tamano: 21,
+                        fondo: Colors.transparent,
+                        color: Colors.white,
+                        borde: const Color(0xFFF3B7B3),
+                        alTocar: c.fueSinQuerer,
+                      ),
                     ],
-                    BotonGrande(
-                      texto: 'Fue sin querer, estoy bien',
-                      alto: 72,
-                      tamano: 21,
-                      fondo: Colors.transparent,
-                      color: Colors.white,
-                      borde: const Color(0xFFF3B7B3),
-                      alTocar: c.fueSinQuerer,
-                    ),
                   ],
                 ),
               ),

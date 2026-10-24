@@ -4,19 +4,28 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.provider.ContactsContract
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var canal: MethodChannel? = null
+    private val reloj = Handler(Looper.getMainLooper())
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/llamadas").setMethodCallHandler { call, result ->
-            when (call.method) {
-                "whatsapp" -> result.success(llamarPorWhatsApp(call.argument<String>("numero").orEmpty()))
-                else -> result.notImplemented()
+        canal = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/llamadas").apply {
+            setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "whatsapp" -> result.success(llamarPorWhatsApp(call.argument<String>("numero").orEmpty()))
+                    else -> result.notImplemented()
+                }
             }
         }
     }
@@ -56,6 +65,7 @@ class MainActivity : FlutterActivity() {
                 }
                 return try {
                     startActivity(intent)
+                    vigilarLlamada()
                     true
                 } catch (e: ActivityNotFoundException) {
                     false
@@ -63,5 +73,46 @@ class MainActivity : FlutterActivity() {
             }
         }
         return false
+    }
+
+    /**
+     * Android no avisa a otra app si la llamada de WhatsApp fue contestada. Lo que sí se ve es el
+     * modo de audio: mientras hay una llamada de voz por internet está en MODE_IN_COMMUNICATION.
+     * Se mira cada medio segundo; cuando la llamada termina, la app vuelve al frente y le dice a
+     * Dart cuántos segundos duró (timbre incluido). Si nunca empezó en 20 s, cuenta como 0.
+     */
+    private fun vigilarLlamada() {
+        val audio = getSystemService(AUDIO_SERVICE) as AudioManager
+        val pedida = SystemClock.elapsedRealtime()
+        var empezo = 0L
+
+        val tic = object : Runnable {
+            override fun run() {
+                val ahora = SystemClock.elapsedRealtime()
+                val enLlamada = audio.mode == AudioManager.MODE_IN_COMMUNICATION
+                when {
+                    empezo == 0L && enLlamada -> empezo = ahora
+                    empezo == 0L && ahora - pedida > 20_000 -> return terminar(0)
+                    empezo != 0L && !enLlamada -> return terminar(((ahora - empezo) / 1000).toInt())
+                }
+                reloj.postDelayed(this, 500)
+            }
+        }
+        reloj.postDelayed(tic, 500)
+    }
+
+    private fun terminar(segundos: Int) {
+        // Volver al frente necesita el permiso «Mostrar sobre otras apps»: sin él, Android no deja
+        // que una app en segundo plano se abra sola. Si no está, la persona vuelve con la tecla
+        // de inicio, porque la app es la pantalla de inicio del teléfono de la casa.
+        try {
+            startActivity(
+                Intent(this, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        } catch (e: Exception) {
+            // Si Android no deja volver, igual se avisa a Dart para que llame por teléfono.
+        }
+        canal?.invokeMethod("whatsappTermino", mapOf("segundos" to segundos))
     }
 }

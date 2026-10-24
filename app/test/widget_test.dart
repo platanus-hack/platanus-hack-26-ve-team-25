@@ -1,10 +1,11 @@
-import 'package:casa/datos/llamadas.dart';
 import 'package:casa/datos/simulado.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:casa/main.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'telefono_falso.dart';
 
 void main() {
   // Un teléfono acostado, como en los mockups: 844 × 390 puntos.
@@ -16,6 +17,21 @@ void main() {
 
   // Las 6:00, antes de la primera pastilla, para que el reposo no muestre un recordatorio.
   DateTime temprano() => DateTime(2026, 10, 24, 6);
+
+  const casaConNumero = Casa(
+    id: 'prueba',
+    nombre: 'Carmen',
+    condiciones: [],
+    contactos: [
+      Contacto(
+        nombre: 'Josuep',
+        relacion: 'hijo',
+        canal: Canal.llamada,
+        orden: 1,
+        telefono: '04120000000',
+      ),
+    ],
+  );
 
   testWidgets('del reposo a «¿Está bien?» y de vuelta deslizando', (
     tester,
@@ -51,49 +67,96 @@ void main() {
     await _cerrar(tester, c);
   });
 
-  testWidgets('el pánico llama al primer contacto una sola vez', (
-    tester,
-  ) async {
-    comoRelojDeMesa(tester);
-    final llamadas = <String>[];
-    final c = Controlador(
-      casa: const Casa(
-        id: 'prueba',
-        nombre: 'Carmen',
-        condiciones: [],
-        contactos: [
-          Contacto(
-            nombre: 'Josuep',
-            relacion: 'hijo',
-            canal: Canal.llamada,
-            orden: 1,
-            telefono: '04120000000',
-          ),
-        ],
-      ),
-      reloj: temprano,
-      llamar: (numero) async {
-        llamadas.add(numero);
-        return ViaLlamada.whatsapp;
+  group('la llamada de emergencia', () {
+    late DateTime ahora;
+    late TelefonoFalso t;
+    late Controlador c;
+
+    Future<void> pedirAyuda(WidgetTester tester) async {
+      comoRelojDeMesa(tester);
+      ahora = temprano();
+      t = TelefonoFalso();
+      c = Controlador(casa: casaConNumero, reloj: () => ahora, telefono: t);
+      await tester.pumpWidget(AppCasa(controlador: c));
+      await tester.tap(find.text('Pedir ayuda'));
+      await tester.pump();
+    }
+
+    testWidgets('el pánico llama primero por WhatsApp, una sola vez', (
+      tester,
+    ) async {
+      await pedirAyuda(tester);
+      expect(find.text('Estamos llamando a Josuep'), findsOneWidget);
+      expect(t.porWhatsApp, ['04120000000']);
+      expect(t.porTelefono, isEmpty);
+      expect(find.textContaining('WhatsApp'), findsNothing);
+
+      await tester.pump(
+        const Duration(seconds: 3),
+      ); // los tics del reloj no vuelven a llamar
+      expect(t.porWhatsApp, hasLength(1));
+      await _cerrar(tester, c);
+    });
+
+    testWidgets(
+      'si el WhatsApp terminó enseguida, llama por teléfono sin preguntar',
+      (tester) async {
+        await pedirAyuda(tester);
+        t.terminarWhatsApp(4);
+        await tester.pump();
+        expect(t.porTelefono, ['04120000000']);
+        expect(find.text('¿Pudo hablar con Josuep?'), findsNothing);
+        await _cerrar(tester, c);
       },
     );
-    await tester.pumpWidget(AppCasa(controlador: c));
 
-    await tester.tap(find.text('Pedir ayuda'));
-    await tester.pump();
-    expect(find.text('Estamos llamando a Josuep'), findsOneWidget);
-    expect(llamadas, ['04120000000']);
-    expect(find.textContaining('WhatsApp'), findsNothing);
+    testWidgets('si duró más, pregunta; «Sí, ya hablamos» cierra la alerta', (
+      tester,
+    ) async {
+      await pedirAyuda(tester);
+      t.terminarWhatsApp(40);
+      await tester.pump();
+      expect(find.text('¿Pudo hablar con Josuep?'), findsOneWidget);
 
-    await tester.pump(
-      const Duration(seconds: 3),
-    ); // los tics del reloj no vuelven a llamar
-    expect(llamadas, hasLength(1));
+      await tester.tap(find.text('Sí, ya hablamos'));
+      await tester.pump();
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(t.porTelefono, isEmpty);
+      await _cerrar(tester, c);
+    });
 
-    await tester.tap(find.text('Fue sin querer, estoy bien'));
-    await tester.pump();
-    expect(find.text('Cuidando la casa'), findsOneWidget);
-    await _cerrar(tester, c);
+    testWidgets(
+      'si nadie responde la pregunta, llama por teléfono a los 15 s',
+      (tester) async {
+        await pedirAyuda(tester);
+        t.terminarWhatsApp(40);
+        await tester.pump();
+
+        ahora = ahora.add(const Duration(seconds: 14));
+        await tester.pump(const Duration(seconds: 1));
+        expect(t.porTelefono, isEmpty);
+
+        ahora = ahora.add(const Duration(seconds: 2));
+        await tester.pump(const Duration(seconds: 1));
+        expect(t.porTelefono, ['04120000000']);
+        expect(find.text('¿Pudo hablar con Josuep?'), findsNothing);
+        await _cerrar(tester, c);
+      },
+    );
+
+    testWidgets(
+      '«Fue sin querer» cierra todo y el fin del WhatsApp ya no llama',
+      (tester) async {
+        await pedirAyuda(tester);
+        await tester.tap(find.text('Fue sin querer, estoy bien'));
+        await tester.pump();
+        t.terminarWhatsApp(4);
+        await tester.pump();
+        expect(find.text('Cuidando la casa'), findsOneWidget);
+        expect(t.porTelefono, isEmpty);
+        await _cerrar(tester, c);
+      },
+    );
   });
 
   testWidgets('sin número configurado no promete una llamada', (tester) async {

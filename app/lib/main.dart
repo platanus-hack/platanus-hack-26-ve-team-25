@@ -23,9 +23,9 @@ Future<void> main() async {
     casa: casaSimulada,
     pastillas: pastillasSimuladas,
     escuchas: oido.escuchas,
-    // WhatsApp primero (los hijos suelen estar afuera); si no se puede, llamada normal.
-    // En la web no hay ni lo uno ni lo otro.
-    llamar: kIsWeb ? null : llamarEnElTelefono,
+    // WhatsApp primero (los hijos suelen estar afuera); si no se puede o no contestan,
+    // llamada telefónica normal. En la web no hay ni lo uno ni lo otro.
+    telefono: kIsWeb ? null : TelefonoAndroid(),
   );
   runApp(AppCasa(controlador: controlador));
 
@@ -34,6 +34,11 @@ Future<void> main() async {
 
   // Los permisos se piden con la app ya en pantalla: Android solo los muestra así.
   await [Permission.phone, Permission.contacts].request();
+  // «Mostrar sobre otras apps»: para volver sola al frente cuando termina el WhatsApp. Android lo
+  // pide en una pantalla de ajustes aparte; se activa una vez al configurar la casa.
+  if (!await Permission.systemAlertWindow.isGranted) {
+    await Permission.systemAlertWindow.request();
+  }
   await oido.iniciar();
 }
 

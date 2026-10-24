@@ -1,33 +1,59 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 /// Por dónde salió la llamada de emergencia.
 enum ViaLlamada { whatsapp, telefono }
 
+/// Lo que la casa sabe hacer con el teléfono. En la app es Android de verdad; en las pruebas,
+/// uno falso que anota las llamadas.
+abstract interface class Telefono {
+  /// Abre una llamada de voz de WhatsApp. False si no se pudo.
+  Future<bool> whatsapp(String numero);
+
+  /// Una llamada telefónica normal y directa.
+  Future<void> llamar(String numero);
+
+  /// Cada vez que termina una llamada de WhatsApp, cuántos segundos duró, timbre incluido.
+  /// Android no dice si la contestaron.
+  Stream<int> get finDeWhatsApp;
+}
+
 /// WhatsApp primero: los hijos suelen estar fuera del país, y una llamada normal al exterior
 /// cuesta y muchas veces no entra. Si WhatsApp no se puede (no está instalado, el contacto no
 /// está en la agenda o falta el permiso), cae a la llamada telefónica normal.
-Future<ViaLlamada> llamarPrimeroPorWhatsApp(
-  String numero, {
-  required Future<bool> Function(String numero) whatsapp,
-  required Future<void> Function(String numero) telefono,
-}) async {
+Future<ViaLlamada> llamarPrimeroPorWhatsApp(String numero, Telefono t) async {
   try {
-    if (await whatsapp(numero)) return ViaLlamada.whatsapp;
+    if (await t.whatsapp(numero)) return ViaLlamada.whatsapp;
   } on PlatformException {
     // Cualquier falla de WhatsApp termina en la llamada normal: lo importante es que salga.
   }
-  await telefono(numero);
+  await t.llamar(numero);
   return ViaLlamada.telefono;
 }
 
-const _canal = MethodChannel('casa/llamadas');
+/// El teléfono de verdad. El lado de WhatsApp está en MainActivity.kt.
+class TelefonoAndroid implements Telefono {
+  TelefonoAndroid() {
+    _canal.setMethodCallHandler((llamada) async {
+      if (llamada.method == 'whatsappTermino') {
+        _fin.add((llamada.arguments as Map)['segundos'] as int);
+      }
+    });
+  }
 
-/// La llamada de verdad, en el teléfono: el lado de WhatsApp está en MainActivity.kt.
-Future<ViaLlamada> llamarEnElTelefono(String numero) =>
-    llamarPrimeroPorWhatsApp(
-      numero,
-      whatsapp: (n) async =>
-          await _canal.invokeMethod<bool>('whatsapp', {'numero': n}) ?? false,
-      telefono: (n) async => FlutterPhoneDirectCaller.callNumber(n),
-    );
+  static const _canal = MethodChannel('casa/llamadas');
+  final _fin = StreamController<int>.broadcast();
+
+  @override
+  Future<bool> whatsapp(String numero) async =>
+      await _canal.invokeMethod<bool>('whatsapp', {'numero': numero}) ?? false;
+
+  @override
+  Future<void> llamar(String numero) async =>
+      FlutterPhoneDirectCaller.callNumber(numero);
+
+  @override
+  Stream<int> get finDeWhatsApp => _fin.stream;
+}
