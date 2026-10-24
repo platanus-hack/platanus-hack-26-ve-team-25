@@ -47,6 +47,7 @@ docs/contexto.md                  el problema, la competencia y las decisiones d
 docs/riesgos.md                   muros técnicos (kiosco, apagones, batería), riesgos del demo
 docs/preguntas-tecnicas.md        preguntas técnicas frecuentes, con la evidencia de cada respuesta
 docs/por-planificar.md            ideas de Abrahan que se van pensando antes de construirlas
+docs/armar-demo.md                qué va en cada teléfono del demo, cómo se conectan y cómo se prueba
 docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
 docs/investigacion-alertas.md     capa de alertas: transporte, escalamiento, apagones y perfil energético
 docs/investigacion-audio.md       voz del adulto mayor, modelos, sensores y paquetes de Flutter
