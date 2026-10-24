@@ -15,6 +15,7 @@
 | 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Investigar permisos primero |
 | 5 | [Altavoz y volumen al máximo en la llamada](#5-altavoz-y-volumen-al-máximo-en-la-llamada) | Técnico | Se puede probar ya |
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
+| 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |
 
 ## 1. Proyección para el pitch
 
@@ -60,7 +61,8 @@ vistas, porque sus dos teléfonos hacen cosas distintas:
   tipo (mesa o personal), su propia clave en hash y su propio latido. Así se puede apagar uno
   sin tocar el otro, y la familia ve cuál dejó de reportar.
 - **Se emparejan con un QR que muestra el de mesa**, como ya hace la invitación de la familia.
-  Nadie escribe claves.
+  Nadie escribe claves. **Decidido por Abrahan el sábado 24:** todo tiene que ser lo más
+  sencillo posible para el abuelo, y el QR es eso.
 - **Supabase sigue siendo la única fuente de verdad.** Los dos teléfonos del abuelo escriben
   eventos y alertas a la misma casa, y la misma alerta se ve en todos. Si el personal pide ayuda,
   el de mesa también lo muestra.
@@ -79,7 +81,10 @@ copian tal cual. Hay tres caminos:
 | App Flutter que muestra la web adentro (WebView) y agrega lo nativo | Reutiliza las pantallas y suma push y sonido fuerte | Dos tecnologías en la misma app |
 | Pasar las pantallas de la familia a Flutter | Una sola app para las tres vistas, como dice futuro.md | Rehacer lo que ya funciona |
 
+- [x] Emparejar los teléfonos con un QR.
 - [ ] Decidir si son dos roles o tres. Propuesta: dos roles y tres vistas.
+- [ ] Diseñar el emparejamiento: quién muestra el QR, quién lo escanea, y qué pasa si se pierde
+      un teléfono (revocar su clave sin tocar los demás).
 - [ ] Decidir el camino de la vista de familia. Para el hackatón, la web como está. Para el
       producto, depende del punto 6.
 - [ ] Qué tiene la vista personal además de «Pedir ayuda», y si tiene que funcionar en iPhone.
@@ -168,6 +173,27 @@ contacto de emergencia, como las rutinas de Samsung.
 | iPhone | Las «alertas críticas» suenan en silencio, pero Apple tiene que aprobar la app (las da a apps de salud y seguridad) | En Contactos, el tono del contacto tiene «Omitir modo silencioso» (Emergency Bypass): suena aunque el iPhone esté en silencio o en Concentración |
 | Web (PWA) | No: una notificación web nunca salta el silencio | — |
 
+**Las alertas críticas de Apple, en detalle:** sí se pueden, con tres condiciones. Una app
+nativa de iPhone (no la web), la cuenta de Apple Developer ($99 al año) y un formulario en que
+Apple decide si la aprueba. Las da a apps de salud, médicas, de seguridad del hogar y de
+seguridad pública; esta encaja, pero no hay garantía y puede tardar semanas. Aun aprobada, el
+iPhone le pregunta al hijo si las permite, aparte del permiso normal de notificaciones.
+
+**Samsung, en detalle:** no tiene un «Omitir modo silencioso» por contacto como el iPhone. Lo
+que sí tiene:
+
+- **Modos y rutinas** (One UI 5 o posterior; antes se llamaba Rutinas de Bixby): una rutina «si
+  entra una llamada de este contacto, el modo de sonido pasa a sonido y el volumen al máximo».
+  Hay que comprobar en un Samsung real que la condición deja elegir el contacto, porque cambia
+  entre versiones.
+- **No molestar → excepciones:** deja pasar las llamadas de los favoritos y las repetidas. Eso
+  salta el «No molestar», pero **no** el modo silencio ni el de vibración.
+
+Lo que sí sirve **en todos los Android, Samsung incluidos**, es una app propia para la familia:
+la alerta suena por el canal de alarma, que Android hace sonar aunque el teléfono esté en
+silencio o en vibración, y con el permiso de «No molestar» que da el hijo una vez, también salta
+ese modo. Es lo mismo que hacen los despertadores.
+
 **Conclusión:** lo que sirve ya, sin escribir código, es una **guía al invitar a la familia**:
 «guarda este número y márcalo como emergencia». Con instrucciones para iPhone, Android y Samsung.
 Para hacerlo desde la app, la familia necesita una app nativa: eso empuja el punto 2 hacia una
@@ -177,3 +203,24 @@ app de verdad para la familia.
       ponerlo como emergencia.
 - [ ] Probar «Omitir modo silencioso» en un iPhone y la rutina en un Samsung.
 - [ ] Decidir si se pide la aprobación de Apple para alertas críticas (después del hackatón).
+- [ ] Probar en un Samsung que Modos y rutinas deja elegir el contacto que llama.
+
+## 7. Probar y afinar las IAs: voz y OCR
+
+**Qué se quiere:** agregar las IAs, probar que funcionan y afinarlas. Es trabajo de prueba y
+ajuste, no de construir de cero.
+
+**Lo que ya existe:**
+
+| IA | Dónde | Qué falta probar |
+|---|---|---|
+| YAMNet: los sonidos de la casa | [`oido.dart`](../app/lib/oido/oido.dart) | Alarma, vidrio, golpe, grito y quejido en el teléfono real, con la TV prendida |
+| Vosk: las frases de ayuda, sin internet | [`pedidos.dart`](../app/lib/dominio/pedidos.dart), [`Frases.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Frases.kt) | Qué palabras del banco no conoce el modelo, cuántos falsos positivos da la TV y si 0,6 es buen umbral de confianza |
+| Reconocimiento de voz de Android: «¿Pudo hablar con…?» | [`voz.dart`](../app/lib/datos/voz.dart) | «Sí» y «no» con y sin internet |
+| Claude: leer la factura | `web/` (lo hizo la sesión de facturas) | Facturas de verdad de Farmatodo y Locatel, fotos torcidas o con poca luz |
+| Claude: leer el récipe | Por hacer: hoy se carga con un script | Letra de médico a mano |
+
+- [ ] Medir cada una con un conjunto chico de pruebas propio (por ejemplo, 20 frases dichas por
+      personas mayores y 10 facturas), anotando aciertos y errores. Nada de eso va al repo:
+      es público y son voces y datos reales.
+- [ ] Con voces mayores de verdad, como pide [pendientes.md](pendientes.md#probar-con-voces-mayores--abrahan).
