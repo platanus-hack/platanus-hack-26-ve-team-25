@@ -12,9 +12,9 @@ y lo tache al terminar. Las preguntas de investigación por persona siguen en
   y si no por teléfono, y si no contestan el WhatsApp pregunta «¿Pudo hablar con…?» por botón o
   por voz. Recuerda las pastillas del día. Tiene 51 pruebas. **Nada de eso se ha probado todavía
   en un teléfono real con sonidos, llamadas o voz de verdad.**
-- **Web de la familia:** solo existen la prueba `/escucha` y el manifiesto instalable. Las
-  pantallas de la familia están diseñadas en el lienzo, pero no programadas.
-- **Supabase y Telegram:** nada todavía.
+- **Web de la familia:** las cuatro pantallas, la invitación y `/demo` con el QR, con datos
+  simulados (sábado 08:50).
+- **Supabase y WhatsApp:** nada todavía.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
 ## P0: sin esto no hay demo
@@ -74,23 +74,33 @@ El contrato de datos ya existe en Dart ([`tipos.dart`](../app/lib/dominio/tipos.
 - [ ] Decidir el latido y quién declara «sin señal»
       ([investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)).
 
-### 4. Telegram · *Josuep*
+### 4. WhatsApp por Kapso · *Josuep*
 
-- [ ] Crear el bot y una Edge Function de Supabase que mande la alerta 🔴. La llave del bot vive
-      en Supabase, nunca en el repo.
-- [ ] El botón «Recibir avisos en Telegram» de la pantalla de invitación tiene que enlazar el chat
-      con la casa.
+Decidido el sábado 08:40: **el aviso va por WhatsApp con Kapso**, usando los créditos del evento.
+Telegram sale del P0.
+
+- [ ] Número de Kapso y `KAPSO_API_KEY` en Vercel y en `web/.env.local`, nunca en el repo.
+- [ ] Poner el número en `NEXT_PUBLIC_WHATSAPP_NUMERO` (solo dígitos): con eso aparece el botón
+      «Recibir avisos por WhatsApp» de la invitación. Hoy dice «pronto».
+- [ ] Webhook de Kapso: el mensaje «Quiero cuidar a Carmen (casa demo)» registra el teléfono con
+      la casa. Ese mensaje abre la ventana de 24 h de Meta.
+- [ ] Cuando la alerta escala, a todos les llega un WhatsApp con el enlace a `/f/[token]`.
 
 ### 5. La web de la familia · *Rogelio*
 
-Las pantallas están en el lienzo, en la fila «Teléfono de la familia». El plan de estructura está
-en [pantallas.md](pantallas.md#web-de-la-familia-nextjs-en-web).
+Hecho con datos simulados: el estado se deriva en
+[`estado.ts`](../web/src/lib/familia/estado.ts) (13 pruebas) y las pantallas están en
+[`components/familia/`](../web/src/components/familia/). Para verla:
+`/f/demo?escenario=todo-bien | alerta | para-saber | sin-senal`.
 
-- [ ] `/f/[token]`: todo bien, alerta urgente, para saber y sin señal, según los datos.
-- [ ] La invitación que se ve al escanear el QR, con «Recibir avisos en Telegram».
-- [ ] `/demo`, con el QR gigante para el público.
-- [ ] La raíz lleva a la última casa abierta, para que la web instalada no abra la plantilla.
-- [ ] Escenarios simulados por URL (`?escenario=alerta`) como respaldo del demo.
+- [x] `/f/[token]`: todo bien, alerta urgente, para saber y sin señal, según los datos.
+- [x] La invitación que se ve al escanear el QR (`/f/demo/bienvenida`), con WhatsApp.
+- [x] `/demo`, con el QR gigante para el público.
+- [x] La raíz lleva a la última casa abierta.
+- [x] Escenarios simulados por URL (`?escenario=alerta`) como respaldo del demo.
+- [ ] Cambiar [`datos.ts`](../web/src/lib/familia/datos.ts) por Supabase en tiempo real cuando
+      estén las tablas del punto 3. Las pantallas no cambian.
+- [ ] «Ya hablé con Carmen» escribe en Supabase. Hoy solo cambia la pantalla.
 
 ## P1: si P0 está listo
 
