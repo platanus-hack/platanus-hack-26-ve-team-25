@@ -56,6 +56,35 @@ Diez frases dichas normal, un «¡ayuda!» débil, un quejido y una tos. Las gra
 máquina de quien grabó y no se suben al repo, que es público. Con eso se mide si YAMNet y la
 palabra clave las detectan a 1 m y a 4 m del teléfono.
 
+## 1.2 Limpiar el audio antes de YAMNet
+
+El objetivo de estudiar las frecuencias es limpiar la señal para que YAMNet reconozca mejor. Hay
+una trampa: **YAMNet se entrenó con audio crudo y ruidoso** (videos de YouTube de AudioSet). Su
+propio frente convierte el audio a 16 kHz mono y a 64 bandas mel entre 125 y 7.500 Hz. Si lo
+limpiamos de más, le llega un sonido que nunca vio y puede acertar menos.
+
+Y un supresor de ruido de voz borra justo lo que buscamos: los modelos como RNNoise o DeepFilterNet
+dejan pasar solo la voz y tratan como ruido la alarma, el vidrio y el golpe.
+
+**Por eso van dos caminos desde el mismo micrófono:**
+
+```text
+micrófono ─► limpieza suave ─┬─► YAMNet (eventos: alarma, vidrio, golpe, quejido, rutina)
+                             └─► realce de voz ─► palabra clave «¡auxilio!» y detector de voz
+```
+
+| Paso | Dónde | Qué hace | Por qué |
+|---|---|---|---|
+| Pedirle a Android el audio sin procesar | Los dos caminos | Fuente de audio `UNPROCESSED` o `VOICE_RECOGNITION`, no la de llamadas | El modo de llamadas trae su propio supresor de ruido y control de volumen, que borra los sonidos que no son voz |
+| Filtro pasa-altos a ~80 Hz | Los dos | Quita el retumbo y el zumbido de la red eléctrica (60 Hz en Venezuela) | No toca voces ni alarmas. YAMNet empieza en 125 Hz de todas formas |
+| Normalizar el volumen | Los dos | Sube una voz débil hasta un nivel de referencia | La voz del adulto mayor es más baja: sin esto, sus energías en las bandas de YAMNet quedan por debajo de lo que vio entrenando |
+| Restar el fondo de esa casa | Los dos | Aprende el ruido constante (nevera, ventilador, aire) y lo descuenta | Es ruido estable. Se resta suave para no deformar la señal |
+| Realce de voz (RNNoise) | Solo el camino de la voz | Deja solo la voz | Ayuda a la palabra clave con voces débiles. Nunca va hacia YAMNet |
+
+**Esto no se decide por intuición, se mide** (pregunta 6): las mismas grabaciones de voces mayores,
+crudas y con cada paso, y se compara el puntaje de YAMNet en las clases que importan. Se queda
+solo el paso que sube el puntaje.
+
 ## 2. Plan: modelos tipo YAMNet y personalización por casa
 
 **Punto de partida.** YAMNet sí es open source: el código y los pesos están en
@@ -89,6 +118,8 @@ micrófono ─► detectores clásicos (dB, alarma, aspereza)
 | 3 | ¿Los embeddings separan las falsas alarmas de una casa? | Grabar 20 sonidos reales por clase (ollas, puerta, TV, golpe, grito) y medir el kNN con validación cruzada | 1,5 h |
 | 4 | ¿El modelo de rutina detecta un día anómalo? | Simular 7 días de eventos con un generador y verificar que marca el día sin actividad matutina | 1 h |
 | 5 | ¿Los detectores clásicos aciertan? | Probar la alarma de 3.100 Hz y 520 Hz y gritos contra TV con gritos | 1 h |
+| 6 | ¿La limpieza ayuda o estorba a YAMNet? | Grabaciones de voces mayores, crudas y con cada paso de la sección 1.2. Comparar el puntaje en «Speech», «Wail, moan» y «Shout» | 1 h |
+| 7 | ¿Qué sienten los sensores de un teléfono de 2019? | Ver la sección 3: registrar cada sensor 10 min con la casa quieta, y luego con una caída simulada, una puerta y la luz | 1,5 h |
 
 ### Candidatos a comparar
 
@@ -121,3 +152,31 @@ Se elige el modelo que cumpla las tres condiciones:
 
 Si YAMNet cumple, se queda YAMNet: cambiar de modelo el sábado cuesta más de lo que suma en el
 demo.
+
+## 3. Los demás sensores del teléfono
+
+Un teléfono Android de 2019 en adelante trae más que micrófono. Cada sensor suma una señal
+independiente. Para que suene el aviso basta una sola señal fuerte o dos que coincidan, y la
+persona sigue siendo el sensor que confirma.
+
+| Sensor | ¿Lo trae un teléfono de 2019? | Qué nos dice | Uso |
+|---|---|---|---|
+| Acelerómetro | Todos | Vibraciones: golpes y pasos fuertes en el piso | Fusión con el sonido: un golpe que suena *y* hace vibrar. Funciona mejor con el teléfono pegado a la pared o al piso que sobre una mesa |
+| Giroscopio | Casi todos | Que alguien movió o levantó el teléfono | Señal de vida para la rutina. También detecta si el teléfono se cayó |
+| Sensor de luz | Todos | Si las luces del cuarto se prenden o se apagan | **Rutina sin micrófono y sin problema de privacidad**: «prendió la luz a las 6:50». Una luz prendida a las 3 a. m. por mucho rato es una alerta amarilla |
+| Proximidad | Todos | Algo a pocos centímetros de la pantalla | **Apagar la alarma pasando la mano por encima**, sin tener que atinarle a un botón. Pensado para quien ve mal o tiene temblor |
+| Carga de batería | Todos | Si el teléfono dejó de cargar | Detecta el apagón, que el plan ya usa para no confundirlo con una emergencia |
+| Barómetro | Solo algunos | Cambios de presión, por ejemplo al abrir una puerta en un espacio cerrado | Extra solo si el teléfono lo trae. No se promete |
+| Magnetómetro | Casi todos | Cerca de metal que se mueve | Poco útil en casa. Fuera del alcance |
+| Cámara | Todos | Imagen | **No se usa**: vigilar con video a la persona es justo lo que la hace sentir invadida |
+
+**Lo que limita a todos: Android en segundo plano.** Desde Android 9, una app en segundo plano no
+puede usar el micrófono y deja de recibir los sensores continuos, como el acelerómetro y el
+giroscopio. La app de la casa tiene que correr como servicio en primer plano, con una notificación
+fija y el teléfono enchufado. Eso se resuelve en Flutter con un servicio en primer plano. Falta
+confirmar los paquetes: `sensors_plus` para el acelerómetro y el giroscopio, y paquetes aparte
+para la luz y la proximidad.
+
+**Cómo encaja con la rutina de la sección 2.** El modelo de rutina cuenta por franja del día
+todas las señales, no solo los sonidos: luz, movimiento del teléfono, agua, cocina, TV. Mientras
+más fuentes tenga la rutina, menos depende de que el micrófono oiga bien la voz del abuelo.
