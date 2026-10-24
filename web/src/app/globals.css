@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-atkinson);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -126,6 +126,18 @@
   }
   html {
     @apply font-sans;
+    accent-color: var(--color-verde);
+    caret-color: var(--color-verde);
+  }
+  ::selection {
+    background: var(--color-verde-claro);
+    color: var(--color-tinta);
+  }
+  /* Un anillo grueso que se vea con prisa. Sobre el rojo de la alerta, la pantalla lo pide
+     blanco con --anillo. */
+  :focus-visible {
+    outline: 3px solid var(--anillo, var(--color-verde));
+    outline-offset: 3px;
   }
 }
 /* Colores de la web de la familia, los mismos del lienzo de mockups. Fijos en claro: la alerta
@@ -148,4 +160,5 @@
   --color-amarillo-fondo: #fef0c7;
   --color-amarillo-tinta: #7a2e0b;
   --color-whatsapp: #128c4a;
+  --color-telegram: #229ed9;
 }
