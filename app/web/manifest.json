@@ -1,0 +1,36 @@
+{
+    "name": "En casa · teléfono de la casa",
+    "short_name": "Casa",
+    "description": "Vista previa del teléfono de la casa: «¿Está bien?», el botón de pánico y el aviso a la familia.",
+    "lang": "es",
+    "start_url": ".",
+    "display": "fullscreen",
+    "background_color": "#0B0B0C",
+    "theme_color": "#0B0B0C",
+    "orientation": "landscape",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -23,9 +24,13 @@ Future<void> main() async {
     pastillas: pastillasSimuladas,
     escuchas: oido.escuchas,
     // WhatsApp primero (los hijos suelen estar afuera); si no se puede, llamada normal.
-    llamar: llamarEnElTelefono,
+    // En la web no hay ni lo uno ni lo otro.
+    llamar: kIsWeb ? null : llamarEnElTelefono,
   );
   runApp(AppCasa(controlador: controlador));
+
+  // La web es la vista previa de las pantallas: sin oído ni llamadas (ver oido/tflite_web.dart).
+  if (kIsWeb) return;
 
   // Los permisos se piden con la app ya en pantalla: Android solo los muestra así.
   await [Permission.phone, Permission.contacts].request();
