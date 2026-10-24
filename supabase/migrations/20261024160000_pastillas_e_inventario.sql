@@ -7,10 +7,12 @@
 -- conteo a mano ajusta. Lo que queda es la suma. Nadie guarda «quedan 12» en una columna, así la
 -- casa y la web nunca se pisan el número. La cuenta de cuántos días alcanzan y cuándo comprar no
 -- vive aquí: la hace web/src/lib/familia/inventario.ts, que es una función pura con pruebas.
+--
+-- Se aplica pegándola en el SQL Editor de Supabase. Se puede pegar dos veces sin romper nada.
 
 -- Un medicamento del récipe. El nombre es el genérico; los comerciales sirven para reconocerlo en la
 -- factura (Losartán / Cozaar). Solo lo que está aquí entra al inventario.
-create table public.medicamentos (
+create table if not exists public.medicamentos (
   id             uuid primary key default gen_random_uuid(),
   casa_id        uuid not null references public.casas on delete cascade,
   nombre         text not null check (length(nombre) between 1 and 80),
@@ -18,12 +20,12 @@ create table public.medicamentos (
   concentracion  text not null default '' check (length(concentracion) <= 40),
   creado         timestamptz not null default now()
 );
-create unique index medicamentos_unicos
+create unique index if not exists medicamentos_unicos
   on public.medicamentos (casa_id, lower(nombre), lower(concentracion));
 
 -- Las tomas del récipe. `clave` es el id de la pastilla en la app de la casa ("losartan-manana"):
 -- es lo que manda casa_tomar. `cantidad` admite media pastilla.
-create table public.tomas (
+create table if not exists public.tomas (
   id              uuid primary key default gen_random_uuid(),
   casa_id         uuid not null references public.casas on delete cascade,
   medicamento_id  uuid not null references public.medicamentos on delete cascade,
@@ -34,7 +36,7 @@ create table public.tomas (
 );
 
 -- Una factura de farmacia. El número, si se leyó, evita cargar la misma factura dos veces.
-create table public.compras (
+create table if not exists public.compras (
   id           uuid primary key default gen_random_uuid(),
   casa_id      uuid not null references public.casas on delete cascade,
   farmacia     text check (length(farmacia) <= 80),
@@ -43,11 +45,11 @@ create table public.compras (
   cargada_por  text check (length(cargada_por) <= 60),
   creada       timestamptz not null default now()
 );
-create unique index compras_sin_repetir
+create unique index if not exists compras_sin_repetir
   on public.compras (casa_id, lower(coalesce(farmacia, '')), numero) where numero is not null;
 
 -- Solo los renglones que están en el récipe: lo demás de la factura no se guarda.
-create table public.compra_renglones (
+create table if not exists public.compra_renglones (
   id              uuid primary key default gen_random_uuid(),
   compra_id       uuid not null references public.compras on delete cascade,
   medicamento_id  uuid not null references public.medicamentos on delete cascade,
@@ -56,9 +58,12 @@ create table public.compra_renglones (
   por_caja        int not null check (por_caja between 1 and 500)
 );
 
-create type public.motivo_movimiento as enum ('compra', 'toma', 'ajuste');
+do $$ begin
+  create type public.motivo_movimiento as enum ('compra', 'toma', 'ajuste');
+exception when duplicate_object then null;
+end $$;
 
-create table public.movimientos (
+create table if not exists public.movimientos (
   id              uuid primary key default gen_random_uuid(),
   casa_id         uuid not null references public.casas on delete cascade,
   medicamento_id  uuid not null references public.medicamentos on delete cascade,
@@ -71,8 +76,8 @@ create table public.movimientos (
   -- casa reintente el envío.
   dia             date
 );
-create index movimientos_medicamento on public.movimientos (medicamento_id, hora);
-create unique index movimientos_una_toma_al_dia
+create index if not exists movimientos_medicamento on public.movimientos (medicamento_id, hora);
+create unique index if not exists movimientos_una_toma_al_dia
   on public.movimientos (toma_id, dia) where motivo = 'toma';
 
 alter table public.medicamentos     enable row level security;
@@ -87,7 +92,7 @@ alter table public.movimientos      enable row level security;
 -- tomas de antes no cuentan: salieron de pastillas que nunca se anotaron. null si nunca entró nada:
 -- «no sabemos», que no es lo mismo que «se acabaron». Puede dar negativo si había pastillas sin
 -- anotar; quien lo muestra lo deja en 0, que es el lado seguro (avisa antes, no después).
-create function public.pastillas_crudas(p_medicamento uuid) returns numeric
+create or replace function public.pastillas_crudas(p_medicamento uuid) returns numeric
 language sql stable security definer set search_path = ''
 as $$
   select case when d.desde is null then null else coalesce(sum(m.cantidad), 0) end
@@ -97,7 +102,7 @@ as $$
   group by d.desde
 $$;
 
-create function public.pastillas_quedan(p_medicamento uuid) returns numeric
+create or replace function public.pastillas_quedan(p_medicamento uuid) returns numeric
 language sql stable security definer set search_path = ''
 as $$
   select case when c is null then null else greatest(0, c) end
@@ -111,7 +116,7 @@ $$;
 -- sin internet; una toma repetida el mismo día no descuenta otra vez. Devuelve qué medicamento era
 -- y cuántas quedan (quedan es null si todavía no se ha cargado ninguna factura), o null si la clave
 -- o la pastilla no existen.
-create function public.casa_tomar(p_clave text, p_pastilla text, p_hora timestamptz default now())
+create or replace function public.casa_tomar(p_clave text, p_pastilla text, p_hora timestamptz default now())
 returns jsonb
 language plpgsql volatile security definer set search_path = ''
 as $$
@@ -137,7 +142,7 @@ end $$;
 -- Agrega o actualiza un medicamento del récipe con sus tomas, y borra las tomas que ya no están.
 -- p_tomas: [{ "clave": "losartan-manana", "hora": "08:00", "cantidad": 1 }]. Es lo que llamará la
 -- lectura del récipe por foto, después de que la familia confirme.
-create function public.familia_recetar(
+create or replace function public.familia_recetar(
   p_token text, p_nombre text, p_concentracion text default '',
   p_comerciales text[] default '{}', p_tomas jsonb default '[]'
 ) returns uuid
@@ -175,7 +180,7 @@ end $$;
 -- Un renglón cuyo medicamento no es del récipe de esta casa se descarta aquí también, no solo en
 -- la pantalla. Si la factura ya se había cargado (misma farmacia y número), no suma de nuevo.
 -- Devuelve { compra, repetida, guardados } o null si el token no existe o no quedó ningún renglón.
-create function public.familia_comprar(
+create or replace function public.familia_comprar(
   p_token text, p_renglones jsonb, p_farmacia text default null, p_numero text default null,
   p_fecha date default null, p_quien text default 'la familia'
 ) returns jsonb
@@ -227,7 +232,7 @@ end $$;
 
 -- «Conté y quedan 12». Anota la diferencia, así el libro sigue sumando bien. Sirve también para
 -- empezar: las pastillas que ya había en la casa antes de la primera factura.
-create function public.familia_ajustar(p_token text, p_medicamento uuid, p_quedan numeric)
+create or replace function public.familia_ajustar(p_token text, p_medicamento uuid, p_quedan numeric)
 returns numeric
 language plpgsql volatile security definer set search_path = ''
 as $$
