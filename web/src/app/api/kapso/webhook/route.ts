@@ -51,7 +51,7 @@ async function suscribir(token: string, telefono: string): Promise<boolean> {
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ p_token: token, p_telefono: telefono }),
+      body: JSON.stringify({ p_token: token, p_canal: "whatsapp", p_identificador: telefono }),
       cache: "no-store",
     });
     if (!res.ok) {

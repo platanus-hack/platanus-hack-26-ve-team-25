@@ -67,15 +67,4 @@ export async function enviarTexto(
   }
 }
 
-/**
- * Arma el texto del aviso en español. Corto, con un solo emoji al inicio para que destaque
- * en la notificación sin saturar. Incluye el enlace al panel de la familia para que toquen
- * y vean el contexto.
- */
-export function textoDeAlerta(datos: {
-  nombre: string;
-  descripcion: string;
-  enlace: string;
-}): string {
-  return `🔴 ${datos.nombre}: ${datos.descripcion}\n${datos.enlace}`;
-}
+

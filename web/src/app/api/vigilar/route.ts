@@ -12,7 +12,9 @@
 // Devuelve `{ escaladas, enviados, fallidos }` para que el cron pueda loguear.
 
 import { NextResponse } from "next/server";
-import { enviarTexto, textoDeAlerta } from "@/lib/kapso";
+import { enviarTexto as enviarWhatsApp } from "@/lib/kapso";
+import { enviarTexto as enviarTelegram } from "@/lib/telegram";
+import { textoDeAlerta } from "@/lib/avisos";
 
 
 type AlertaEscalada = {
@@ -24,7 +26,8 @@ type AvisoPendiente = {
   alerta_id: string;
   casa_id: string;
   nombre: string;
-  telefono: string;
+  canal: string;
+  identificador: string;
   token: string;
   nivel: string;
   descripcion: string;
@@ -99,21 +102,30 @@ export async function GET(req: Request): Promise<Response> {
         descripcion: aviso.descripcion,
         enlace,
       });
-      const resultado = await enviarTexto(aviso.telefono, texto);
+      
+      // Despachar según el canal de suscripción
+      const resultado =
+        aviso.canal === "telegram"
+          ? await enviarTelegram(aviso.identificador, texto)
+          : aviso.canal === "whatsapp"
+            ? await enviarWhatsApp(aviso.identificador, texto)
+            : { ok: false as const, error: `canal desconocido: ${aviso.canal}` };
+      
       if (resultado.ok) {
         enviados++;
-        // Se sella aunque haya varios teléfonos para la misma alerta: el primero que logre
-        // enviar marca `avisada_en`; los demás siguen enviando (porque la fila ya estaba en
+        // Se sella aunque haya varios destinatarios para la misma alerta: el primero que logre
+        // enviar marca la fila; los demás siguen enviando (porque la fila ya estaba en
         // memoria) pero el `marcar_avisada` posterior será no-op. Ver comentario en la
-        // migración sobre el sello por alerta vs. por teléfono.
+        // migración sobre el sello por alerta y por destinatario.
         await rpcSecret<boolean>("marcar_avisada", {
           p_alerta: aviso.alerta_id,
-          p_telefono: aviso.telefono,
+          p_canal: aviso.canal,
+          p_identificador: aviso.identificador,
         });
       } else {
         fallidos++;
         console.error(
-          `[vigilar] falló envío a ${aviso.telefono} para alerta ${aviso.alerta_id}: ${resultado.error}`,
+          `[vigilar] falló envío ${aviso.canal} a ${aviso.identificador} para alerta ${aviso.alerta_id}: ${resultado.error}`,
         );
       }
     }

@@ -2,10 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cargarCasa } from "@/lib/familia/datos";
 
-// Lo que ve quien escanea el QR. El botón abre WhatsApp con un mensaje listo para el número de
+// Lo que ve quien escanea el QR. El botón de Telegram abre el bot con el token como payload
+// (/start <token>); el botón de WhatsApp abre wa.me con un mensaje listo para el número de
 // Kapso: ese mensaje registra el teléfono con la casa y abre la ventana de 24 h de Meta, en la
 // que se le puede escribir sin plantillas aprobadas (docs/plan.md, créditos).
 const NUMERO_WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMERO?.replace(/\D/g, "");
+const BOT_TELEGRAM = process.env.NEXT_PUBLIC_TELEGRAM_BOT;
 
 export default async function Page(props: PageProps<"/f/[token]/bienvenida">) {
   const { token } = await props.params;
@@ -16,6 +18,7 @@ export default async function Page(props: PageProps<"/f/[token]/bienvenida">) {
   const whatsapp = NUMERO_WHATSAPP
     ? `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`
     : null;
+  const telegram = BOT_TELEGRAM ? `https://t.me/${BOT_TELEGRAM}?start=${token}` : null;
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-[18px] px-[22px] pt-14 pb-6">
@@ -35,6 +38,28 @@ export default async function Page(props: PageProps<"/f/[token]/bienvenida">) {
         </span>
       </div>
       <div className="mt-auto flex flex-col gap-3">
+        {telegram && (
+          <a
+            href={telegram}
+            className="flex h-[72px] items-center justify-center gap-3 rounded-[18px] bg-[#229ED9] text-[21px] font-bold text-white active:scale-[0.98]"
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+            Recibir avisos por Telegram
+          </a>
+        )}
+        {telegram && (
+          <span className="text-center text-[14px] leading-[1.3] text-gris">
+            Un toque. Llega como notificación al teléfono.
+          </span>
+        )}
         {whatsapp ? (
           <a
             href={whatsapp}
