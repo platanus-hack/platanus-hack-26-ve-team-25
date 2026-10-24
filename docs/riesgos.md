@@ -3,6 +3,21 @@
 > Dónde puede fallar el proyecto y cómo evitamos que reste en vez de sumar. Lo lleva Rogelio.
 > Cada riesgo tiene su salida. Si alguien encuentra uno nuevo, lo agrega aquí.
 
+## Los principales, en orden (sábado 24-oct, 01:45)
+
+| # | Riesgo | Dueño | Límite | Está resuelto cuando |
+|---|---|---|---|---|
+| 1 | Nadie tiene asignado construir, y el stack se parte a última hora | Rogelio | **Sáb 02:30** | Cada pieza del núcleo tiene un nombre al lado y se sabe qué se hace en Flutter y qué en web |
+| 2 | El oído no está probado con micrófono real | Abrahan | Sáb 09:00 | La alarma de humo dispara, el golpe con vibración dispara y la TV no dispara, en una sala con ruido |
+| 3 | El demo con el público: QR, 50 teléfonos, wifi del evento | Rogelio | Sáb 12:00 | Cuatro teléfonos entran por el QR en producción y reciben la alerta |
+| 4 | La app de la casa muere en segundo plano o tras reiniciarse | Josuep | Sáb 18:00 | El teléfono pasa 1 h con la pantalla apagada y sigue oyendo |
+| 5 | Falsas alarmas que cansan a la familia, y caídas que no se oyen | Josuep | Sáb 12:00 | Los tres niveles funcionan y el demo muestra un 🟡 que no suena |
+| 6 | Sin luz o sin internet, que es la historia venezolana | Josuep | Sáb 18:00 | Se corta el wifi, se dispara un evento, vuelve el wifi y la alerta llega |
+| 7 | El canal real de aviso no está construido | Josuep | Sáb 12:00 | Llega un mensaje de Telegram a un iPhone y a un Android |
+| 8 | Confianza: espionaje, datos de salud, responsabilidad | Rogelio | Sáb 20:00 | Hay una respuesta de una línea para cada uno, en la app y en el pitch |
+| 9 | ¿Quién paga y cómo, desde afuera? | Anttony | Sáb 20:00 | Hay un precio, un comprador y un testimonio |
+| 10 | Alcance que crece con cada idea buena | Rogelio | **Sáb 24:00** | El alcance queda congelado y lo que sobra pasa a «después» |
+
 ## La regla de oro: despreocupar, no angustiar
 
 El producto no vende alertas. Vende **tranquilidad**: que el hijo que está lejos deje de pensar en
@@ -57,8 +72,12 @@ queda para el lado de la familia, que es web.
   Android 14).
 - Xiaomi, Samsung y Huawei matan las apps en segundo plano para ahorrar batería. Hay que guiar al
   familiar a quitar la optimización de batería al configurar.
-- Alternativa más simple para el demo: **modo kiosco**, con la app en pantalla, enchufada y la
-  pantalla siempre encendida.
+- **Un servicio de micrófono no puede arrancar desde segundo plano**, ni siquiera al encender el
+  teléfono. Si un apagón largo agota la batería y el teléfono se reinicia, la app no vuelve a oír
+  sola hasta que alguien la abra. Lo cubre el latido: la familia ve «sin señal».
+- Salida para el demo, y quizá para el producto: **modo kiosco**. La app se instala como
+  pantalla de inicio del teléfono, así que al reiniciar arranca visible y puede volver a oír.
+  Queda enchufada y con la pantalla siempre encendida.
 
 ### 4. Sin luz, sin wifi, sin datos
 
