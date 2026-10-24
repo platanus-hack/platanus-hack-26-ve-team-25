@@ -23,7 +23,8 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 |---|---|---|
 | **La ficha de emergencia** | Tipo de sangre, condiciones, alergias, pastillas, seguro y a qué clínica llevarla. La llena la familia y viaja con la alerta, para el paramédico o el vecino que llega | Una pantalla en la web de la familia y un QR en la casa. Reutiliza el perfil de salud y el récipe |
 | **Pedir la ambulancia** | Hoy el aviso llega a la familia, que está lejos. El paso natural es que la alerta confirmada llame a quien puede ir | Integración con Venemergencia o el 911. No hay API pública: es un acuerdo |
-| **Las pastillas a domicilio** | El inventario ya sabe cuándo se acaban y qué comprar para un mes | Una farmacia con entrega (Yummy, Farmatodo). El punto de enganche es `pedido()` en [`inventario.ts`](../web/src/lib/familia/inventario.ts) |
+| **El 911, la ambulancia y la familia en una sola acción** | En una emergencia grave no hay tiempo para un paso después del otro. La casa llama al 911 por llamada normal en altavoz y avisa a la ambulancia del seguro y a la familia a la vez, con la ficha y una foto descrita | La llamada al 911 ya se puede hacer desde el teléfono de mesa ([por-planificar.md](por-planificar.md#5-altavoz-y-volumen-al-máximo-en-la-llamada)); la ambulancia necesita el acuerdo de arriba |
+| **Las pastillas a domicilio** | El inventario ya sabe cuándo se acaban y qué comprar para un mes. El hijo las compra desde afuera | Una farmacia con entrega. Farmatodo no tiene una API gratis y Yummy no tiene una que se pueda usar (revisado el sábado 24): es un acuerdo comercial. El punto de enganche es `pedido()` en [`inventario.ts`](../web/src/lib/familia/inventario.ts) |
 | **Las aseguradoras como canal** | Venden médico a domicilio y ambulancia a la diáspora, pero después del problema. Nosotros somos el aviso que dispara su respuesta | Un plan por afiliado con asistensi, Venemergencia o un seguro |
 
 ## La app
@@ -71,7 +72,7 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 | **Resumen del día redactado** | «Hoy Carmen se levantó a las 7, cocinó y vio la novela» | Un LLM; no va en el camino de la alerta |
 | **Preguntar por WhatsApp** | «¿Cómo amaneció mi mamá?», y Claude responde leyendo los eventos de hoy | El webhook de Kapso ya recibe los mensajes |
 | **La rutina de la casa** | Avisar si falta lo de siempre: no sonó la cocina a mediodía | Contar los eventos del oído por franja del día |
-| **La cámara que confirma** | Ver que la persona está en el suelo antes de pedir la ambulancia. Víctor lo propuso, no para el demo | Un modelo de pose en el teléfono, sin que la imagen salga de él |
+| **La cámara que confirma** | Ver que la persona está en el suelo antes de pedir la ambulancia. Víctor lo propuso, no para el demo. Una IA describe la foto o el video en voz alta, para quien atiende | Abrahan decidió el sábado 24 que la imagen sí puede salir del teléfono, solo con una alerta sin respuesta; el audio sigue sin salir. Ver [por-planificar.md](por-planificar.md#4-cámara-y-fotos-que-la-ia-describe) |
 
 ## Conexión
 

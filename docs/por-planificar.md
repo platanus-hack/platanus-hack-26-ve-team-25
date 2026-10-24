@@ -9,13 +9,14 @@
 
 | # | Punto | Tipo | Estado |
 |---|---|---|---|
-| 1 | [Proyección: seguros, ficha médica, farmacia, 911 y ambulancia](#1-proyección-para-el-pitch) | Pitch | Casi todo ya está en futuro.md |
+| 1 | [Proyección: seguros, ficha médica, farmacia, 911 y ambulancia](#1-proyección-para-el-pitch) | Pitch | En futuro.md; falta que el equipo apruebe el orden |
 | 2 | [Tres vistas: de mesa, personal y familia](#2-tres-vistas-y-cómo-se-conectan) | Producto | Por decidir |
 | 3 | [Mejorar los mockups de la vista de mesa](#3-mejorar-los-mockups-de-mesa) | Diseño | Por hacer |
-| 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Investigar permisos primero |
-| 5 | [Altavoz y volumen al máximo en la llamada](#5-altavoz-y-volumen-al-máximo-en-la-llamada) | Técnico | Se puede probar ya |
+| 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Decidido que sí; falta el cómo |
+| 5 | [Altavoz y volumen al máximo en la llamada](#5-altavoz-y-volumen-al-máximo-en-la-llamada) | Técnico | Decidido; se puede probar ya |
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
 | 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |
+| 8 | [Comandos de voz: «llama a emergencias», «llama a mi hijo»](#8-comandos-de-voz) | Producto | Propuesta lista |
 
 ## 1. Proyección para el pitch
 
@@ -31,10 +32,27 @@ inventario de pastillas ya calcula cuándo comprar y deja el enganche en `pedido
 **Lo nuevo del sábado 24:** Farmatodo no tiene una API gratis, y Yummy tampoco tiene una que se
 pueda usar. Queda como proyección, no como demo.
 
-- [ ] Agregar a futuro.md lo de Farmatodo y Yummy, y que el 911 y la ambulancia salgan **en una
-      sola acción** cuando la emergencia es grave (no un paso después del otro).
-- [ ] Decidir qué de esto se dice en el pitch y en qué orden. Hoy futuro.md lo ordena en tres
-      pasos: lo que se ve en el demo, conectar con quien atiende, y la app de cuidado completa.
+- [x] Agregar a futuro.md lo de Farmatodo y Yummy, y que el 911 y la ambulancia salgan **en una
+      sola acción** cuando la emergencia es grave (sábado 24).
+- [ ] Que el equipo apruebe el orden del pitch de abajo. La venta (precio, quién paga) sigue en
+      [plan.md](plan.md#la-venta-para-el-pitch).
+
+**Propuesta de orden para el pitch**, después del demo. Cada paso responde la pregunta que deja
+el anterior:
+
+1. **«¿Y si es grave de verdad?»** Una sola acción: la casa llama al 911 en altavoz, avisa a la
+   ambulancia del seguro y a la familia a la vez. La alerta lleva la ficha médica (sangre,
+   alergias, pastillas, seguro, clínica) y una foto que una IA describe en voz alta para quien
+   atiende. Hoy la alerta solo llega a la familia.
+2. **«¿Y el resto de los días?»** Las pastillas: la casa sabe cuántas quedan y cuándo se acaban,
+   y el hijo las compra desde afuera. Hoy se calcula el inventario desde la factura; mañana el
+   pedido sale solo por una farmacia con entrega, cuando haya un acuerdo con Farmatodo o Yummy.
+3. **«¿Quién paga?»** El hijo, y también los seguros, que ya venden ambulancia y médico a
+   domicilio a la diáspora pero se enteran tarde. Nosotros somos el aviso que dispara su
+   respuesta.
+
+Lo que hay que decir con honestidad: nada de esto está integrado. Ni el 911 ni Venemergencia ni
+las farmacias tienen una API pública: son acuerdos, no código.
 
 ## 2. Tres vistas y cómo se conectan
 
@@ -43,6 +61,10 @@ pueda usar. Queda como proyección, no como demo.
 - **De mesa** (nombre interno): el teléfono viejo, fijo en la casa. Es la app de hoy.
 - **Personal:** el teléfono que el abuelo usa y lleva encima.
 - **Familia:** la web de la familia de hoy, pero como app, reutilizando sus pantallas.
+
+**El teléfono de mesa es Android** (confirmado por Abrahan el sábado 24). Eso facilita mucho:
+oír todo el día, llamar sin tocar, ser la app de teléfono predeterminada, usar la cámara y
+quedar fijo como kiosco.
 
 **Propuesta: dos roles de persona y tres vistas.** Los roles son quién es la persona (el que es
 cuidado y el que cuida). Las vistas son qué hace cada teléfono. El abuelo es un solo rol con dos
@@ -120,17 +142,24 @@ recordatorio solo se quita con «Ya me la tomé». El lienzo no tiene nada de es
 | iPhone | No: iOS nunca deja usar la cámara en segundo plano | La persona abre la app y toca |
 | Web instalable (PWA) | Solo con la página abierta y en pantalla, en Android y en iPhone | `getUserMedia` o el selector de fotos. Sirve para «tomar una foto», no para grabar sola |
 
-**Lo que choca con una decisión que ya tomamos:** el audio nunca sale del teléfono
-([AGENTS.md](../AGENTS.md)), y futuro.md propone que la imagen tampoco salga («un modelo de pose
-en el teléfono»). Mandar el video a una IA en la nube rompe esa regla. Hay opciones intermedias:
+**Decidido por Abrahan el sábado 24: la imagen sí puede salir del teléfono.** Choca con lo que
+habíamos dicho (el audio nunca sale, y futuro.md proponía lo mismo para la imagen), pero aporta
+más de lo que quita: en una emergencia, ver la escena le sirve a quien atiende. **El audio sigue
+sin salir nunca.**
 
-- Un modelo de pose en el teléfono decide si hay alguien en el suelo, y solo esa etiqueta sale.
-- Solo sale una foto, no un video, y solo cuando la alerta ya escaló, para quien atiende.
-- Que la familia lo active a sabiendas y que el abuelo sepa que existe.
+Propuesta para que el cambio sea defendible ante el jurado y ante la familia:
+
+- La cámara solo se prende cuando hay una alerta sin respuesta (o la pastilla de la mañana sin
+  confirmar), nunca para vigilar.
+- Mientras graba, la pantalla lo dice en grande, además del punto verde de Android.
+- La familia lo activa al configurar, a sabiendas, y el abuelo sabe que existe.
+- La imagen se borra después de describirla, o al cerrar la alerta; se guarda la descripción.
 
 - [ ] Investigar: la ley y el consentimiento en Venezuela, y qué pide Google Play para una app
       que usa la cámara sin que la toquen.
-- [ ] Decidir qué sale del teléfono: nada, una etiqueta, una foto o un video.
+- [x] Decidir qué sale del teléfono: la imagen sí; el audio no.
+- [ ] Foto o video corto: una foto es más barata y más fácil de describir; el video muestra si se
+      mueve.
 - [ ] Decidir qué IA describe la imagen (Claude ya lee las facturas) y con qué voz habla (la voz
       del teléfono o una de la nube).
 - [ ] Qué hacer con la imagen después: cuánto se guarda y quién la ve.
@@ -156,8 +185,11 @@ hablar.
 
 - [ ] Probar el extra de altavoz y el volumen máximo en el Infinix. Es poco código y se puede
       hacer ya.
-- [ ] Decidir si la emergencia sale por llamada normal en altavoz, o por WhatsApp sin altavoz.
-      Hoy sale primero por WhatsApp.
+- [x] **La llamada a emergencias es una llamada normal, en altavoz y con el volumen al máximo**
+      (sábado 24). A la familia se le sigue llamando primero por WhatsApp, porque suele estar
+      afuera.
+- [ ] Qué número: 911 es el número de emergencias en Venezuela (VEN 911). Configurable por casa,
+      porque a futuro puede ser la ambulancia del seguro.
 
 ## 6. Que el teléfono del hijo suene aunque esté en silencio
 
@@ -224,3 +256,38 @@ ajuste, no de construir de cero.
       personas mayores y 10 facturas), anotando aciertos y errores. Nada de eso va al repo:
       es público y son voces y datos reales.
 - [ ] Con voces mayores de verdad, como pide [pendientes.md](pendientes.md#probar-con-voces-mayores--abrahan).
+
+## 8. Comandos de voz
+
+**Qué se quiere:** que Vosk, además de entender un pedido de ayuda, entienda órdenes: «llama a
+emergencias», «llama a mi hijo», «llama a la vecina», y otras parecidas.
+
+**La diferencia con los pedidos de ayuda.** Hoy «ayuda» o «me siento mal» abren «¿Está bien?»,
+y si es la TV, se apaga deslizando. Una orden de llamar actúa: si la TV dice «llama a tu hijo»
+en una novela, la casa llamaría. Por eso propongo dos reglas:
+
+1. **Las órdenes empiezan con un nombre para la casa**, como «Ok Google»: «Casa, llama a mi
+   hijo». El nombre lo elige la familia al configurar («Lucero», «Teléfono»…). Los pedidos de
+   ayuda no lo necesitan: quien está en el suelo no se va a acordar.
+2. **Las llamadas salen con 5 s para arrepentirse:** la pantalla dice en grande «Llamando a
+   Josuep» con un botón «No llamar», y decir «no» o «cancela» también la para. A emergencias,
+   igual.
+
+**Órdenes propuestas**, para elegir:
+
+| Orden | Qué hace | Ojo |
+|---|---|---|
+| «Llama a emergencias», «llama al 911», «llama a una ambulancia» | Llamada normal al 911, en altavoz y al máximo | El costo de un falso positivo es alto: los 5 s para arrepentirse no son opcionales |
+| «Llama a mi hijo», «llama a mi hija», «llama a Josuep» | Llama a ese contacto, por WhatsApp primero | Los nombres y parentescos salen de los contactos de la casa: la gramática de Vosk se arma al iniciar con esos nombres |
+| «Llama a la vecina», «llama al vecino» | Llama al contacto con parentesco «vecino» | Igual que arriba |
+| «Altavoz» | Prende el altavoz en la llamada en curso | Durante la llamada, el micrófono lo usa la llamada: hay que probar si Vosk sigue oyendo |
+| «Contesta» | Contesta una llamada que entra | Permiso `ANSWER_PHONE_CALLS`. Sirve si el hijo devuelve la llamada y ella está en el suelo |
+| «Cuelga» | Termina la llamada | Mismo permiso, o ser la app de teléfono predeterminada |
+| «¿Qué hora es?», «¿Qué pastilla me toca?» | La casa lo dice en voz alta | Acompaña sin pantalla; usa la voz del teléfono (TTS) |
+| «Ya me la tomé» | Marca la pastilla | Cómodo, pero se puede decir sin haberla tomado. Propongo dejarlo solo con el botón |
+| «Estoy bien» en «¿Está bien?» | Apagaría la alarma | Propongo que no: la alarma se apaga deslizando justo para que no se apague por reflejo ni por la TV |
+
+- [ ] Elegir el nombre de la casa para las órdenes.
+- [ ] Elegir qué órdenes entran en el hackatón. Propuesta: emergencias, hijo y vecino, con los
+      5 s para arrepentirse. Son las que se ven bien en el demo.
+- [ ] Probar en el teléfono si Vosk oye durante una llamada.
