@@ -157,7 +157,7 @@ class Reposo extends StatelessWidget {
 }
 
 /// Las pastillas en una línea: la que le toca, o la próxima. Si le toca, tocar la tarjeta abre el
-/// recordatorio grande, con «Ya la tomé».
+/// recordatorio grande, con «Ya me la tomé».
 class _Pastillas extends StatelessWidget {
   const _Pastillas({required this.c});
 

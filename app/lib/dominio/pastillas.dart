@@ -43,7 +43,6 @@ class PlanDelDia {
 
   final List<Pastilla> pastillas;
   final _tomadas = <String, DateTime>{};
-  final _pospuestas = <String, DateTime>{};
 
   bool tomada(Pastilla p) => _tomadas.containsKey(p.id);
 
@@ -63,22 +62,10 @@ class PlanDelDia {
     return null;
   }
 
-  /// La que hay que recordar en pantalla completa: le toca y no está pospuesta.
-  Pastilla? recordar(DateTime ahora) {
-    final p = leToca(ahora);
-    if (p == null) return null;
-    final hasta = _pospuestas[p.id];
-    return hasta != null && ahora.isBefore(hasta) ? null : p;
-  }
+  /// La que hay que recordar en pantalla completa: la que le toca. No se puede posponer.
+  Pastilla? recordar(DateTime ahora) => leToca(ahora);
 
   void marcarTomada(Pastilla p, DateTime ahora) => _tomadas[p.id] = ahora;
-
-  /// «Recuérdame en 10 min».
-  void posponer(
-    Pastilla p,
-    DateTime ahora, {
-    Duration por = const Duration(minutes: 10),
-  }) => _pospuestas[p.id] = ahora.add(por);
 
   /// Para probar sin esperar a la hora: la próxima toma pendiente pasa a tocar ya.
   Pastilla? siguientePendiente(DateTime ahora) {

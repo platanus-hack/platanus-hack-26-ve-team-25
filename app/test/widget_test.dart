@@ -249,26 +249,28 @@ void main() {
     await _cerrar(tester, c);
   });
 
-  testWidgets('a la hora de la pastilla la recuerda y «Ya la tomé» la marca', (
-    tester,
-  ) async {
-    comoRelojDeMesa(tester);
-    final c = Controlador(
-      casa: casaSimulada,
-      pastillas: pastillasSimuladas,
-      reloj: () => DateTime(2026, 10, 24, 8, 2),
-    );
-    await tester.pumpWidget(AppCasa(controlador: c));
+  testWidgets(
+    'a la hora de la pastilla la recuerda y «Ya me la tomé» la marca',
+    (tester) async {
+      comoRelojDeMesa(tester);
+      final c = Controlador(
+        casa: casaSimulada,
+        pastillas: pastillasSimuladas,
+        reloj: () => DateTime(2026, 10, 24, 8, 2),
+      );
+      await tester.pumpWidget(AppCasa(controlador: c));
 
-    expect(find.text('Es hora de la losartán'), findsOneWidget);
-    await tester.tap(find.text('Ya la tomé'));
-    await tester.pump();
+      expect(find.text('Es hora de la losartán'), findsOneWidget);
+      expect(find.text('Recuérdame en 10 min'), findsNothing);
+      await tester.tap(find.text('Ya me la tomé'));
+      await tester.pump();
 
-    expect(find.text('Cuidando la casa'), findsOneWidget);
-    expect(find.text('Le toca ahora'), findsNothing);
-    expect(c.plan.tomada(pastillasSimuladas.first), isTrue);
-    await _cerrar(tester, c);
-  });
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(find.text('Le toca ahora'), findsNothing);
+      expect(c.plan.tomada(pastillasSimuladas.first), isTrue);
+      await _cerrar(tester, c);
+    },
+  );
 
   testWidgets('una alarma gana sobre el recordatorio de la pastilla', (
     tester,

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../dominio/pastillas.dart';
+import '../dominio/tipos.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
 import 'componentes/capsula.dart';
 import 'controlador.dart';
 
-/// «Es hora de la losartán»: verde y tranquila. La pastilla se dibuja con sus colores para
-/// reconocerla sin leer, y «Ya la tomé» es un toque grande: aquí no hay riesgo en un toque
-/// por reflejo, como sí lo hay al apagar una alarma.
+/// «Es hora de la losartán»: verde, tranquila y en toda la pantalla. La pastilla se dibuja con
+/// sus colores para reconocerla sin leer. Solo se quita con «Ya me la tomé», que ocupa todo el
+/// lado derecho: no hay «más tarde». Si pasan 2 horas sin tomarla, se va sola y queda como
+/// olvidada (PlanDelDia.ventana): así nunca empuja a tomar dos dosis seguidas.
+///
+/// Abajo queda «Pedir ayuda», más chico: mientras la pantalla está, el reposo no se ve, y la
+/// persona no puede quedarse sin forma de pedir ayuda.
 ///
 /// Por hacer: la foto de la caja, que vendrá del récipe leído por foto (OCR).
 class HoraPastilla extends StatelessWidget {
@@ -87,36 +92,33 @@ class HoraPastilla extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 22),
+                      SizedBox(
+                        width: 220,
+                        child: BotonGrande(
+                          texto: 'Pedir ayuda',
+                          alto: 64,
+                          tamano: 21,
+                          fondo: Colores.rojo,
+                          color: Colors.white,
+                          alTocar: () => c.pedirAyuda(TipoEvento.panico),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(width: 28),
               SizedBox(
-                width: 300,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BotonGrande(
-                      texto: 'Ya la tomé',
-                      icono: Icons.check_rounded,
-                      alto: 180,
-                      tamano: 38,
-                      fondo: Colors.white,
-                      color: Colores.verde,
-                      alTocar: () => c.yaLaTome(pastilla),
-                    ),
-                    const SizedBox(height: 14),
-                    BotonGrande(
-                      texto: 'Recuérdame en 10 min',
-                      alto: 64,
-                      tamano: 21,
-                      fondo: Colors.transparent,
-                      color: Colors.white,
-                      borde: const Color(0xFF8FC3A1),
-                      alTocar: () => c.recordarLuego(pastilla),
-                    ),
-                  ],
+                width: 340,
+                child: BotonGrande(
+                  texto: 'Ya me la tomé',
+                  icono: Icons.check_rounded,
+                  alto: double.infinity,
+                  tamano: 44,
+                  fondo: Colors.white,
+                  color: Colores.verde,
+                  alTocar: () => c.yaLaTome(pastilla),
                 ),
               ),
             ],

@@ -103,12 +103,6 @@ class Controlador extends ChangeNotifier {
     notifyListeners();
   }
 
-  void recordarLuego(Pastilla p) {
-    plan.posponer(p, ahora);
-    if (_forzada == p) _forzada = null;
-    notifyListeners();
-  }
-
   /// El primero de la lista, al que se llama cuando la alerta escala.
   Contacto get primerContacto =>
       ([...casa.contactos]..sort((a, b) => a.orden.compareTo(b.orden))).first;

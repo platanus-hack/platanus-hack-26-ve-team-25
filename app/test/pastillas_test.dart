@@ -40,12 +40,6 @@ void main() {
     expect(plan.recordar(a(8, 4)), isNull);
   });
 
-  test('«Recuérdame en 10 min» la esconde 10 minutos y vuelve', () {
-    final plan = PlanDelDia([manana])..posponer(manana, a(8, 0));
-    expect(plan.recordar(a(8, 9)), isNull);
-    expect(plan.recordar(a(8, 10)), manana);
-  });
-
   test('pasadas dos horas sin tomarla queda olvidada', () {
     final plan = PlanDelDia([manana]);
     expect(plan.estado(manana, a(10, 0)), EstadoToma.olvidada);
