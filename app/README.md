@@ -65,6 +65,13 @@ la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).
 
 ## Correrla en un Android
 
+`make run` busca solo el teléfono Android conectado por adb; si no hay ninguno, lo dice y no
+compila (antes compilaba para Linux de escritorio y fallaba). **`make logs`** muestra en vivo el
+log de la app, se vuelve a enganchar si la app se reinicia, avisa si Android la cierra o dice que
+no responde, y guarda una copia en `app/build/logs/`. Cada minuto aparece una línea
+`casa.salud` (escuchas del oído, cola y alerta), y cada reconocimiento de Vosk dice cuánto tardó
+(`casa.vosk`).
+
 Desde la raíz del repo hay atajos: `make` muestra todos. Los más usados son `make run`,
 `make run-demo`, `make test` y `make build-appbundle`. El App Bundle de release se firma por ahora
 con la llave de debug: para subirlo a Google Play hace falta una llave propia.

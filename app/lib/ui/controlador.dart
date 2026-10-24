@@ -306,6 +306,7 @@ class Controlador extends ChangeNotifier {
   }
 
   void _alOir(Escucha escucha) {
+    _escuchasDelMinuto++;
     _ultimaEscucha = escucha;
     final sordo = _sordoHasta;
     final sonido = sordo != null && ahora.isBefore(sordo)
@@ -535,7 +536,24 @@ class Controlador extends ChangeNotifier {
 
   bool _dijoElFinal = false;
 
+  // Una línea por minuto en el log (make logs), para saber qué se trabó si algo se traba: si deja
+  // de aparecer, se trabó la app; si el oído da 0, se cayó el micrófono; si la cola crece, no hay
+  // internet.
+  int _escuchasDelMinuto = 0;
+  int _segundos = 0;
+
+  void _salud() {
+    if (++_segundos % 60 != 0) return;
+    final hhmm = '${ahora.hour}:${ahora.minute.toString().padLeft(2, '0')}';
+    debugPrint(
+      'casa.salud $hhmm · oído: $_escuchasDelMinuto escuchas/min · '
+      'cola: ${nube?.enCola ?? '-'} · alerta: ${_alerta?.estado.name ?? 'ninguna'}',
+    );
+    _escuchasDelMinuto = 0;
+  }
+
   void _alPasarUnSegundo() {
+    _salud();
     final silencio = rutina.revisar(ahora);
     if (silencio != null) nube?.rutina(silencio);
     final pendiente = _alerta;

@@ -3,6 +3,8 @@ package ve.equipo25.casa
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONArray
@@ -12,6 +14,7 @@ import org.vosk.Model
 import org.vosk.Recognizer
 import org.vosk.android.StorageService
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Reconoce las frases de ayuda con Vosk, sin internet, sobre el audio que ya oyó la casa.
@@ -55,9 +58,16 @@ class Frases(private val contexto: Context, mensajero: BinaryMessenger) {
     }
 
     // Devuelve el JSON de Vosk tal cual, con la confianza de cada palabra: Dart decide.
+    // Si todavía está reconociendo lo anterior, lo nuevo se descarta en vez de hacer cola: en un
+    // teléfono viejo, con la TV hablando, la cola crecería sin fin y la app se iría trabando.
     private fun reconocer(pcm: ByteArray, result: MethodChannel.Result) {
         val m = modelo ?: return result.success(null)
+        if (!ocupado.compareAndSet(false, true)) {
+            Log.d(ETIQUETA, "ocupado: se descarta un audio de ${pcm.size / 32} ms")
+            return result.success(null)
+        }
         hilo.execute {
+            val inicio = SystemClock.elapsedRealtime()
             val json = try {
                 Recognizer(m, 16000f, gramatica).use { r ->
                     r.setWords(true)
@@ -65,9 +75,20 @@ class Frases(private val contexto: Context, mensajero: BinaryMessenger) {
                     r.finalResult
                 }
             } catch (e: Exception) {
+                Log.w(ETIQUETA, "falló el reconocimiento", e)
                 null
+            } finally {
+                ocupado.set(false)
             }
+            // Cuánto tarda en el teléfono: si se acerca a los segundos de audio, no da abasto.
+            Log.d(ETIQUETA, "${pcm.size / 32} ms de audio en ${SystemClock.elapsedRealtime() - inicio} ms: $json")
             principal.post { result.success(json) }
         }
+    }
+
+    private val ocupado = AtomicBoolean(false)
+
+    private companion object {
+        const val ETIQUETA = "casa.vosk"
     }
 }
