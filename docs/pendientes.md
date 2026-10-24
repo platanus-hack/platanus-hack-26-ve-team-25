@@ -63,6 +63,10 @@ está probado solo con pruebas automáticas.
       con wifi y sin wifi.
 - [ ] **Pastillas:** mantener presionado «Pastillas de hoy» para forzar el recordatorio, y probar
       «Ya me la tomé», que es la única forma de quitarlo.
+- [ ] **Que la toma descuente** · *Abrahan*: «Ya me la tomé» llama `casa_tomar` (ver «Inventario
+      de pastillas» en el P1) y en `/f/demo/pastillas` el losartán baja de 8 a 7. Es el momento 1
+      del demo. La casa de demo arranca con 8 losartán (4 días, sale «Hay que comprar») y 40
+      metformina; para volver a eso, «Las conté y son otras» en esa misma página.
 - [ ] Anotar aquí lo que falló, con el modelo del teléfono y su versión de Android.
 
 ### 2. El reposo nuevo · *Abrahan*
