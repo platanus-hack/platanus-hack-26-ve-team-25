@@ -1,46 +1,55 @@
 # Contexto y decisiones
 
-Por qué el proyecto es lo que es. Sale de la apertura del evento, del primer debate del equipo y de
-la mentoría con Víctor Orozco (Head of Engineering, Yummy) el viernes 23 de octubre de 2026.
-Track: **Emergencias**.
+Por qué el proyecto es lo que es. Track: **Emergencias**. Mentor: Víctor Orozco (Head of
+Engineering, Yummy).
 
-## La decisión: un solo producto
+## El problema
 
-El equipo llegó con dos ideas:
+Cerca de 8 millones de venezolanos emigraron (R4V, cifra por confirmar) y muchos padres mayores
+quedaron viviendo solos. Si se caen o hay un incendio, nadie se entera a tiempo. Hoy la familia lo
+resuelve llamando varias veces al día.
 
-1. **Semáforos que abren paso a la ambulancia.**
-2. **Una red de emergencias**: conectar a quien tiene una emergencia con el médico o socorrista
-   registrado más cercano, con su ficha médica a mano.
+## La propuesta
 
-La recomendación del mentor fue elegir **una**. Los semáforos tienen más ingeniería: audio, tiempo
-real, control y hardware. La red de emergencias es sobre todo formularios y datos, más producto
-que ingeniería. En este evento el criterio técnico pesa 25%, así que la red queda en el pitch como
-visión de futuro: una plataforma general de gestión de emergencias.
+> Para el venezolano que emigró y dejó a sus padres solos, ofrecemos saber cada día que están bien
+> y enterarse en segundos si se caen o suena una alarma, con el teléfono viejo que ya tienen en
+> casa, a diferencia de llamarlos cinco veces al día o de cámaras y relojes caros que ellos no
+> saben usar.
 
-## Cómo funciona
+## Cómo llegamos aquí
 
-| Pieza | Qué hace | Por qué así |
-|---|---|---|
-| Nodo de cruce | Escucha la sirena con el micrófono | La ambulancia no necesita app, datos ni GPS. La sirena suena casi igual en todas partes y hay miles de audios para validar |
-| Motor central | Abre 2 o 3 semáforos adelante según la velocidad estimada | Abrir solo uno no alcanza. Abrir toda la avenida congela el tráfico |
-| Resincronización | Devuelve cada semáforo a su plan y descuenta los segundos perdidos | Sin eso se rompe la onda verde de los demás autos |
-| Simulación | Ambulancia y autos en una avenida real de Caracas | Mide el tiempo de llegada con el sistema y sin él |
+Arrancamos el viernes en la noche con semáforos que abren paso a la ambulancia. Tenía ingeniería,
+pero no una propuesta de valor para la gente: las ambulancias son pocas, pasan por pocas calles y
+el único comprador es el gobierno. Buscamos un problema que toque a muchas familias todos los días
+y en el que pague el usuario. El mentor validó la idea nueva el sábado a las 00:23 y propuso el
+flujo del MVP: una alarma en la casa que hay que apagar, y si nadie la apaga en 60 s, el aviso al
+contacto de emergencia.
 
-Se respetan el amarillo y el todo-rojo de seguridad antes de cada cambio.
+## Lo que ya existe y en qué nos distinguimos
 
-## El demo
+| Qué existe | Por qué no es esto |
+|---|---|
+| Apps de caídas (uFallAlert, FallSafety, Senior Safety App) | Usan el acelerómetro del teléfono que la persona lleva encima. En casa, el teléfono queda en la mesa |
+| CareBridge | Solo mira si se desbloqueó la pantalla: no oye ni detecta caídas. Muestra que las familias pagan por saber que está bien |
+| Google Nest | Oye la alarma de humo y el vidrio roto, pero pide un parlante, suscripción y dirección en EE. UU. No detecta caídas ni gritos |
+| Sound Notifications de Android | Reconoce la alarma de humo y los gritos, pero el aviso no sale del mismo teléfono |
+| AlfredCamera | Convierte el teléfono viejo en cámara: es video de la persona y solo detecta movimiento |
+| Colgantes y sensores dedicados | Hardware que hay que comprar e instalar |
+| Investigación y patentes | Detectan caídas con sonido ambiente, y con vibración del piso más sonido. Nadie lo llevó al teléfono viejo |
 
-Un teléfono reproduce la sirena, el nodo la oye y los semáforos se abren en ola. Los teléfonos del
-público hacen de semáforos: así lo prueba cualquiera sin hardware.
+Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 
-## Las objeciones que esperamos
+## Decisiones de diseño
 
-- **En Venezuela las ambulancias se coordinan por radio y a veces no hay señal.** Por eso se detecta
-  en el cruce: no depende de la ambulancia. El GPS de despacho queda como segunda vía.
-- **Los semáforos no están en red.** Proponemos el hardware y la lógica. Al ser open source, sirve en
-  cualquier ciudad que sí los tenga conectados o que los conecte.
+| Decisión | Por qué |
+|---|---|
+| El audio se procesa en el teléfono, con YAMNet en el navegador | Privacidad: solo salen etiquetas de eventos. Y no cuesta nada por uso |
+| Una compuerta de decibeles antes del modelo | Lo barato corre siempre; el modelo solo confirma |
+| Sonido más vibración del piso | La TV puede gritar, pero no hace temblar el piso. Una caída sí |
+| Una alarma en la casa que hay que apagar en 60 s | Una falsa alarma cuesta un toque de la persona, no un susto a la familia. Cada alarma apagada calibra esa casa |
+| Escalamiento por vencimiento, una sola vez | Si el teléfono de la casa se apaga en plena alarma, la alerta escala igual: cualquier teléfono de la familia ve que venció |
+| El silencio también avisa | Si la casa deja de reportar, la familia lo ve |
 
 ## Pendiente
 
-- El número del problema, con fuente: cuántas personas mueren por ambulancias atascadas en el
-  tráfico. El pitch empieza por ahí.
+- Las cifras con fuente: venezolanos emigrados, adultos mayores que viven solos y caídas en casa.

@@ -1,7 +1,7 @@
-# Plan: semáforos que abren paso a la ambulancia
+# Plan: un teléfono viejo que cuida a los que se quedaron solos
 
-> Propuesta del 23-oct a las 22:00. **Falta que el equipo la confirme.** Si cambia, se reescribe
-> aquí. El porqué está en [contexto.md](contexto.md).
+> Decidido el sábado 24-oct a las 00:30 y validado con el mentor. Si cambia, se reescribe aquí.
+> El porqué, lo que ya existe y las decisiones de diseño están en [contexto.md](contexto.md).
 
 ## Reloj (hora de Caracas)
 
@@ -13,57 +13,65 @@
 | **Dom 08:30** | **Fin del hacking. Lo que no esté pusheado no existe.** |
 | Dom 10:00 | Presentaciones |
 
+## El flujo del MVP
+
+1. El teléfono de la casa oye (y siente el piso) un posible evento: alarma de humo, vidrio roto,
+   golpe con vibración, grito.
+2. Suena una alarma fuerte en la casa: «¿Está bien? Toque la pantalla para apagar». La pantalla
+   destella y vibra.
+3. Si nadie la apaga en 60 s, se avisa al contacto de emergencia: en la app de la familia y por un
+   canal real.
+4. Cada alarma que la persona apaga queda anotada como falsa alarma de esa casa y ajusta sus
+   umbrales.
+
 ## Núcleo (meta: sábado 12:00, desplegado)
 
-1. **Nodo de cruce en el navegador.** Micrófono → detector de sirena. MediaPipe Audio Classifier
-   con YAMNet corre en el navegador y trae clases de sirena de ambulancia y de vehículo de
-   emergencia. Lo primero es comprobar que detecta una sirena reproducida desde un teléfono, con
-   el ruido de la sala. Encima va la lógica propia: suavizado en el tiempo y acercamiento
-   (volumen creciente, Doppler).
-2. **Motor central.** El corredor son los semáforos de OpenStreetMap de la avenida del CCCT. El
-   motor:
-   - abre 2 o 3 semáforos adelante según la velocidad estimada
-   - respeta el amarillo y el todo-rojo de seguridad
-   - resincroniza el plan al pasar la ambulancia
-   - publica el estado en tiempo real
-   - tiene pruebas: el jurado técnico las busca en el repo
-3. **Simulación.** Autos con un modelo de seguimiento (IDM) que frenan en rojo, y la ambulancia.
-   La métrica: tiempo de llegada con y sin el sistema, y demora de los demás autos.
-4. **Los teléfonos del público son los semáforos.** Se escanea el QR y la pantalla pasa a ser el
-   semáforo N de la avenida. Así el público prueba la app sin hardware.
+1. **El oído.** Micrófono → compuerta de dB → YAMNet en el navegador (ya existe como prueba en
+   `/escucha`). Se suma el acelerómetro para la vibración del piso y se combinan las dos señales
+   en un evento con su confianza.
+2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s y un botón grande para apagar.
+3. **El escalamiento que no depende de un solo teléfono.** La casa registra la alerta con su hora
+   de vencimiento. Si nadie la cancela, el primero que vea el vencimiento (la casa o cualquier
+   teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico. Si la casa
+   deja de reportar, la familia ve «sin señal desde las 14:05».
+4. **La app de la familia.** Estado de la casa en vivo (última actividad, TV, luz), alertas e
+   historial del día. Sin login: se entra con un enlace de invitación, que en el demo es un QR.
+5. **La rutina.** «Se levantó a las 7:12» y aviso si a la hora de siempre no hubo actividad. Si no
+   llega al sábado 12:00, va después.
 
 ## Extras (solo si el núcleo está listo)
 
-- Visión: el destello rojo y azul de la ambulancia con la cámara.
-- Despacho por GPS: la ambulancia disponible más cercana y su ruta.
-- LEDs físicos con un ESP32. Se arman aquí: código y hardware nuevos, nada hecho antes del evento.
+- Voz: «Carmen, ¿está bien?», y que pueda responder hablando.
+- El vecino de confianza como segundo escalón.
+- Detectar el apagón porque el teléfono dejó de cargar.
 
-## Demo (3 pasos)
+## Demo
 
-1. Alguien del equipo reproduce la sirena desde un teléfono.
-2. La laptop la oye y los teléfonos del público se ponen en verde en ola, de adelante hacia atrás.
-3. La simulación muestra cuánto antes llegó la ambulancia y cómo se recupera el tráfico.
-
-Respaldo: un video grabado del mismo flujo.
+1. Un teléfono en la tarima es la casa de «la señora Carmen» (inventada). El público escanea el QR
+   y su teléfono pasa a ser la familia.
+2. Suena una alarma de humo. En la tarima suena la alarma de confirmación, nadie la apaga y a los
+   60 s (15 s en modo demo) les llega el aviso a todos los teléfonos.
+3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» apaga la alarma y se ve
+   que no escala.
+4. Se prende la TV con una escena de gritos: no dispara, porque el piso no tembló.
 
 ## Roles
 
 | Rol | Qué | Quién |
 |---|---|---|
-| Detección | Audio, y visión si da el tiempo | |
-| Motor + tiempo real | Corredor, tiempos, resincronización, publicación del estado | |
-| Simulación + panel | Mapa, autos, métricas, vista de semáforo para teléfonos | |
-| Datos + pitch | El número del problema con fuente, las objeciones, el README de arquitectura y el video | |
+| Detección | Audio, vibración, fusión de señales, umbrales por casa | |
+| Confirmación + escalamiento | Alarma local, vencimientos, estado atómico, canal real de aviso | |
+| App de la familia + demo | Estado en vivo, alertas, historial, invitación por QR | |
+| Datos + pitch | Las cifras con fuente, la competencia, el README de arquitectura y el video | |
 
 ## Infra (presupuesto cero)
 
 - **Web:** Next.js en Vercel, plan gratis. Producción:
   https://platanus-hack-26-ve-team-25.vercel.app. Por ahora el deploy es manual desde la cuenta
   de Rogelio (`vercel --prod` en `web/`).
-- **Tiempo real:** Supabase Realtime, plan gratis, suficiente para ~100 teléfonos a la vez.
-  Render gratis se duerme a los 15 minutos sin uso: no sirve para el demo.
-- **Motor:** TypeScript, en el navegador del panel o como proceso Node. Se decide al construirlo.
-- **Detector:** corre en el navegador, no cuesta nada por uso.
+- **Estado y tiempo real:** Supabase, plan gratis.
+- **Detección:** corre en el teléfono, sin costo por uso. El audio nunca sale del teléfono.
+- **Aviso real:** correo o Telegram, que son gratis. El SMS cuesta: se decide si hay presupuesto.
 
 ## Cómo trabajamos
 
@@ -74,6 +82,7 @@ Respaldo: un video grabado del mismo flujo.
 
 ## Pendiente
 
-- [ ] El equipo confirma este plan
+- [ ] Probar `/escucha` con micrófono real: alarma de humo, golpe, grito, TV
 - [ ] Nombres en la tabla de roles
-- [ ] El número del problema, con fuente
+- [ ] Cifras con fuente: venezolanos emigrados (R4V), adultos mayores que viven solos, caídas
+- [ ] Elegir el canal real de aviso: correo o Telegram
