@@ -7,7 +7,8 @@ mayor, oye y siente lo que pasa: una alarma de humo, un vidrio roto, un golpe co
 alertar, suena una alarma en la casa que la persona puede apagar; si nadie la apaga en 60 s,
 avisa a la familia, esté donde esté. El audio se procesa en el teléfono y nunca sale de ahí.
 
-Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.vercel.app
+Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.vercel.app · Teléfono de la
+casa en el navegador: https://platanus-hack-26-ve-team-25-casa.vercel.app
 
 - El plan, los roles y el demo: [docs/plan.md](docs/plan.md)
 - De los mockups al código, pantalla por pantalla: [docs/pantallas.md](docs/pantallas.md)
@@ -28,7 +29,8 @@ Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.verc
 | Vibración del piso con el acelerómetro | Por hacer |
 | Alarma de confirmación de 60 s, botón de pánico y reportes de la persona | Por hacer |
 | Perfil de salud y niveles de aviso (🔴 🟡 🟢) | Por hacer |
-| App del teléfono de la casa en Flutter | Las 4 pantallas con datos simulados y la máquina de estados de la alerta, con 12 pruebas: [`app/`](app/README.md). Falta el oído, Supabase, sonido y sensores |
+| App del teléfono de la casa en Flutter | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono. 35 pruebas: [`app/`](app/README.md). Falta Supabase, Telegram, sonido y vibración |
+| La app de la casa en el navegador | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app para probar las pantallas sin Android. Sin oído ni llamadas: [cómo y por qué](app/README.md#verla-en-el-navegador) |
 | Alertas con vencimiento y escalamiento (Supabase) | Por hacer |
 | Web de la familia instalable (PWA) | Hecha la base: manifiesto, íconos y metadatos para Android e iPhone. Faltan las pantallas |
 | Aviso real por Telegram | Decidido; falta implementarlo |

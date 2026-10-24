@@ -21,6 +21,7 @@ suele estar en otro país. El audio se procesa en el teléfono y nunca sale de �
 | Comparación de 9 modelos de audio (YAMNet, EfficientAT, PANNs, sherpa-onnx) en 640 sonidos de casa | Hecha y reproducible, con resultados | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
 | Web de la familia instalable (PWA): manifiesto, íconos provisionales y metadatos para Android e iPhone | Hecho. La web de la familia en sí está por hacer | [`web/src/app/manifest.ts`](web/src/app/manifest.ts), [`web/src/lib/app.ts`](web/src/lib/app.ts) |
 | App Flutter del teléfono de la casa | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono. 35 pruebas. Falta Supabase, Telegram, sonido y vibración | [`app/`](app/README.md) |
+| La app de la casa compilada para web, instalable | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app. Sin oído ni llamadas: en web, TFLite se cambia por una versión vacía con una importación condicional. Vercel baja Flutter 3.47.5 y compila | [`app/lib/oido/tflite_web.dart`](app/lib/oido/tflite_web.dart), [`app/tool/vercel_build.sh`](app/tool/vercel_build.sh) |
 | Alarma de confirmación de 60 s, botón de pánico | Por hacer | — |
 | Alertas con vencimiento y escalamiento en Supabase | Diseñado, por hacer | [`docs/plan.md`](docs/plan.md) |
 | Web de la familia y aviso por Telegram | Por hacer | — |

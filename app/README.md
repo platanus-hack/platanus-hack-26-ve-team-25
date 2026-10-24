@@ -52,6 +52,18 @@ Para el demo, con la cuenta regresiva de 15 s en vez de 60 s:
 flutter run --dart-define=DEMO=true
 ```
 
+## Verla en el navegador
+
+https://platanus-hack-26-ve-team-25-casa.vercel.app es la misma app compilada para web e
+instalable desde el navegador. Sirve para ver y probar las pantallas sin un Android, con los mismos
+toques largos de abajo. **No oye ni llama:** TFLite usa `dart:ffi`, que no existe en el navegador,
+así que la web compila contra [`lib/oido/tflite_web.dart`](lib/oido/tflite_web.dart), una versión
+vacía. Tampoco lleva el número de emergencia, porque el sitio es público.
+
+`make casa-deploy` la publica. Vercel no trae Flutter: [`tool/vercel_build.sh`](tool/vercel_build.sh)
+baja la misma versión del equipo (3.47.5) y compila allá, así que no hace falta Flutter en la
+laptop. Con Flutter instalado, `make casa-web` la arma en `build/web`.
+
 ## Cómo probar las pantallas
 
 El oído ya escucha. Además hay dos toques largos de prueba:
