@@ -307,6 +307,17 @@ viejo para medir. Ninguna de las dos cosas está disponible hoy.
 
 ## Para el pitch y el jurado
 
+- [x] **Aguanta al público:** [`web/scripts/carga.ts`](../web/scripts/carga.ts) simula los
+      teléfonos que escanean el QR en 5 s, abren `/f/demo` y leen la casa cada 5 s. Sábado 24-oct,
+      ~16:00, desde la laptop en Caracas contra producción:
+
+      | Teléfonos | Duración | Lecturas | Fallas | Abrir `/f/demo` (p50 · p95) | Leer la casa (p50 · p95 · máx) |
+      |---|---|---|---|---|---|
+      | 50 | 2 min | 1124 (8,6/s) | 0 | 433 · 1437 ms | 262 · 1474 · 4005 ms |
+      | 150 | 1 min | 1653 (22,9/s) | 0 | 729 · 1406 ms | 344 · 2913 · 10145 ms |
+
+      Con 50 sobra. Con 150 no falla nada, pero alguna lectura tarda hasta 10 s: la alerta se ve un
+      ciclo más tarde. No se midió si el cuello es Supabase Free o la red de la laptop.
 - [x] **Cifras con fuente** ([investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)).
       Revisadas el sábado 10:00 contra la fuente original. **Para el pitch, solo estas:**
 
