@@ -53,3 +53,6 @@ app.*.map.json
 # Enlace al proyecto de Vercel de la web de la casa (make casa-deploy)
 /.vercel
 /.flutter-sdk/
+
+# El modelo de Vosk (~40 MB): lo baja tool/descargar_vosk.sh
+/android/app/src/main/assets/vosk-es/

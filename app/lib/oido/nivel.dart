@@ -28,6 +28,16 @@ class LectorPcm16 {
   }
 }
 
+/// Muestras entre -1 y 1 de vuelta a PCM de 16 bits little endian, como las pide Vosk.
+Uint8List pcm16DeMuestras(Float32List muestras) {
+  final datos = ByteData(muestras.length * 2);
+  for (var i = 0; i < muestras.length; i++) {
+    final v = (muestras[i] * 32768).round().clamp(-32768, 32767);
+    datos.setInt16(2 * i, v, Endian.little);
+  }
+  return datos.buffer.asUint8List();
+}
+
 /// Nivel RMS de un bloque en dBFS: 0 es el máximo digital, el silencio queda cerca de -100.
 double rmsDb(Float32List bloque) {
   var suma = 0.0;

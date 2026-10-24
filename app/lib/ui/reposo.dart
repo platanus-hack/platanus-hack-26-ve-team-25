@@ -39,7 +39,7 @@ const _meses = [
 /// la derecha, de arriba abajo, «Pedir ayuda»: lo único que hay que encontrar con prisa.
 ///
 /// «Huele a gas» y «Me siento mal» ya no son botones: se dicen en voz alta (ver
-/// Controlador._escucharPedido).
+/// Controlador._reconocerPedido y el banco de pedidos.dart).
 ///
 /// Toques largos de prueba:
 /// - mantener el reloj simula una alarma de humo;
@@ -77,7 +77,7 @@ class Reposo extends StatelessWidget {
                             builder: (_) => Configurar(casa: c.casa),
                           ),
                         ),
-                        child: _Estado(escuchando: c.escuchandoVoz),
+                        child: const _Estado(),
                       ),
                     ),
                     Expanded(
@@ -260,10 +260,7 @@ class _LeerRecipe extends StatelessWidget {
 }
 
 class _Estado extends StatelessWidget {
-  const _Estado({required this.escuchando});
-
-  /// True mientras el reconocimiento de voz escucha lo que dijo la persona.
-  final bool escuchando;
+  const _Estado();
 
   @override
   Widget build(BuildContext context) {
@@ -273,18 +270,15 @@ class _Estado extends StatelessWidget {
         color: Colores.verdeFondo,
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Row(
+      child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (escuchando)
-            const Icon(Icons.mic_rounded, size: 18, color: Colores.verdePunto)
-          else
-            const CircleAvatar(radius: 5, backgroundColor: Colores.verdePunto),
-          const SizedBox(width: 10),
+          CircleAvatar(radius: 5, backgroundColor: Colores.verdePunto),
+          SizedBox(width: 10),
           Flexible(
             child: Text(
-              escuchando ? 'Le escucho…' : 'Cuidando la casa',
-              style: const TextStyle(fontSize: 16, color: Colores.verdeClaro),
+              'Cuidando la casa',
+              style: TextStyle(fontSize: 16, color: Colores.verdeClaro),
             ),
           ),
         ],

@@ -30,6 +30,7 @@ class MainActivity : FlutterActivity() {
                 }
             }
         }
+        Frases(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/energia").setMethodCallHandler { call, result ->
             if (call.method == "leer") result.success(leerEnergia()) else result.notImplemented()
         }

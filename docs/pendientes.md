@@ -44,7 +44,7 @@ archivo no se sube, porque el repo es público.
 - [ ] **Por voz:** en «¿Pudo hablar con…?», decir «sí» (cierra) y «no» (llama por teléfono). Probar
       con wifi y sin wifi.
 - [ ] **Pastillas:** mantener presionado «Pastillas de hoy» para forzar el recordatorio, y probar
-      «Ya la tomé» y «Recuérdame en 10 min».
+      «Ya me la tomé», que es la única forma de quitarlo.
 - [ ] Anotar aquí lo que falló, con el modelo del teléfono y su versión de Android.
 
 ### 2. El reposo nuevo · *Abrahan*
@@ -54,12 +54,16 @@ Decidido por Abrahan el sábado 24: **«Pedir ayuda» ocupa el panel derecho** d
 **«Huele a gas» y «Me siento mal» dejan de ser botones y se dicen en voz alta.**
 
 - [x] [`reposo.dart`](../app/lib/ui/reposo.dart) con ese diseño, con los toques largos de prueba.
-- [x] Pedir por voz: `pedidoPorVoz` en [`respuesta.dart`](../app/lib/dominio/respuesta.dart) y
-      `_escucharPedido` en el [controlador](../app/lib/ui/controlador.dart). Pasa por «¿Está
-      bien?», no llama directo, porque la voz puede ser de la TV.
+- [x] Pedir por voz con Vosk sin internet: banco de ~70 frases en
+      [`pedidos.dart`](../app/lib/dominio/pedidos.dart), `_reconocerPedido` en el
+      [controlador](../app/lib/ui/controlador.dart) y [`Frases.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Frases.kt).
+      Lee el mismo anillo que YAMNet: no lo pausa. Pasa por «¿Está bien?», no llama directo.
+- [x] El recordatorio de la pastilla solo se quita con «Ya me la tomé» (sin «más tarde»).
 - [x] [contexto.md](contexto.md) actualizado: la persona sigue siendo sensor, por voz.
-- [ ] **Probarlo en el teléfono:** decir «me huele a gas» dos veces con la TV apagada y con la TV
-      prendida. Ver cuánto molesta el pitido del reconocedor de Android, si lo hace.
+- [ ] **Probarlo en el teléfono:** decir frases del banco cerca y lejos, con la TV apagada y
+      prendida. Mirar en los registros si Vosk ignora palabras que no están en su vocabulario
+      («malita»), y ajustar `confianzaMinima` en [`frases.dart`](../app/lib/datos/frases.dart).
+- [ ] Probar el banco con voces mayores reales (ver «Probar con voces mayores»).
 - [ ] «Leer récipe» abre una pantalla que dice que todavía no está lista: falta la cámara y el
       OCR (ver P1, «Las pastillas desde la foto del récipe»).
 

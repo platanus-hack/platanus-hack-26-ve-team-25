@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'datos/frases.dart';
 import 'datos/llamadas.dart';
 import 'datos/nube.dart';
 import 'datos/voz.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
 
   final oido = Oido();
   final nube = _nube();
+  final frases = kIsWeb ? null : FrasesVosk();
   final controlador = Controlador(
     casa: casaSimulada,
     pastillas: pastillasSimuladas,
@@ -31,6 +33,7 @@ Future<void> main() async {
     telefono: kIsWeb ? null : TelefonoAndroid(),
     voz: kIsWeb ? null : VozAndroid(),
     microfono: oido,
+    frases: frases,
     nube: nube,
   );
   runApp(AppCasa(controlador: controlador));
@@ -48,6 +51,7 @@ Future<void> main() async {
     await Permission.systemAlertWindow.request();
   }
   await oido.iniciar();
+  await frases?.iniciar();
 }
 
 /// Supabase, si local.json trae la URL, la llave pública y la clave de la casa. La web de la casa

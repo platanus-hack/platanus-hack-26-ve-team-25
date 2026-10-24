@@ -20,8 +20,8 @@ ayuda: ## Muestra estos comandos
 devices: ## Lista los teléfonos conectados
 	flutter devices
 
-deps: ## Baja las dependencias de la app
-	cd $(APP) && flutter pub get
+deps: ## Baja las dependencias de la app y el modelo de Vosk
+	cd $(APP) && flutter pub get && ./tool/descargar_vosk.sh
 
 run: deps ## Corre la app en el teléfono conectado (r recarga, q sale)
 	cd $(APP) && flutter run $(CONFIG)

@@ -1,3 +1,4 @@
+import 'package:casa/dominio/pedidos.dart';
 import 'package:casa/dominio/respuesta.dart';
 import 'package:casa/dominio/tipos.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -62,6 +63,33 @@ void main() {
       expect(pedidoPorVoz(['vamos a comer a las doce']), isNull);
       expect(pedidoPorVoz(['el gasto del mes']), isNull);
       expect(pedidoPorVoz([]), isNull);
+    });
+
+    test('el banco grande: venezolano y asustado', () {
+      expect(pedidoPorVoz(['ay me siento malita']), TipoEvento.meSientoMal);
+      expect(pedidoPorVoz(['no me puedo parar']), TipoEvento.meSientoMal);
+      expect(pedidoPorVoz(['se está botando el gas']), TipoEvento.hueleGas);
+      expect(pedidoPorVoz(['llamen a mi hijo']), TipoEvento.panico);
+      expect(pedidoPorVoz(['hay humo']), TipoEvento.panico);
+    });
+
+    test('las palabras sueltas de una conversación no piden nada', () {
+      expect(pedidoPorVoz(['fui al médico']), isNull);
+      expect(pedidoPorVoz(['hay que comprar la bombona']), isNull);
+    });
+
+    test('cada frase del banco se reconoce a sí misma', () {
+      for (final MapEntry(key: tipo, value: frases) in bancoDePedidos.entries) {
+        for (final f in frases) {
+          expect(pedidoPorVoz([f]), isNotNull, reason: f);
+          // Una frase de abajo puede contener una de arriba, nunca al revés.
+          expect(
+            bancoDePedidos.keys.toList().indexOf(pedidoPorVoz([f])!),
+            lessThanOrEqualTo(bancoDePedidos.keys.toList().indexOf(tipo)),
+            reason: f,
+          );
+        }
+      }
     });
 
     test('mira todas las versiones del reconocedor', () {

@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../datos/frases.dart';
 import '../datos/llamadas.dart';
 import '../datos/nube.dart';
 import '../datos/voz.dart';
 import '../dominio/alerta.dart';
 import '../dominio/pastillas.dart';
+import '../dominio/pedidos.dart';
 import '../dominio/respuesta.dart';
 import '../dominio/tipos.dart';
 import '../oido/oido.dart';
@@ -21,6 +23,7 @@ class Controlador extends ChangeNotifier {
     this.telefono,
     this.voz,
     this.microfono,
+    this.frases,
     this.nube,
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
@@ -43,10 +46,12 @@ class Controlador extends ChangeNotifier {
   /// Cuánto se espera a que la persona diga «Sí, ya hablamos» antes de llamar por teléfono.
   static const esperaPregunta = Duration(seconds: 15);
 
-  /// Cuánto escucha la voz cuando el oído oye hablar a alguien, y cada cuánto puede volver a
-  /// hacerlo. Mientras la voz escucha, YAMNet no oye: por eso no puede ser seguido.
-  static const escuchaPedido = Duration(seconds: 6);
-  static const repetirPedido = Duration(seconds: 20);
+  /// Cuando el oído oye hablar, cuánto se espera a que termine la frase, cuánto audio se le
+  /// pasa a Vosk y cada cuánto se puede volver a reconocer. Vosk no pausa el oído, así que puede
+  /// ser seguido; el límite es la CPU del teléfono viejo.
+  static const finDeFrase = Duration(milliseconds: 1500);
+  static const audioDelPedido = Duration(seconds: 5);
+  static const repetirPedido = Duration(seconds: 4);
 
   final Casa casa;
 
@@ -59,8 +64,11 @@ class Controlador extends ChangeNotifier {
   /// Para responder «¿Pudo hablar con…?» por voz, además del botón.
   final Voz? voz;
 
-  /// El oído, que se pausa mientras la voz escucha.
+  /// El oído, que se pausa mientras la voz escucha y guarda lo último que oyó.
   final Microfono? microfono;
+
+  /// Las frases de ayuda dichas en voz alta, reconocidas con Vosk sobre el audio del oído.
+  final Frases? frases;
 
   /// Supabase, para que la familia vea lo que pasa. Null sin configurar (y en la web).
   final Nube? nube;
@@ -76,6 +84,7 @@ class Controlador extends ChangeNotifier {
   Escucha? _ultimaEscucha;
   final _ultimaVez = <TipoSonido, DateTime>{};
   DateTime? _ultimoPedido;
+  bool _reconociendo = false;
 
   DateTime get ahora => _reloj();
 
@@ -217,14 +226,19 @@ class Controlador extends ChangeNotifier {
         oirEvento(evento);
       }
     }
-    if (_hablanEnLaCasa(escucha)) unawaited(_escucharPedido());
+    if (_hablanEnLaCasa(escucha)) unawaited(_reconocerPedido());
     notifyListeners();
   }
 
   /// YAMNet oye a una persona hablar, y no es la TV. No se pide que la compuerta esté abierta:
   /// un «ayuda» débil de una persona mayor puede no pasar el umbral de dB.
   bool _hablanEnLaCasa(Escucha e) {
-    if (voz == null || alerta != null || escuchandoVoz) return false;
+    if (frases == null ||
+        microfono == null ||
+        alerta != null ||
+        _reconociendo) {
+      return false;
+    }
     final antes = _ultimoPedido;
     if (antes != null && ahora.difference(antes) < repetirPedido) return false;
     double puntaje(String clase) =>
@@ -233,27 +247,27 @@ class Controlador extends ChangeNotifier {
     return puntaje('Speech') >= 0.4 && tv < 0.2;
   }
 
-  /// «Huele a gas», «me siento mal» o «ayuda», dichos en voz alta. El reconocedor empieza a
-  /// escuchar después de que el oído oyó hablar, así que entiende lo que la persona dice a
-  /// continuación o repite. Lo que pide pasa por «¿Está bien?» y no llama directo: así, si la voz
-  /// venía de la TV o se entendió mal, la persona lo apaga deslizando, y si no responde, escala.
-  Future<void> _escucharPedido() async {
-    final voz = this.voz;
-    if (voz == null) return;
+  /// Busca las frases del banco (pedidos.dart) en los últimos segundos que oyó la casa. Vosk lee
+  /// el mismo anillo que YAMNet, así que el oído nunca se pausa y la frase que despertó al
+  /// reconocedor también cuenta. Lo que se pide pasa por «¿Está bien?» y no llama directo: si la
+  /// voz era de la TV o se entendió mal, la persona lo apaga deslizando; si no responde, escala.
+  Future<void> _reconocerPedido() async {
+    final frases = this.frases;
+    final microfono = this.microfono;
+    if (frases == null || microfono == null) return;
     _ultimoPedido = ahora;
-    escuchandoVoz = true;
-    notifyListeners();
-    List<String> versiones = const [];
+    _reconociendo = true;
     try {
-      await microfono?.pausar();
-      versiones = await voz.escuchar(hasta: escuchaPedido);
+      // Que la frase termine de entrar al anillo antes de leerlo.
+      await Future<void>.delayed(finDeFrase);
+      final versiones = await frases.reconocer(
+        microfono.ultimoAudio(audioDelPedido),
+      );
+      final pedido = pedidoPorVoz(versiones);
+      if (pedido != null) oirEvento(pedido);
     } finally {
-      escuchandoVoz = false;
-      await microfono?.reanudar();
+      _reconociendo = false;
     }
-    final pedido = pedidoPorVoz(versiones);
-    if (pedido != null) oirEvento(pedido);
-    notifyListeners();
   }
 
   void _alPasarUnSegundo() {

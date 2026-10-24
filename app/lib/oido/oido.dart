@@ -35,10 +35,14 @@ class Escucha {
 /// Por ahora YAMNet clasifica dos veces por segundo siempre, como en /escucha. Despertarlo
 /// solo cuando la compuerta se abre, para ahorrar batería, va después.
 /// Algo que usa el micrófono y puede soltarlo un momento. El controlador lo pausa mientras el
-/// reconocimiento de voz escucha una respuesta.
+/// reconocimiento de voz escucha una respuesta, y le pide lo último que oyó para buscar ahí las
+/// frases de ayuda.
 abstract interface class Microfono {
   Future<void> pausar();
   Future<void> reanudar();
+
+  /// Lo último que oyó, en PCM de 16 bits a 16 kHz. Sale del anillo: nunca deja el teléfono.
+  Uint8List ultimoAudio(Duration duracion);
 }
 
 class Oido implements Microfono {
@@ -92,6 +96,10 @@ class Oido implements Microfono {
     _audio = null;
     await _recorder.stop();
   }
+
+  @override
+  Uint8List ultimoAudio(Duration duracion) =>
+      pcm16DeMuestras(_anillo.ultimas(_sr * duracion.inMilliseconds ~/ 1000));
 
   /// Vuelve a oír después de una pausa.
   @override

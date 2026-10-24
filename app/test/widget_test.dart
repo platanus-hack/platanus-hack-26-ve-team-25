@@ -290,7 +290,6 @@ void main() {
   });
 
   group('pedir por voz, sin botones', () {
-    late VozFalsa voz;
     late MicrofonoFalso mic;
     late StreamController<Escucha> oido;
     late Controlador c;
@@ -302,56 +301,53 @@ void main() {
       top: [for (final e in clases.entries) Clase(e.key, e.value)],
     );
 
-    Future<void> abrir(WidgetTester tester) async {
+    Future<FrasesFalsas> abrir(WidgetTester tester, List<String> dice) async {
       comoRelojDeMesa(tester);
-      voz = VozFalsa();
+      final frases = FrasesFalsas(dice);
       mic = MicrofonoFalso();
       oido = StreamController<Escucha>();
       c = Controlador(
         casa: casaSimulada,
         reloj: temprano,
         escuchas: oido.stream,
-        voz: voz,
+        frases: frases,
         microfono: mic,
       );
       await tester.pumpWidget(AppCasa(controlador: c));
+      return frases;
     }
 
     testWidgets('«me huele a gas» pregunta «¿Está bien?» con el motivo', (
       tester,
     ) async {
-      await abrir(tester);
+      final frases = await abrir(tester, ['me huele a gas']);
       expect(find.text('Huele a gas'), findsNothing);
 
       oido.add(oye({'Speech': 0.8}));
       await tester.pump();
-      expect(voz.escucho, isTrue);
-      expect(mic.pasos, ['pausar']);
-      expect(find.text('Le escucho…'), findsOneWidget);
-
-      voz.responder(['me huele a gas']);
+      // Espera a que termine la frase y lee los últimos 5 s del anillo, sin pausar el oído.
+      await tester.pump(Controlador.finDeFrase);
       await tester.pump();
-      await tester.pump();
-      expect(mic.pasos, ['pausar', 'reanudar']);
+      expect(frases.audios, [32000 * Controlador.audioDelPedido.inSeconds]);
+      expect(mic.pasos, isEmpty);
       expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
       expect(find.text(TipoEvento.hueleGas.frase), findsOneWidget);
       await _cerrar(tester, c);
     });
 
     testWidgets('la voz de la TV no despierta al reconocedor', (tester) async {
-      await abrir(tester);
+      final frases = await abrir(tester, ['ayuda']);
       oido.add(oye({'Speech': 0.7, 'Television': 0.4}));
-      await tester.pump();
-      expect(voz.escucho, isFalse);
+      await tester.pump(Controlador.finDeFrase);
+      expect(frases.audios, isEmpty);
       await _cerrar(tester, c);
     });
 
-    testWidgets('una conversación cualquiera vuelve al reposo', (tester) async {
-      await abrir(tester);
+    testWidgets('una conversación cualquiera sigue en reposo', (tester) async {
+      await abrir(tester, []);
       oido.add(oye({'Speech': 0.9}));
       await tester.pump();
-      voz.responder(['qué rico está el café']);
-      await tester.pump();
+      await tester.pump(Controlador.finDeFrase);
       await tester.pump();
       expect(find.text('Cuidando la casa'), findsOneWidget);
       await _cerrar(tester, c);

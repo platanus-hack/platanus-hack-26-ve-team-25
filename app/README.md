@@ -10,13 +10,19 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   reflejo; «Necesito ayuda» es un toque.
 - **El reposo:** el reloj grande y, a la derecha, «Pedir ayuda» de arriba abajo. Abajo, en chico,
   la pastilla que le toca o la próxima, y «Leer récipe», que todavía solo dice que no está lista.
-- **Pedir en voz alta:** cuando YAMNet oye hablar a alguien (y no es la TV), el reconocimiento de
-  voz escucha 6 s, como mucho cada 20 s. «Huele a gas», «me siento mal», «me caí» o «ayuda» abren
-  «¿Está bien?» con ese motivo, en vez de llamar directo: si era la TV, se apaga deslizando. El
-  reconocedor empieza después de oír la voz, así que entiende lo que la persona repite.
-- **Las pastillas del día:** a la hora, una pantalla
-  verde la recuerda («Es hora de la losartán») con la pastilla dibujada en sus colores. Se puede
-  posponer 10 minutos; pasadas 2 horas sin tomarla queda como olvidada.
+- **Pedir en voz alta:** cuando YAMNet oye hablar a alguien (y no es la TV), Vosk lee los últimos
+  5 s del mismo anillo de audio y busca un banco de unas 70 frases
+  ([`pedidos.dart`](lib/dominio/pedidos.dart)): «huele a gas», «me siento malita», «no me puedo
+  parar», «llamen a mi hijo»… El banco es la gramática de Vosk, así que solo reconoce esas
+  palabras, y descarta las de confianza menor a 0,6. No pausa el oído ni pierde la primera frase.
+  Lo que se pide abre «¿Está bien?» con ese motivo en vez de llamar directo: si era la TV, se apaga
+  deslizando. El modelo chico de español de Vosk (Apache 2.0, ~40 MB) no va en git: lo baja
+  `make deps` con [`tool/descargar_vosk.sh`](tool/descargar_vosk.sh). El lado nativo está en
+  [`Frases.kt`](android/app/src/main/kotlin/ve/equipo25/casa/Frases.kt).
+- **El recordatorio de la pastilla:** en toda la pantalla, y solo se quita con «Ya me la tomé».
+  Si pasan 2 horas se va solo y queda como olvidada, para no empujar a tomar dos dosis.
+- **Las pastillas del día:** a la hora, una pantalla verde la recuerda («Es hora de la losartán»)
+  con la pastilla dibujada en sus colores. Pasadas 2 horas sin tomarla queda como olvidada.
 - **La llamada de emergencia:** al escalar, la casa llama al primer contacto, una sola vez,
   **primero por WhatsApp**, porque los hijos suelen estar fuera del país. Si no se puede, hace una
   llamada telefónica normal. WhatsApp no tiene una vía oficial para esto: la app abre la fila de
@@ -97,7 +103,7 @@ El oído ya escucha. Además hay dos toques largos de prueba:
 | Mantener presionado «Cuidando la casa» | Abre la configuración, que en el producto usa el familiar |
 | Mantener presionado «Pastillas de hoy» | Recuerda ya la próxima pastilla, sin esperar a su hora |
 | Tocar «Pedir ayuda» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
-| Decir «me huele a gas» o «me siento mal» (dos veces, la primera despierta al reconocedor) | Abre «¿Está bien?» con ese motivo. Arriba a la izquierda dice «Le escucho…» mientras escucha |
+| Decir «me huele a gas», «me siento mal» o «ayuda» | Abre «¿Está bien?» con ese motivo, 1,5 s después de terminar la frase |
 
 Si la cuenta regresiva llega a cero, la alerta escala sola y **la casa llama de verdad** al número
 configurado. En modo debug, debajo de la fecha se ve lo que oye el modelo y su puntaje.
