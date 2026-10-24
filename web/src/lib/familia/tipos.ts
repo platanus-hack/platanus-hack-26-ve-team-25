@@ -68,9 +68,30 @@ export type Alerta = {
   atendidaPor?: string | null;
 };
 
+/** Una toma del récipe. `clave` es el id de la pastilla en la app de la casa ("losartan-manana"). */
+export type Toma = {
+  clave: string;
+  hora: string; // "08:00", hora de Caracas
+  cantidad: number; // pastillas por toma; 0.5 es media
+};
+
+/** Un medicamento del récipe con lo que queda. Solo la web lo usa: la casa no lee el inventario. */
+export type Medicamento = {
+  id: string;
+  nombre: string; // el genérico: "Losartán"
+  comerciales: string[]; // ["Cozaar"]
+  concentracion: string; // "50 mg"
+  /** null si nunca se cargó una factura ni se contaron: no se sabe, que no es «se acabaron». */
+  quedan: number | null;
+  tomas: Toma[];
+  ultimaCompra?: { fecha: string; porCaja: number } | null;
+};
+
 /** Todo lo que la web necesita de una casa para pintar la pantalla. */
 export type DatosCasa = {
   casa: Casa;
   eventos: Evento[];
   alertas: Alerta[];
+  /** El récipe y lo que queda (supabase/migrations/20261024160000_pastillas_e_inventario.sql). */
+  inventario?: Medicamento[];
 };

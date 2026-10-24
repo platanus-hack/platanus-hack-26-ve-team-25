@@ -1,6 +1,7 @@
 // Qué pantalla ve la familia, derivado de los datos de la casa. Es una función pura: los mismos
 // datos y la misma hora dan siempre la misma pantalla, y por eso se prueba sin navegador.
-import type { Alerta, Casa, DatosCasa, Evento, TipoEvento } from "./tipos";
+import { contarTodo, cuandoSeAcaba, cuantoComprar, nombreCompleto, quedanTexto } from "./inventario";
+import type { Alerta, Casa, DatosCasa, Evento, Medicamento, TipoEvento } from "./tipos";
 
 /** Dos latidos perdidos (cada 90 s) y la casa se declara sin señal. Ver investigacion-alertas.md. */
 export const SILENCIO_SIN_SENAL_MS = 180_000;
@@ -26,10 +27,12 @@ const TITULAR: Record<TipoEvento, (nombre: string) => string> = {
 const LO_PIDIO: TipoEvento[] = ["panico", "huele_gas", "me_siento_mal"];
 
 export type AvisoSuave = {
-  hora: string;
+  hora: string; // vacía si el aviso no es de un momento, como el de comprar pastillas
   etiqueta: string; // "FALSA ALARMA"
   titulo: string;
   detalle: string;
+  /** A dónde lleva el aviso dentro de /f/[token], si lleva a algún lado. */
+  enlace?: "pastillas";
 };
 
 export type Vista =
@@ -144,6 +147,23 @@ function avisosSuaves(datos: DatosCasa, hoy: string): AvisoSuave[] {
     .map(({ hora, etiqueta, titulo, detalle }) => ({ hora, etiqueta, titulo, detalle }));
 }
 
+/** Las pastillas que se acaban en menos de AVISO_DIAS: qué comprar, cuántas quedan y para cuándo. */
+export function avisosDeCompra(inventario: Medicamento[], ahora: Date): AvisoSuave[] {
+  return contarTodo(inventario, ahora)
+    .filter((c) => c.hayQueComprar)
+    .map((c) => {
+      const toma = hora(c.seAcaba!);
+      const porCaja = c.medicamento.ultimaCompra?.porCaja ?? null;
+      return {
+        hora: "",
+        etiqueta: "HAY QUE COMPRAR",
+        titulo: `${quedanTexto(c.quedan ?? 0)} de ${nombreCompleto(c.medicamento)}`,
+        detalle: `Se acaban ${cuandoSeAcaba(c.seAcaba!, ahora)}, en la toma de las ${toma}. Para un mes: ${cuantoComprar({ ...c, porCaja })}.`,
+        enlace: "pastillas" as const,
+      };
+    });
+}
+
 /**
  * El orden importa: una alerta roja sin atender gana sobre todo, porque es lo único que pide que
  * alguien haga algo ya. Después, el silencio de la casa. Si no, todo bien.
@@ -170,7 +190,9 @@ export function derivarVista(datos: DatosCasa, ahora: Date): Vista {
 
   const hoy = diaDe(ahora);
   const dia = recientes.filter((e) => diaDe(new Date(e.hora)) === hoy);
-  return { tipo: "bien", paraSaber: avisosSuaves(datos, hoy), dia, ultimo: dia[0] };
+  // Comprar pastillas va primero: es lo único de «para saber» que pide que alguien haga algo.
+  const paraSaber = [...avisosDeCompra(datos.inventario ?? [], ahora), ...avisosSuaves(datos, hoy)];
+  return { tipo: "bien", paraSaber, dia, ultimo: dia[0] };
 }
 
 /** «Ya hablé con ella»: la misma transición que `Alerta.atender` en Dart. */

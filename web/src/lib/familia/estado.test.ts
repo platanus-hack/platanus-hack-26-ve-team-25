@@ -73,11 +73,11 @@ describe("derivarVista", () => {
     expect(derivarVista(con(SILENCIO_SIN_SENAL_MS + 1000), AHORA).tipo).toBe("sin_senal");
   });
 
-  test("para saber junta la falsa alarma y el día distinto, lo más nuevo primero", () => {
+  test("para saber junta la compra, la falsa alarma y el día distinto, lo más nuevo primero", () => {
     const vista = derivarVista(simular("para-saber", AHORA), AHORA);
     if (vista.tipo !== "bien") throw new Error(vista.tipo);
-    expect(vista.paraSaber.map((a) => a.etiqueta)).toEqual(["FALSA ALARMA", "DÍA DISTINTO"]);
-    expect(vista.paraSaber[0].detalle).toBe("No te molestamos: respondió en 8 segundos.");
+    expect(vista.paraSaber.map((a) => a.etiqueta)).toEqual(["HAY QUE COMPRAR", "FALSA ALARMA", "DÍA DISTINTO"]);
+    expect(vista.paraSaber[1].detalle).toBe("No te molestamos: respondió en 8 segundos.");
   });
 
   test("su día solo trae lo de hoy, lo más nuevo primero", () => {

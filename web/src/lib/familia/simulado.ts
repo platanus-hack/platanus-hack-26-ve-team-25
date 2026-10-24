@@ -1,7 +1,8 @@
 // Datos inventados para ver las pantallas sin backend: /f/demo?escenario=alerta. Es también el
 // respaldo del pitch si falla la red. Las horas se calculan desde «ahora», así el demo siempre
 // parece de hoy. Nada de esto es de una persona real.
-import type { Alerta, Casa, DatosCasa, Evento } from "./tipos";
+import { diaCaracas } from "./inventario";
+import type { Alerta, Casa, DatosCasa, Evento, Medicamento } from "./tipos";
 
 export const ESCENARIOS = ["todo-bien", "alerta", "para-saber", "sin-senal"] as const;
 export type Escenario = (typeof ESCENARIOS)[number];
@@ -25,6 +26,39 @@ function casaDemo(ultimoLatido: Date): Casa {
     enchufado: true,
     bateria: 82,
   };
+}
+
+/**
+ * El récipe de Carmen, el mismo de app/lib/datos/simulado.dart: las claves son los ids de sus
+ * pastillas en la app de la casa. scripts/recipe-demo.ts lo carga en la casa de demo de Supabase.
+ */
+export const RECIPE_DEMO: Omit<Medicamento, "id" | "quedan" | "ultimaCompra">[] = [
+  {
+    nombre: "Losartán",
+    comerciales: ["Cozaar"],
+    concentracion: "50 mg",
+    tomas: [
+      { clave: "losartan-manana", hora: "08:00", cantidad: 1 },
+      { clave: "losartan-noche", hora: "20:00", cantidad: 1 },
+    ],
+  },
+  {
+    nombre: "Metformina",
+    comerciales: ["Glucophage"],
+    concentracion: "500 mg",
+    tomas: [{ clave: "metformina", hora: "14:00", cantidad: 1 }],
+  },
+];
+
+/** Cuántas quedan de cada una, en el mismo orden del récipe. La última caja fue hace 20 días. */
+function inventarioDemo(ahora: Date, quedan: number[]): Medicamento[] {
+  const fecha = diaCaracas(new Date(ahora.getTime() - 20 * 86_400_000));
+  return RECIPE_DEMO.map((m, i) => ({
+    ...m,
+    id: `med-${i}`,
+    quedan: quedan[i],
+    ultimaCompra: { fecha, porCaja: 30 },
+  }));
 }
 
 /** Su día, a horas fijas de Caracas. Solo se muestra lo que ya pasó a la hora del demo. */
@@ -64,7 +98,12 @@ export function simular(escenario: Escenario, ahora: Date): DatosCasa {
 
   switch (escenario) {
     case "todo-bien":
-      return { casa: casaDemo(new Date(ahora.getTime() - MIN)), eventos: eventosDelDia(ahora), alertas: [] };
+      return {
+        casa: casaDemo(new Date(ahora.getTime() - MIN)),
+        eventos: eventosDelDia(ahora),
+        alertas: [],
+        inventario: inventarioDemo(ahora, [40, 24]),
+      };
 
     case "alerta": {
       // El caso del pitch: un golpe y nadie responde. Se dice «golpe», no «caída»: el modelo oye el
@@ -90,6 +129,7 @@ export function simular(escenario: Escenario, ahora: Date): DatosCasa {
         casa: casaDemo(new Date(ahora.getTime() - 20_000)),
         eventos: [...eventosDelDia(ahora, 5), golpe],
         alertas: [alerta],
+        inventario: inventarioDemo(ahora, [40, 24]),
       };
     }
 
@@ -123,10 +163,17 @@ export function simular(escenario: Escenario, ahora: Date): DatosCasa {
         casa: casaDemo(new Date(ahora.getTime() - MIN)),
         eventos: [...eventosDelDia(ahora), golpe, tarde],
         alertas: [falsa],
+        // El losartán se acaba en unos 4 días: el aviso de comprar.
+        inventario: inventarioDemo(ahora, [9, 24]),
       };
     }
 
     case "sin-senal":
-      return { casa: casaDemo(new Date(ahora.getTime() - 25 * MIN)), eventos: eventosDelDia(ahora, 26), alertas: [] };
+      return {
+        casa: casaDemo(new Date(ahora.getTime() - 25 * MIN)),
+        eventos: eventosDelDia(ahora, 26),
+        alertas: [],
+        inventario: inventarioDemo(ahora, [40, 24]),
+      };
   }
 }
