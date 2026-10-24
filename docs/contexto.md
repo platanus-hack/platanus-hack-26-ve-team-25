@@ -63,6 +63,7 @@ Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 | El audio llega crudo al modelo | YAMNet se entrenó con audio ruidoso. Limpiarlo le muestra un sonido que nunca vio, y los supresores de voz borran la alarma y el golpe |
 | La alarma se apaga pasando la mano por encima | El sensor de proximidad evita tener que atinarle a un botón a quien ve mal o tiene temblor. El botón grande queda por si el sensor falla |
 | El teléfono de la casa es Android | iOS no deja escuchar todo el día en segundo plano. La familia puede usar cualquier teléfono |
+| La web de la familia es instalable (PWA) | Se abre con un QR sin instalar nada, y quien quiera la agrega a la pantalla de inicio y se ve como una app, sin tienda. En iPhone, las notificaciones web solo funcionan así. La alerta 🔴 va igual por Telegram, que suena aunque el teléfono esté bloqueado |
 
 ## Pendiente
 
