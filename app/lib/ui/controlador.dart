@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../datos/frases.dart';
 import '../datos/llamadas.dart';
 import '../datos/nube.dart';
+import '../datos/sirena.dart';
 import '../datos/voz.dart';
 import '../dominio/alerta.dart';
 import '../dominio/comandos.dart';
@@ -27,6 +28,7 @@ class Controlador extends ChangeNotifier {
     this.frases,
     this.nube,
     this.numeroEmergencias = '',
+    this.sirena,
     List<Pastilla> pastillas = const [],
   }) : _reloj = reloj ?? DateTime.now,
        plan = PlanDelDia(pastillas) {
@@ -55,6 +57,9 @@ class Controlador extends ChangeNotifier {
   static const audioDelPedido = Duration(seconds: 5);
   static const repetirPedido = Duration(seconds: 4);
 
+  /// Cuánto se ignoran los sonidos después de callar la alarma: el anillo es de 5 s.
+  static const sordoTrasLaAlarma = Duration(seconds: 5);
+
   /// Cuánto se espera antes de una llamada pedida en voz alta, para decir «no».
   static const esperaLlamada = Duration(seconds: 5);
 
@@ -71,6 +76,9 @@ class Controlador extends ChangeNotifier {
 
   /// El oído, que se pausa mientras la voz escucha y guarda lo último que oyó.
   final Microfono? microfono;
+
+  /// El tono de 520 Hz y la vibración de «¿Está bien?». Null en la web.
+  final Sirena? sirena;
 
   /// Al que llama «Lucero, llama a emergencias». Vacío si no está configurado.
   final String numeroEmergencias;
@@ -92,6 +100,10 @@ class Controlador extends ChangeNotifier {
   Escucha? _ultimaEscucha;
   final _ultimaVez = <TipoSonido, DateTime>{};
   DateTime? _ultimoPedido;
+
+  /// Hasta cuándo no se hace caso a los sonidos: justo después de callar la alarma, el oído
+  /// todavía tiene el tono de 520 Hz en el anillo y abriría otro «¿Está bien?».
+  DateTime? _sordoHasta;
   bool _reconociendo = false;
 
   DateTime get ahora => _reloj();
@@ -226,7 +238,10 @@ class Controlador extends ChangeNotifier {
 
   void _alOir(Escucha escucha) {
     _ultimaEscucha = escucha;
-    final sonido = escucha.sonido;
+    final sordo = _sordoHasta;
+    final sonido = sordo != null && ahora.isBefore(sordo)
+        ? null
+        : escucha.sonido;
     final evento = sonido == null ? null : eventoDeSonido(sonido.tipo);
     if (sonido != null && evento != null) {
       final antes = _ultimaVez[sonido.tipo];
@@ -389,6 +404,14 @@ class Controlador extends ChangeNotifier {
   void _cambiar(Alerta? nueva, {bool naciendo = false}) {
     final antes = _alerta?.estado;
     _alerta = nueva;
+    // Suena mientras pregunta; al responder, vencer o escalar, se calla.
+    final ahoraPendiente = nueva?.estado == EstadoAlerta.pendiente;
+    if (ahoraPendiente && (naciendo || antes != EstadoAlerta.pendiente)) {
+      unawaited(sirena?.sonar());
+    } else if (!ahoraPendiente && antes == EstadoAlerta.pendiente) {
+      unawaited(sirena?.callar());
+      _sordoHasta = ahora.add(sordoTrasLaAlarma);
+    }
     // La base hace las mismas transiciones que Alerta: se le cuenta cada cambio de estado.
     if (!naciendo && nueva != null && nueva.estado != antes) {
       nube?.cambioDeEstado(nueva.estado);
@@ -409,6 +432,7 @@ class Controlador extends ChangeNotifier {
 
   @override
   void dispose() {
+    if (_alerta?.estado == EstadoAlerta.pendiente) unawaited(sirena?.callar());
     _tic.cancel();
     _oyendo?.cancel();
     _finDeWhatsApp?.cancel();

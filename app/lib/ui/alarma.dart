@@ -10,7 +10,8 @@ import 'controlador.dart';
 /// A la izquierda qué oyó y cuánto falta; a la derecha los dos controles grandes. Si nadie
 /// responde a tiempo, la alerta escala sola.
 ///
-/// Por hacer: el tono de 520 Hz y la vibración. Ver docs/pantallas.md.
+/// Mientras se ve, suena el tono de 520 Hz y vibra (Sirena.kt): lo prende y lo apaga el
+/// controlador, no la pantalla.
 class Alarma extends StatefulWidget {
   const Alarma({super.key, required this.c, required this.alerta});
 

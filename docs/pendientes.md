@@ -222,11 +222,12 @@ datos. Cada punto lleva su motivo.
 **Sábado 14:30:** del P1 entran al alcance solo el tono y la vibración, y conectar el inventario de
 pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)).
 
-- [ ] **El tono de 520 Hz y la vibración** en «¿Está bien?»
-      ([investigacion-audio.md §1.1](investigacion-audio.md)). Ya está marcado «Por hacer» en
-      [`alarma.dart`](../app/lib/ui/alarma.dart).
-      *Sin hacer: no hay paquete de audio ni de vibración en `app/pubspec.yaml`. Consecuencia para
-      el demo: la alarma de confirmación **no suena, solo se ve**.*
+- [x] **El tono de 520 Hz y la vibración** en «¿Está bien?» (sábado 24). Onda cuadrada con el
+      patrón temporal-3 de las alarmas de humo, por el canal de alarma (suena aunque el teléfono
+      esté en silencio) y con su volumen al máximo mientras dura; la vibración sigue el mismo
+      ritmo. En Kotlin, sin paquetes: [`Sirena.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Sirena.kt).
+      Después de callarse, el oído ignora los sonidos 5 s, para no oír su propio tono.
+      Falta oírlo en el teléfono: si satura el parlante, bajar `AMPLITUD`.
 - [ ] **Que la app no se muera:** servicio en primer plano tipo `microphone` con
       `flutter_foreground_task`, pantalla encendida mientras carga y la app como pantalla de
       inicio ([riesgos.md §3](riesgos.md)).

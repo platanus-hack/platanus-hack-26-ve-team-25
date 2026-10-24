@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'datos/frases.dart';
 import 'datos/llamadas.dart';
 import 'datos/nube.dart';
+import 'datos/sirena.dart';
 import 'datos/voz.dart';
 import 'datos/simulado.dart';
 import 'oido/oido.dart';
@@ -35,6 +36,7 @@ Future<void> main() async {
     microfono: oido,
     frases: frases,
     numeroEmergencias: numeroEmergencias,
+    sirena: kIsWeb ? null : SirenaAndroid(),
     nube: nube,
   );
   runApp(AppCasa(controlador: controlador));

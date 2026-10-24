@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- Para volver al frente sola cuando termina la llamada de WhatsApp -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- «¿Está bien?» vibra además de sonar: para quien oye poco -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:label="Casa"
         android:name="${applicationName}"
