@@ -18,7 +18,7 @@
     <!-- El teléfono de mesa es dedicado: se le pide salir de la optimización de batería -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <application
-        android:label="Casa"
+        android:label="En casa"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

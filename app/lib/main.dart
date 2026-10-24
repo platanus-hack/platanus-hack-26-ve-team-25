@@ -98,7 +98,7 @@ class AppCasa extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Casa',
+      title: 'En casa',
       debugShowCheckedModeBanner: false,
       theme: temaCasa(),
       // Atrás no cierra la app: si se cierra, la casa deja de oír. Las pantallas que se abren

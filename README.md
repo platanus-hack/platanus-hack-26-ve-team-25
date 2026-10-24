@@ -1,4 +1,4 @@
-# Equipo 25 · Platanus Hack 26: Caracas ft. Yummy
+# En casa · Equipo 25 · Platanus Hack 26: Caracas ft. Yummy
 
 <img src="./project-logo.png" alt="Logo del proyecto" width="200" />
 
@@ -7,7 +7,8 @@ mayor que vive solo, lo acompaña en el día a día (la pastilla, llamar a su hi
 lo que pasa en la casa: una alarma de humo, un vidrio roto, un golpe, un grito o un «¡ayuda!» dicho
 en voz alta. Antes de avisar, pregunta «¿Está bien?». Si nadie responde en 60 s, avisa a la
 familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp. **El audio se
-procesa en el teléfono y nunca sale de él.**
+procesa en el teléfono y nunca sale de él.** Su asistente de voz se llama **Lucero**: «Lucero,
+estoy bien» calla la alarma y «Lucero, llama a mi hijo» llama.
 
 Track: 🚨 Emergencias
 

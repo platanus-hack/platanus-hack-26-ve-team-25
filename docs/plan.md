@@ -73,7 +73,7 @@ Todo esto ya está escrito. Falta probarlo en el teléfono y conectarlo:
 | 3 | El ciclo casa → Supabase → `/f/demo` abierta en 5 a 10 teléfonos a la vez | Rogelio | 17:00 | Es lo que vive el público |
 | 4 | Avisos: ~~el vigilante cada 5 s~~ (16:21, en pg_cron), ~~el `setWebhook` de Telegram~~, y el webhook de Kapso apuntando a `/api/kapso/webhook` | Josuep | 17:00 | Es la integración real que ven los jueces. Falta probarla de punta a punta con el teléfono |
 | 5 | Pastillas: migración, `ANTHROPIC_API_KEY` en Vercel y `casa_tomar` desde la app | Abrahan y Rogelio | 20:00 | La web está hecha, falta conectarla |
-| 6 | Nombre del producto, README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
+| 6 | ~~Nombre del producto~~ («En casa», con «Lucero» de asistente), README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
 
 **Se cortó y va como proyección:** la vibración del piso, el apagón con el perfil de
 salud, la ficha de emergencia, el teléfono personal de la persona con la pregunta del ánimo, el

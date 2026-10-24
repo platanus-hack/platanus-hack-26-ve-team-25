@@ -52,9 +52,9 @@ webhook y el vigilante están hechos y verificados.
 
 ### Todo el equipo · el pitch
 
-- [ ] **El nombre del producto.** Hoy la web dice «En casa» de relleno
-      ([`web/src/lib/app.ts`](../web/src/lib/app.ts)) y la app, «Casa». La casa se llama
-      «Lucero» en las órdenes de voz.
+- [x] **El nombre del producto: «En casa»**, y su asistente de voz, **«Lucero»** (sábado 24).
+      Está en la web ([`web/src/lib/app.ts`](../web/src/lib/app.ts)), la app, el README y el
+      `platanus-hack-project.jsonc`.
 - [ ] **El guion del demo** en [plan.md](plan.md#demo), con lo que se decidió el sábado.
 - [ ] **Ensayar las limitaciones en voz alta** ([riesgos.md](riesgos.md#cómo-contar-la-verdad)).
 - [ ] **En el pitch se dice «golpe», no «caída».** El oído reconoce un golpe y por eso pregunta.
