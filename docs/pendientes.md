@@ -19,11 +19,14 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
   y `?escenario=` fuerza los datos simulados. 13 pruebas del estado derivado. El inventario de
   pastillas desde la factura está hecho en la web y espera su migración.
 - **Supabase:** esquema, funciones, casa de demo y 6 pruebas de integración contra la base real.
-  Falta aplicar la migración de pastillas.
+  La migración de avisos quedó **aplicada y verificada** el sábado (las tres funciones existen y
+  responden). Falta aplicar la de pastillas.
 - **WhatsApp (Kapso):** código escrito y **sin desplegar**. Meta restringió la cuenta
   (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
-- **Telegram:** hecho por Josuep el sábado 15:25 y desplegado. Es el canal general. Falta el
-  `setWebhook` y el proceso que llame `/api/vigilar`.
+- **Telegram:** hecho, **desplegado y con el webhook registrado** (sábado, tarde). Es el canal
+  general. Probado a mano de punta a punta contra la base real: suscripción, cola, envío con
+  enlace y sello que evita repetir. **Falta el cron** que llame a `/api/vigilar` y la prueba desde
+  un segundo teléfono.
 - **Alcance congelado el sábado 14:30:** lo que se presenta y quién hace qué está en
   [plan.md](plan.md#alcance-congelado-lo-que-se-presenta). Lo que no está ahí no se construye.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
@@ -137,15 +140,17 @@ tiene una cuenta publicitaria deshabilitada desde 2019 y Meta no deja conectar u
 verificación de negocio. Lo único que funciona hoy es el **sandbox de Kapso**, y el sandbox exige
 **activar cada teléfono a mano** (sesión con un código de 6 caracteres que caduca en 15 minutos).
 Sirve para el demo con los teléfonos de la tarima; no para que el público escanee el QR y reciba.
-El código ya está escrito: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
+El código ya está escrito y desplegado: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
 [`api/kapso/webhook`](../web/src/app/api/kapso/webhook/route.ts),
 [`api/vigilar`](../web/src/app/api/vigilar/route.ts) y
-[`supabase/migrations/20261024180000_whatsapp.sql`](../supabase/migrations/20261024180000_whatsapp.sql).
+[`supabase/migrations/20261024180000_avisos.sql`](../supabase/migrations/20261024180000_avisos.sql)
+— la misma migración sirve a los dos canales. **El circuito completo ya se probó, pero con
+Telegram**: el camino de WhatsApp sigue sin ejecutarse ni una vez.
 
 - [x] Credenciales de Kapso en `web/.env.local`: `KAPSO_PHONE_NUMBER_ID`, `KAPSO_API_KEY` y
       `KAPSO_WEBHOOK_SECRET`, comprobadas contra la API (responde 200) y fuera de Git
-      (`.env.local` está ignorado). **Queda pendiente subirlas a Vercel**, junto con
-      `SUPABASE_SECRET_KEY`, porque las de Supabase en `web/.env.local` son todavía las del ejemplo.
+      (`.env.local` está ignorado). Las de Supabase y Telegram ya están en Vercel; **falta
+      confirmar que las tres de Kapso también** para el demo del sandbox.
 - [x] Un teléfono activado en el sandbox (*Add test number*): el de Josuep ya tiene sesión y sirve
       para las pruebas de envío.
 - [ ] Poner el número en `NEXT_PUBLIC_WHATSAPP_NUMERO` (solo dígitos): con eso aparece el botón
@@ -155,51 +160,63 @@ El código ya está escrito: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
       que no sirven en `wa.me`. Hasta que aparezca el número, el botón se queda en «pronto» y el
       demo no lo usa.*
 - [ ] Webhook de Kapso: el mensaje «Quiero cuidar a Carmen (casa demo)» registra el teléfono con
-      la casa. **La URL registrada apunta hoy a `/f/demo`**: hay que cambiarla a
-      `/api/kapso/webhook`.
-      *Sin hacer, por dos motivos encadenados: la URL está mal, y además las rutas responden
-      **404 en producción** porque `api/kapso/webhook`, `api/vigilar` y `lib/kapso.ts` siguen sin
-      commitear ni desplegar.*
+      la casa.
+      *Listo para probar, sin probar: la URL ya apunta a `/api/kapso/webhook` (verificado por API)
+      y las rutas están desplegadas, responden 401 sin firma válida. Falta mandar un mensaje real
+      desde el sandbox.*
 - [ ] Cuando la alerta escala, a todos les llega un WhatsApp con el enlace a `/f/[token]`.
-      *Escrito y sin ejecutar ni una vez: `/api/vigilar` escala, lee `avisos_pendientes`, manda y
-      sella. No se ha probado porque depende del deploy.*
+      *El circuito está probado, pero con Telegram: `/api/vigilar` escala, lee `avisos_pendientes`,
+      manda y sella. Para WhatsApp falta que haya un teléfono suscrito por ese canal, y el sandbox
+      solo lo permite activándolo a mano.*
 - [ ] Activar en el sandbox cada teléfono que vaya a la tarima, y decirlo en el guion: el público
       no recibe.
       *A medias: solo el teléfono de Josuep tiene sesión. Cada uno más necesita su código de 6
       caracteres, que caduca en 15 minutos.*
-- [ ] Aplicar la migración `20261024180000_whatsapp.sql` en la base real y probar el ciclo:
-      mensaje entrante → `suscripciones` → `GET /api/vigilar` envía.
-      *Sin hacer: hay que pegarla a mano en el SQL Editor de Supabase, como la primera, y no se ha
-      pegado.*
+- [x] Aplicar la migración en la base real: `20261024180000_avisos.sql` (antes
+      `…_whatsapp.sql`), pegada en el SQL Editor el sábado y verificada contra el catálogo de la
+      API: `familia_suscribir`, `avisos_pendientes` y `marcar_avisada` existen y responden.
+- [ ] Probar el ciclo de WhatsApp: mensaje entrante → `suscripciones` → `GET /api/vigilar` envía.
+      *Sin hacer: hace falta un mensaje real desde el sandbox. El mismo ciclo ya se probó con
+      Telegram.*
 
 ### 4b. El mismo aviso por Telegram · *Josuep*
 
-**Hecho el sábado 15:25** (`5ad9671`, `24a0bd8`) y desplegado. Falta el `setWebhook` y el proceso
-que llame `/api/vigilar`: sin él no sale ningún aviso. La lista de abajo es la de antes de
-empezar.
+**Hecho el sábado 15:25** (`5ad9671`, `24a0bd8`), **desplegado y con el webhook registrado**.
+Falta el proceso que llame a `/api/vigilar`: sin él, la cola se llena y nadie manda nada.
 
 El sandbox no sirve para «que le llegue a todos»: cada teléfono necesita sesión activa y la
 apelación de Meta tarda 24-48 h. **Telegram sí llega a cualquiera sin verificación de negocio**, y
 es el canal que ya describen [plan.md](plan.md) e
-[investigacion-alertas.md](investigacion-alertas.md). Se implementa la misma dinámica que WhatsApp:
-la familia se registra desde la invitación y recibe el aviso con el enlace a su panel.
+[investigacion-alertas.md](investigacion-alertas.md). La familia se registra desde la invitación y
+recibe el aviso con el enlace a su panel.
 
 Lo único que Telegram no permite: **el bot no puede escribirle primero a nadie**. Cada familiar
 tiene que abrir el bot y pulsar `/start` una vez, con un deep link `t.me/<bot>?start=<token>`.
 
-**Por qué está sin empezar:** se decidió hoy, cuando Meta restringió la cuenta de WhatsApp. No hay
-bot creado, no hay token y no hay una línea de código: los seis puntos de abajo están intactos.
-
-- [ ] Crear el bot con @BotFather y guardar el token en `TELEGRAM_BOT_TOKEN` (Vercel y
-      `web/.env.local`). Sin verificación ni cuenta de negocio.
-- [ ] `web/src/lib/telegram.ts` con el mismo contrato que `kapso.ts` (`hayTelegram`, `enviarTexto`):
+- [x] Bot creado con @BotFather (`@CasaAvisoBot`, «Casa • Avisos») y token en `TELEGRAM_BOT_TOKEN`,
+      en Vercel y en `web/.env.local`. Sin verificación ni cuenta de negocio.
+- [x] `web/src/lib/telegram.ts` con el mismo contrato que `kapso.ts` (`hayTelegram`, `enviarTexto`):
       `POST https://api.telegram.org/bot<token>/sendMessage`.
-- [ ] `web/src/app/api/telegram/webhook/route.ts`: recibe `/start <token>`, llama a
-      `familia_suscribir` y contesta. Registrar con `setWebhook`.
-- [ ] Botón «Recibir avisos por Telegram» en la invitación, junto al de WhatsApp.
-- [ ] `/api/vigilar` manda por los dos canales: Telegram a todos los suscritos y WhatsApp a los
-      teléfonos con sesión de sandbox. `avisos_pendientes` ya sirve igual para los dos.
+- [x] `web/src/app/api/telegram/webhook/route.ts`: recibe `/start <token>`, llama a
+      `familia_suscribir` y contesta. **`setWebhook` ejecutado**: la URL quedó registrada, con
+      `allowed_updates: ["message"]` y el secreto puesto; `getWebhookInfo` sin errores.
+- [x] Botón «Recibir avisos por Telegram» en la invitación (comprobado en producción:
+      `/f/demo/bienvenida` lleva a `t.me/CasaAvisoBot?start=demo`).
+- [x] `/api/vigilar` manda por los dos canales: Telegram a todos los suscritos y WhatsApp a los
+      teléfonos con sesión de sandbox. `avisos_pendientes` sirve igual para los dos.
+- [ ] **El cron que llame a `/api/vigilar`.** *Sin hacer: nadie lo llama todavía. En el plan gratis
+      de Vercel los cron corren una vez al día, así que para el demo se usa `cron-job.org` cada
+      minuto o un `curl` en bucle desde la laptop.*
 - [ ] Probar sin wifi: el aviso tiene que llegar por datos móviles.
+      *Sin hacer: la prueba de esta tarde fue con la laptop por cable.*
+- [ ] Probar con un segundo teléfono, no solo con el de Josuep.
+      *Sin hacer: solo hay un chat suscrito, y es el del que programó el canal.*
+
+**Cómo se probó el circuito** (sábado, tarde, contra la base real): se creó una casa «Prueba de
+avisos», se suscribió el chat de Josuep como `telegram`, se creó un evento con `casa_evento` y una
+alerta urgente con `casa_alerta`, `avisos_pendientes` devolvió una fila, se envió el mensaje con su
+enlace, `marcar_avisada` la selló y la segunda consulta devolvió **cero filas**. Esa casa **sigue en
+la base** (no hay función de borrado) con el token `8c6e2b92…`; es inofensiva pero conviene saberlo.
 
 
 ### 5. La web de la familia · *Rogelio*
