@@ -7,84 +7,94 @@ archivos enlazados. Si algo no coincide con el código, manda el código.
 
 ## Qué es
 
-Un teléfono Android viejo, enchufado en la casa de un adulto mayor que vive solo, oye y siente lo
-que pasa: alarma de humo, vidrio roto, golpe, grito o quejido. Antes de avisar, suena una alarma
-en la casa que la persona apaga si está bien. Si nadie la apaga en 60 s, avisa a la familia, que
-suele estar en otro país. El audio se procesa en el teléfono y nunca sale de él.
+Un teléfono Android viejo, enchufado en la mesa de un adulto mayor que vive solo, lo acompaña en el
+día a día (el recordatorio de la pastilla, llamar a su hijo con la voz) y oye lo que pasa: alarma de
+humo, vidrio roto, golpe, grito o una frase de ayuda dicha en voz alta. Antes de avisar, pregunta
+«¿Está bien?». Si nadie responde en 60 s, la alerta escala: la familia, que suele estar en otro
+país, recibe un Telegram y la casa la llama por WhatsApp. El audio se procesa en el teléfono y
+nunca sale de él. La arquitectura y las decisiones, con su evidencia, están en el
+[README](README.md).
 
-## Estado real (24-oct-2026)
+## Estado real (sábado 24-oct-2026, 16:45)
 
 | Pieza | Estado | Dónde |
 |---|---|---|
-| Oído en el navegador: micrófono → compuerta de dB → YAMNet → 6 tipos de evento | Prueba de viabilidad funcionando y desplegada | [`web/src/app/escucha/`](web/src/app/escucha/), [`web/src/lib/escucha/`](web/src/lib/escucha/) |
-| Pruebas automáticas de la lógica de audio | 12 pruebas: nivel en dB, fondo de la casa, compuerta, buffer circular, clases de YAMNet | [`web/src/lib/escucha/escucha.test.ts`](web/src/lib/escucha/escucha.test.ts) |
-| Comparación de 9 modelos de audio (YAMNet, EfficientAT, PANNs, sherpa-onnx) en 640 sonidos de casa | Hecha y reproducible, con resultados | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
-| Web de la familia instalable (PWA): manifiesto, íconos provisionales y metadatos para Android e iPhone | Hecho | [`web/src/app/manifest.ts`](web/src/app/manifest.ts), [`web/src/lib/app.ts`](web/src/lib/app.ts) |
-| App Flutter del teléfono de la casa | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono, entiende frases de ayuda y órdenes («Lucero, llama a mi hijo») en voz alta con Vosk sin internet, y le manda a Supabase los eventos, las alertas y el latido, con cola si no hay internet. 91 pruebas. Falta el aviso por WhatsApp, sonido y vibración | [`app/`](app/README.md) |
-| La app de la casa compilada para web, instalable | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app. Sin oído ni llamadas: en web, TFLite se cambia por una versión vacía con una importación condicional. Vercel baja Flutter 3.47.5 y compila | [`app/lib/oido/tflite_web.dart`](app/lib/oido/tflite_web.dart), [`app/tool/vercel_build.sh`](app/tool/vercel_build.sh) |
-| Alarma de confirmación de 60 s, botón de pánico | Por hacer | — |
-| Alertas con vencimiento y escalamiento en Supabase | Hecho: tablas con RLS sin políticas, funciones con secreto en hash y escalamiento atómico. 6 pruebas contra la base real (`bun run test:integracion`). La app de la casa ya las llama ([`nube.dart`](app/lib/datos/nube.dart)) | [`supabase/migrations/`](supabase/migrations/), [`web/src/lib/familia/supabase.integracion.test.ts`](web/src/lib/familia/supabase.integracion.test.ts) |
-| Web de la familia: alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR | Lee de Supabase cada 5 s; con `?escenario=alerta` usa datos simulados. El estado se deriva en una función pura con 13 pruebas | [`web/src/lib/familia/`](web/src/lib/familia/), [`web/src/components/familia/`](web/src/components/familia/) |
-| Inventario de pastillas desde la factura de la farmacia | Hecho en la web, falta aplicar la migración en la base real. La foto va a Claude (`claude-opus-5-5`, salida estructurada), `cruzar` la compara con el récipe por genérico o comercial y la familia confirma; solo se guarda lo del récipe. El inventario es un libro de movimientos: factura suma, `casa_tomar` resta, el conteo a mano ajusta. `inventario.ts` calcula días y fecha de compra (aviso con menos de 7 días). 26 pruebas, más 5 de integración que esperan la migración. La app de la casa todavía no llama `casa_tomar` | [`supabase/migrations/20261024160000_pastillas_e_inventario.sql`](supabase/migrations/20261024160000_pastillas_e_inventario.sql), [`web/src/lib/familia/inventario.ts`](web/src/lib/familia/inventario.ts), [`factura.ts`](web/src/lib/familia/factura.ts), [`web/src/app/f/[token]/pastillas/`](web/src/app/f/[token]/pastillas/) |
-| Aviso por WhatsApp (Kapso) | Por hacer. La invitación ya abre WhatsApp con el mensaje listo | [`web/src/app/f/[token]/bienvenida/`](web/src/app/f/[token]/bienvenida/page.tsx) |
-| Vibración del piso, rutina de la casa, otros sensores | Diseñado, por hacer | [`docs/investigacion-audio.md`](docs/investigacion-audio.md) |
+| App Flutter del teléfono de la casa | Horizontal como reloj de mesa. «¿Está bien?» con cuenta de 60 s y deslizador; «Pedir ayuda» escala sin esperar. Oye con YAMNet en el teléfono; entiende frases de ayuda y órdenes («Lucero, llama a mi hijo») con Vosk sin internet. Al escalar llama al primer contacto por WhatsApp y, si no contestan, por teléfono. Recordatorio de pastillas. Le manda a Supabase eventos, alertas, respuestas y el latido, con cola en memoria si no hay internet. 91 pruebas. **Falta:** que la alarma suene y vibre, llamar `casa_tomar` al tocar «Ya me la tomé» y el servicio en primer plano. Se está probando en el teléfono de la tarima | [`app/`](app/README.md) |
+| La app de la casa compilada para web | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app, sin oído ni llamadas: en web, TFLite se cambia por una versión vacía con una importación condicional | [`app/lib/oido/tflite_web.dart`](app/lib/oido/tflite_web.dart), [`app/tool/vercel_build.sh`](app/tool/vercel_build.sh) |
+| Alertas con vencimiento y escalamiento | Hecho. La casa registra la alerta al nacer, con su vencimiento; `escalar_vencidas()` la pasa a «escalada» con una sola escritura que gana. RLS activado sin políticas, funciones con secreto en hash SHA-256 | [`supabase/migrations/20261024130000_casa_y_familia.sql`](supabase/migrations/20261024130000_casa_y_familia.sql), [`nube.dart`](app/lib/datos/nube.dart) |
+| El vigilante | Hecho y corriendo desde el sábado 16:21: pg_cron llama a `GET /api/vigilar` cada 5 s con pg_net, con el secreto en Vault (`cron_secret`, el mismo `CRON_SECRET` de Vercel). Escala lo vencido, manda los avisos en tandas de 25 en paralelo y los sella por alerta y destinatario | [`20261024200000_vigilante.sql`](supabase/migrations/20261024200000_vigilante.sql), [`api/vigilar/route.ts`](web/src/app/api/vigilar/route.ts) |
+| Aviso por Telegram | Hecho, desplegado y con el webhook registrado. Es el canal general: la familia se suscribe desde la invitación con `t.me/<bot>?start=<token>` | [`api/telegram/webhook/route.ts`](web/src/app/api/telegram/webhook/route.ts), [`lib/telegram.ts`](web/src/lib/telegram.ts), [`20261024180000_avisos.sql`](supabase/migrations/20261024180000_avisos.sql) |
+| Aviso por WhatsApp (Kapso) | Código desplegado. Solo funciona el sandbox, con cada teléfono activado a mano, porque Meta restringió la cuenta. Falta que el webhook de Kapso apunte a `/api/kapso/webhook` | [`api/kapso/webhook/route.ts`](web/src/app/api/kapso/webhook/route.ts), [`lib/kapso.ts`](web/src/lib/kapso.ts) |
+| Web de la familia (PWA) | Alerta urgente, todo bien, para saber, sin señal, invitación con Telegram y WhatsApp, y `/demo` con el QR. Lee `familia_casa` cada 5 s directo de Supabase; con `?escenario=alerta` usa datos simulados. El estado se deriva en una función pura con pruebas | [`web/src/lib/familia/`](web/src/lib/familia/), [`web/src/components/familia/`](web/src/components/familia/) |
+| Inventario de pastillas | Hecho, con la migración aplicada. La foto de la factura va a Claude (`claude-opus-5-5`, salida estructurada), `cruzar` la compara con el récipe y la familia confirma. Es un libro de movimientos: la factura suma, `casa_tomar` resta y el conteo a mano ajusta; `inventario.ts` calcula los días (aviso con menos de 7). La casa de demo tiene 8 losartán y 40 metformina | [`20261024160000_pastillas_e_inventario.sql`](supabase/migrations/20261024160000_pastillas_e_inventario.sql), [`inventario.ts`](web/src/lib/familia/inventario.ts), [`factura.ts`](web/src/lib/familia/factura.ts), [`f/[token]/pastillas/`](web/src/app/f/[token]/pastillas/) |
+| Pruebas de la web | 51 unitarias (`bun test`) y 11 contra la base real: 6 de alertas y 5 de pastillas (`bun run test:integracion`) | [`web/src/lib/`](web/src/lib/) |
+| Prueba de carga del pitch | 50 teléfonos durante 2 min y 150 durante 1 min contra producción, sin una falla | [`web/scripts/carga.ts`](web/scripts/carga.ts), [resultados](docs/pendientes.md#para-el-pitch-y-el-jurado) |
+| Oído en el navegador (`/escucha`) | La prueba de viabilidad: micrófono → compuerta de dB → YAMNet → 6 tipos de evento, con 12 pruebas | [`web/src/app/escucha/`](web/src/app/escucha/), [`web/src/lib/escucha/`](web/src/lib/escucha/) |
+| Comparación de 9 modelos de audio en 640 sonidos de casa | Hecha y reproducible. YAMNet acierta el 82% en el top-5 con 4,1 MB | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
+| Vibración del piso, apagón según el perfil de salud, ficha de emergencia, cámara, rutina | Fuera del alcance del hackatón: van como proyección | [`docs/futuro.md`](docs/futuro.md#hacia-dónde-va) |
 
-La raíz lleva a la última casa abierta en el teléfono. La prueba del oído sigue en `/escucha`.
+La raíz lleva a la última casa abierta en el teléfono. Cada push a `main` despliega la web en
+Vercel; si el build falla, producción no cambia.
 
 ## Mapa del repo
 
 ```text
-README.md                         presentación, estado y cómo correrlo
-docs/preguntas-tecnicas.md        preguntas técnicas frecuentes, con la evidencia de cada respuesta
+README.md                         qué es, cómo probarlo, arquitectura, decisiones, pruebas y límites
+docs/plan.md                      lo que se presenta (alcance congelado), el demo y la venta
 docs/pendientes.md                lo que falta, en orden, con dónde está el código y cómo probarlo
-docs/por-planificar.md            ideas de Abrahan que se van pensando antes de construirlas
-docs/plan.md                      decisiones del equipo, prioridades P0–P2, demo y roles
-docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
+docs/futuro.md                    hacia dónde va el producto
 docs/contexto.md                  el problema, la competencia y las decisiones de diseño
 docs/riesgos.md                   muros técnicos (kiosco, apagones, batería), riesgos del demo
+docs/preguntas-tecnicas.md        preguntas técnicas frecuentes, con la evidencia de cada respuesta
+docs/por-planificar.md            ideas de Abrahan que se van pensando antes de construirlas
+docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
 docs/investigacion-alertas.md     capa de alertas: transporte, escalamiento, apagones y perfil energético
 docs/investigacion-audio.md       voz del adulto mayor, modelos, sensores y paquetes de Flutter
 docs/investigacion-carga.md       cómo se sabe si el teléfono está cargando: señales de Android y battery_plus
 docs/investigacion.md             preguntas abiertas por persona del equipo
-docs/futuro.md                    lo que va después del hackatón
 app/                              Flutter: la app del teléfono de la casa
-web/                              Next.js: la web de la familia y la prueba /escucha
-supabase/migrations/              el esquema: tablas, funciones y quién puede llamar qué
+web/                              Next.js: la web de la familia, el vigilante, los webhooks y /escucha
+web/scripts/                      la prueba de carga y la carga de la casa de demo
+supabase/migrations/              el esquema, las funciones, quién puede llamar qué y el vigilante
 experimentos/modelos-audio/       Python con uv: exportación a ONNX y comparación de modelos
 ```
 
 ## Decisiones técnicas clave
 
+La lista completa, con la evidencia de cada una, está en el [README](README.md#las-decisiones-y-por-qué).
+
 - **Todo lo posible en el teléfono.** El audio vive solo en un buffer circular de 5 s en memoria
-  ([`anillo.ts`](web/src/lib/escucha/anillo.ts)). Al servidor van etiquetas de eventos, alertas y
+  ([`anillo.dart`](app/lib/oido/anillo.dart)). Al servidor van etiquetas de eventos, alertas y
   latidos, nunca audio.
-- **Lo barato corre siempre y el modelo confirma.** Una compuerta de dB contra el fondo aprendido
-  de la casa ([`nivel.ts`](web/src/lib/escucha/nivel.ts)) corre con cada bloque de audio. En la
-  prueba `/escucha`, YAMNet clasifica dos veces por segundo siempre y la compuerta solo se anota
-  junto a cada evento. Que la compuerta decida cuándo despertar al modelo, para ahorrar batería,
-  es el diseño de la app y está por hacer.
 - **El audio llega crudo al modelo.** Sin supresión de ruido ni control de volumen, porque esos
-  filtros borran golpes y alarmas
-  ([`escucha.tsx`](web/src/app/escucha/escucha.tsx), [razón](docs/investigacion-audio.md)).
-- **YAMNet como modelo base**, elegido con la comparación de `experimentos/modelos-audio`. El
-  candidato alternativo es sherpa-onnx CED con ventanas de 5 s.
-- **Stack del hackatón:** Flutter en Android para la casa, web para la familia, Supabase,
-  WhatsApp por Kapso. La casa no puede ser iOS: no deja escuchar todo el día en segundo plano.
+  filtros borran golpes y alarmas ([razón](docs/investigacion-audio.md)).
+- **YAMNet como modelo base**, elegido con la comparación de `experimentos/modelos-audio`.
+- **La alerta vive en la base desde que nace.** Si el teléfono de la casa muere, la base la escala
+  igual; el vigilante corre dentro de Supabase, sin un servidor aparte.
+- **El camino de la alarma no depende de un modelo de lenguaje.** Claude solo lee la factura, y la
+  familia confirma antes de guardar.
+- **Stack del hackatón:** Flutter en Android para la casa; Next.js 16 en Vercel para la familia;
+  Supabase con pg_cron, pg_net y Vault; avisos por Telegram y WhatsApp con Kapso. La casa no puede
+  ser iOS: no deja escuchar todo el día en segundo plano.
 
 ## Cómo correr las pruebas
 
 ```bash
 cd web && bun install && bun test
-cd app && flutter test
+cd web && bun run test:integracion                     # contra la base real, con web/.env.local
+cd web && bun --env-file=.env.local scripts/carga.ts   # carga: 50 teléfonos durante 2 min
+make test                                              # la app de la casa
 cd experimentos/modelos-audio && uv sync && ./descargar.sh && uv run comparar.py
 ```
 
 ## Reglas para trabajar en el repo
 
 - Español en el código, los comentarios, los documentos y los commits.
-- Commits chicos con prefijo (`feat`, `fix`, `docs`, `chore`) y push seguido.
+- Commits chicos con prefijo (`feat`, `fix`, `docs`, `chore`, `test`) y push seguido.
+- Antes de subir algo de `web/`, `cd web && bun run build`: un build roto deja producción vieja.
 - El repo es público: nada de llaves, `.env`, grabaciones de personas ni datos reales. Los datos
   de prueba son inventados.
 - Al terminar una pieza, actualizar la tabla de estado de este archivo y la del README.
 - En `web/` aplica además [`web/AGENTS.md`](web/AGENTS.md): esta versión de Next.js tiene cambios
-  que no están en los datos de entrenamiento.
+  que no están en los datos de entrenamiento. Por ejemplo, con `cacheComponents` las rutas no
+  aceptan `export const runtime` ni `dynamic`.
