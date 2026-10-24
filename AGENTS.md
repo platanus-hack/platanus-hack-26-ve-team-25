@@ -19,6 +19,7 @@ suele estar en otro país. El audio se procesa en el teléfono y nunca sale de �
 | Oído en el navegador: micrófono → compuerta de dB → YAMNet → 6 tipos de evento | Prueba de viabilidad funcionando y desplegada | [`web/src/app/escucha/`](web/src/app/escucha/), [`web/src/lib/escucha/`](web/src/lib/escucha/) |
 | Pruebas automáticas de la lógica de audio | 12 pruebas: nivel en dB, fondo de la casa, compuerta, buffer circular, clases de YAMNet | [`web/src/lib/escucha/escucha.test.ts`](web/src/lib/escucha/escucha.test.ts) |
 | Comparación de 9 modelos de audio (YAMNet, EfficientAT, PANNs, sherpa-onnx) en 640 sonidos de casa | Hecha y reproducible, con resultados | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
+| Web de la familia instalable (PWA): manifiesto, íconos provisionales y metadatos para Android e iPhone | Hecho. La web de la familia en sí está por hacer | [`web/src/app/manifest.ts`](web/src/app/manifest.ts), [`web/src/lib/app.ts`](web/src/lib/app.ts) |
 | App Flutter del teléfono de la casa | Por hacer | — |
 | Alarma de confirmación de 60 s, botón de pánico | Por hacer | — |
 | Alertas con vencimiento y escalamiento en Supabase | Diseñado, por hacer | [`docs/plan.md`](docs/plan.md) |
