@@ -20,7 +20,7 @@ suele estar en otro país. El audio se procesa en el teléfono y nunca sale de �
 | Pruebas automáticas de la lógica de audio | 12 pruebas: nivel en dB, fondo de la casa, compuerta, buffer circular, clases de YAMNet | [`web/src/lib/escucha/escucha.test.ts`](web/src/lib/escucha/escucha.test.ts) |
 | Comparación de 9 modelos de audio (YAMNet, EfficientAT, PANNs, sherpa-onnx) en 640 sonidos de casa | Hecha y reproducible, con resultados | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
 | Web de la familia instalable (PWA): manifiesto, íconos provisionales y metadatos para Android e iPhone | Hecho. La web de la familia en sí está por hacer | [`web/src/app/manifest.ts`](web/src/app/manifest.ts), [`web/src/lib/app.ts`](web/src/lib/app.ts) |
-| App Flutter del teléfono de la casa | Por hacer | — |
+| App Flutter del teléfono de la casa | Las 4 pantallas de los mockups con datos simulados y la máquina de estados de la alerta, con 12 pruebas. Falta el oído, Supabase, sonido y sensores | [`app/`](app/README.md) |
 | Alarma de confirmación de 60 s, botón de pánico | Por hacer | — |
 | Alertas con vencimiento y escalamiento en Supabase | Diseñado, por hacer | [`docs/plan.md`](docs/plan.md) |
 | Web de la familia y aviso por Telegram | Por hacer | — |
@@ -42,6 +42,7 @@ docs/investigacion-audio.md       voz del adulto mayor, modelos, sensores y paqu
 docs/investigacion-carga.md       cómo se sabe si el teléfono está cargando: señales de Android y battery_plus
 docs/investigacion.md             preguntas abiertas por persona del equipo
 docs/futuro.md                    lo que va después del hackatón
+app/                              Flutter: la app del teléfono de la casa
 web/                              Next.js: la prueba /escucha (YAMNet en el navegador con MediaPipe)
 experimentos/modelos-audio/       Python con uv: exportación a ONNX y comparación de modelos
 ```
@@ -68,6 +69,7 @@ experimentos/modelos-audio/       Python con uv: exportación a ONNX y comparaci
 
 ```bash
 cd web && bun install && bun test
+cd app && flutter test
 cd experimentos/modelos-audio && uv sync && ./descargar.sh && uv run comparar.py
 ```
 
