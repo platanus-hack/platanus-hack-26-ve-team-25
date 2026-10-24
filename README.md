@@ -2,124 +2,148 @@
 
 <img src="./project-logo.png" alt="Logo del proyecto" width="200" />
 
-**Un teléfono viejo que cuida a los que se quedaron solos.** Enchufado en la casa de un adulto
-mayor, oye y siente lo que pasa: una alarma de humo, un vidrio roto, un golpe con grito. Antes de
-alertar, suena una alarma en la casa que la persona puede apagar; si nadie la apaga en 60 s,
-avisa a la familia, esté donde esté. El audio se procesa en el teléfono y nunca sale de ahí.
+**Un teléfono viejo que cuida a los que se quedaron solos.** Enchufado en la mesa de un adulto
+mayor que vive solo, lo acompaña en el día a día (la pastilla, llamar a su hijo con un toque) y oye
+lo que pasa en la casa: una alarma de humo, un vidrio roto, un golpe, un grito o un «¡ayuda!» dicho
+en voz alta. Antes de avisar, pregunta «¿Está bien?». Si nadie responde en 60 s, avisa a la
+familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp. **El audio se
+procesa en el teléfono y nunca sale de él.**
 
-Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.vercel.app · Teléfono de la
-casa en el navegador: https://platanus-hack-26-ve-team-25-casa.vercel.app
+Track: 🚨 Emergencias
 
-- **Lo que falta, en orden y por persona: [docs/pendientes.md](docs/pendientes.md)**
-- El plan, los roles y el demo: [docs/plan.md](docs/plan.md)
-- De los mockups al código, pantalla por pantalla: [docs/pantallas.md](docs/pantallas.md)
-- Por qué, lo que ya existe y las decisiones de diseño: [docs/contexto.md](docs/contexto.md)
-- Dónde puede fallar y cómo lo evitamos: [docs/riesgos.md](docs/riesgos.md)
-- Las preguntas abiertas de cada uno: [docs/investigacion.md](docs/investigacion.md)
-- Lo que va después del hackatón: [docs/futuro.md](docs/futuro.md)
-- Preguntas técnicas, con la evidencia de cada respuesta: [docs/preguntas-tecnicas.md](docs/preguntas-tecnicas.md)
-- Comparación de modelos de audio: [experimentos/modelos-audio](experimentos/modelos-audio/README.md)
+## Pruébalo, sin instalar nada ni crear cuenta
 
-## Estado
+- **Eres la familia de Carmen** (inventada): https://platanus-hack-26-ve-team-25.vercel.app/f/demo.
+  El QR del pitch está en [`/demo`](https://platanus-hack-26-ve-team-25.vercel.app/demo).
+- **Para que te llegue el aviso:** en la [invitación](https://platanus-hack-26-ve-team-25.vercel.app/f/demo/bienvenida),
+  «Recibir avisos por Telegram».
+- **Una alerta simulada**, sin esperar a que pase algo: [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta).
+- **El teléfono de la casa en el navegador**, sin oído ni llamadas: https://platanus-hack-26-ve-team-25-casa.vercel.app.
+  El oído de verdad corre en la app Android ([`app/`](app/README.md)).
 
-| Pieza | Estado |
-|---|---|
-| Micrófono → compuerta de dB → YAMNet en el navegador | Prueba funcionando en [`/escucha`](https://platanus-hack-26-ve-team-25.vercel.app/escucha). Falta probarla con micrófono real |
-| Pruebas automáticas de la lógica de audio | 12 pruebas de nivel, compuerta, buffer circular y clases, con `bun test` |
-| Comparación de 9 modelos de audio | Hecha y reproducible sobre 640 sonidos de casa: [experimentos/modelos-audio](experimentos/modelos-audio/README.md) |
-| Vibración del piso con el acelerómetro | Por hacer |
-| Alarma de confirmación de 60 s, botón de pánico y reportes de la persona | Por hacer |
-| Perfil de salud y niveles de aviso (🔴 🟡 🟢) | Por hacer |
-| App del teléfono de la casa en Flutter | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono, entiende frases de ayuda en voz alta con Vosk sin internet, y le manda a Supabase los eventos, las alertas y el latido, con cola si no hay internet. 78 pruebas: [`app/`](app/README.md). Falta el aviso por WhatsApp, sonido y vibración |
-| La app de la casa en el navegador | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app para probar las pantallas sin Android. Sin oído ni llamadas: [cómo y por qué](app/README.md#verla-en-el-navegador) |
-| Alertas con vencimiento y escalamiento (Supabase) | Hecho, con 6 pruebas contra la base real: [`supabase/migrations/`](supabase/migrations/). La app de la casa ya escribe: [`nube.dart`](app/lib/datos/nube.dart) |
-| Web de la familia instalable (PWA) | Alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR, leyendo de Supabase; con datos simulados en [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta) |
-| Inventario de pastillas desde la factura | La familia sube la foto de la factura en `/f/[token]/pastillas/factura`, Claude la lee, se cruza con el récipe y la familia confirma antes de guardar. Cada toma descuenta una y con menos de 7 días sale el aviso «Hay que comprar». 26 pruebas del cálculo y el cruce; la migración [`20261024160000`](supabase/migrations/20261024160000_pastillas_e_inventario.sql) falta aplicarla en la base real. Pendientes: la casa llamando `casa_tomar` y el WhatsApp |
-| Aviso real por WhatsApp (Kapso) | Decidido el sábado; la invitación ya abre WhatsApp, falta el envío |
-
-## Cómo está armado
+## Cómo funciona
 
 ```text
-Teléfono de la casa                                                          Supabase     Familia
-micrófono ──► compuerta dB ──► YAMNet ──┐
-acelerómetro ──► vibración del piso ────┴─► evento ──► alarma local 60 s
-                                                        (si nadie la apaga)
-                                                        │
-                                                        ▼
-                                                        T1 · HTTP (10 s) ──► Supabase ──► web de la familia
-                                                        │                                 └────► Telegram
-                                                           falla o timeout
-                                                        ▼
-                                                        T2 · llamada local (25 s) ──► vecino
-                                                        ▼
-                                                        T3 · SMS local ──► vecino
-
-latido periódico ───────────────────► sin latido = «sin señal» en la web
+TELÉFONO DE LA CASA · Flutter en Android
+  micrófono ─► buffer de 5 s en memoria ─┬─► compuerta de dB ─► YAMNet (TFLite) ─► alarma, vidrio, golpe, grito
+                                         └─► Vosk, sin internet ─► «¡ayuda!», «me siento mal», ~70 frases
+                                                    │
+                                                    ▼
+  «¿Está bien?» ─► casa_alerta(vence en 60 s) ──────────────────────────────────┐
+     ├─ «Estoy bien» ─► casa_responder('cancelar'): no escala                    │
+     └─ vence sin respuesta ─► llama al hijo por WhatsApp; si no, por teléfono   │
+  latido cada 90 s, con enchufado y batería ─► casa_latido                       │
+                                                                                 ▼
+SUPABASE · Postgres
+  alertas: pendiente ─► escalada ─► atendida · escalar_vencidas(): una sola escritura gana
+  pg_cron cada 5 s ─► GET /api/vigilar: escala lo vencido, manda los avisos y los sella
+                                                                                 │
+                                                                                 ▼
+FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
+  /f/[token] lee familia_casa cada 5 s ─► 🔴 alerta · 🟡 para saber · 🟢 todo bien · sin señal
+  Telegram (/start <token>) y WhatsApp por Kapso ◄─ el aviso del vigilante
+  Pastillas: foto de la factura ─► Claude ─► se cruza con el récipe ─► la familia confirma
 ```
 
-- Lo barato (el nivel en dB contra el fondo aprendido) corre con cada bloque de audio. YAMNet
-  clasifica una ventana de 1 s dos veces por segundo, sobre un buffer circular de 5 s en memoria.
-- Las 521 clases de YAMNet se reducen a seis tipos: alarma, vidrio, golpe, grito, TV y rutina.
-- **El escalamiento empieza a los 60 s**, cuando la alarma ya venció y nadie la apagó, y los
-  canales van en serie: primero el POST, después la llamada y al final el SMS. Los contactos de
-  llamada y SMS son locales; al exterior solo llega el POST
-  ([investigacion-alertas.md](docs/investigacion-alertas.md)).
-- **El perfil de salud decide el nivel del aviso.** El mismo apagón es 🔴 en una casa con oxígeno y
-  🟡 en una casa sin equipo eléctrico: el evento no fuerza urgencia por sí solo.
+## Las decisiones, y por qué
+
+- **El audio nunca sale del teléfono.** Vive en un buffer circular de 5 s en memoria
+  ([`anillo.dart`](app/lib/oido/anillo.dart)); a la base van etiquetas de eventos, alertas y
+  latidos. Es privacidad y es costo: no hay un servidor de audio que pagar por minuto.
+- **YAMNet, elegido midiendo.** Comparamos 9 modelos sobre 640 sonidos de casa de ESC-50. YAMNet
+  acierta el 82% en el top-5 con 4,1 MB y 2,5 ms por segundo de audio en una CPU de escritorio.
+  Los dos que se le acercan (81%) pesan entre 7 y 80 veces más y tardan entre 10 y 27 veces más
+  ([resultados](experimentos/modelos-audio/resultados-1s.md),
+  [cómo se midió](experimentos/modelos-audio/README.md)).
+- **El audio llega crudo al modelo:** sin supresión de ruido ni control de volumen, porque esos
+  filtros borran justo los golpes y las alarmas ([investigacion-audio.md](docs/investigacion-audio.md)).
+- **Preguntar antes de avisar.** La meta es despreocupar al que cuida desde lejos, no llenarlo de
+  alertas: cada «Estoy bien» es una falsa alarma que no le llegó
+  ([riesgos.md](docs/riesgos.md#la-regla-de-oro-despreocupar-no-angustiar)).
+- **La alerta vive en la base desde que nace**, con su hora de vencimiento. Si el teléfono de la
+  casa muere a mitad de la cuenta (batería, golpe, apagón), la base la escala igual. El paso a
+  «escalada» es una sola escritura condicional: lo intentan el vigilante y cada lectura de la
+  familia, y gana uno solo ([migración](supabase/migrations/20261024130000_casa_y_familia.sql)).
+- **El vigilante corre dentro de la base:** pg_cron llama a `/api/vigilar` cada 5 s con pg_net, y
+  el secreto está en Vault, no en el repo ([migración](supabase/migrations/20261024200000_vigilante.sql)).
+  Manda en tandas en paralelo para terminar antes de la pasada siguiente, y sella por alerta y por
+  destinatario para no repetir mensajes ([`route.ts`](web/src/app/api/vigilar/route.ts)).
+- **Sin login, pero sin tablas abiertas.** RLS activado sin políticas: la llave pública solo puede
+  ejecutar funciones, y cada función pide la clave de la casa o el token de la familia, de 128 bits
+  y guardados como SHA-256. El token `demo` es público a propósito: es el del QR.
+- **El camino de la alarma no depende de un modelo de lenguaje.** Oír, preguntar, escalar y avisar
+  son reglas. Claude solo lee la foto de la factura de la farmacia, con salida estructurada, y la
+  familia confirma antes de guardar ([`leer/route.ts`](web/src/app/f/[token]/pastillas/factura/leer/route.ts)).
+- **El inventario de pastillas es un libro de movimientos:** la factura suma, cada «Ya me la tomé»
+  resta y el conteo a mano ajusta. El conteo vive en la base, para que la casa y la web no tengan
+  dos números; la web calcula cuántos días alcanzan ([`inventario.ts`](web/src/lib/familia/inventario.ts)).
+- **Telegram es el canal general** porque llega a cualquiera sin verificación de negocio. WhatsApp
+  por Kapso funciona solo en el sandbox, porque Meta restringió la cuenta.
+- **La casa es Android:** iOS no deja escuchar todo el día en segundo plano.
+
+## Las pruebas
+
+| Qué | Cuántas | Cómo |
+|---|---|---|
+| Web: estado de la familia, audio, inventario y factura | 51 | `cd web && bun test` |
+| Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
+| App de la casa: alerta, pastillas, pedidos por voz, nube con cola | 81 | `make test` |
+| Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
+| Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
+| Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |
+
+La carga se midió el sábado 24-oct contra producción, desde una laptop en Caracas
+([detalle](docs/pendientes.md#para-el-pitch-y-el-jurado)).
+
+## Lo que todavía no hace
+
+- La app de la casa escucha con la pantalla encendida y la app abierta: falta el servicio en
+  primer plano para que Android no la cierre.
+- La llamada de WhatsApp va por una vía no oficial (la fila de «llamada de voz» que WhatsApp crea
+  en la agenda), y Android no dice si contestaron: por eso, si la llamada termina rápido, la casa
+  pregunta «¿Pudo hablar con…?» y llama por teléfono normal.
+- Si se cierra la app sin internet, se pierde lo que esperaba en la cola: vive en memoria.
+- No se ha probado con voces de personas mayores reales.
+
+Hacia dónde va el producto, en tres pasos: [futuro.md](docs/futuro.md#hacia-dónde-va).
 
 ## Cómo correrlo
 
 ```bash
-cd web
-bun install
-bun dev     # http://localhost:3000/escucha
-bun test    # pruebas de la lógica de audio, de la web de la familia y de las pastillas
+# La web de la familia
+cd web && bun install
+bun dev        # http://localhost:3000/f/demo
+bun test
+
+# La app de la casa, en un Android conectado por USB
+cp app/config/local.example.json app/config/local.json   # el número de emergencia y la clave de la casa
+make run       # make muestra todos los atajos; make run-demo usa una cuenta regresiva de 15 s
 ```
 
-Para leer facturas de verdad hace falta `ANTHROPIC_API_KEY` en `web/.env.local` y en Vercel. Sin
-ella, `/f/demo/pastillas/factura` funciona con la factura de ejemplo inventada.
-
-El micrófono de un teléfono solo funciona con HTTPS. Para probar desde el teléfono, usa la URL de
-producción o abre un túnel: `cloudflared tunnel --url http://localhost:3000`.
+Las llaves van en `web/.env.local` y en Vercel, nunca en el repo: está
+[`web/.env.example`](web/.env.example). Cada push a `main` despliega la web; si el build falla,
+producción no cambia.
 
 ## Dónde está cada cosa
 
 ```text
-docs/plan.md                     el plan, los roles y el demo
-docs/pantallas.md                de los mockups al código: contrato de datos y orden de las pantallas
-docs/contexto.md                 el porqué, la competencia y las decisiones
-docs/riesgos.md                  los muros, los huecos y cómo hacer que sume y no reste
-docs/preguntas-tecnicas.md       las preguntas frecuentes, con la evidencia de cada respuesta
-docs/investigacion-alertas.md    entrega, escalamiento tras los 60 s y detección del apagón
-docs/investigacion-audio.md      la voz del adulto mayor, modelos de audio y sensores
-docs/investigacion-carga.md      cómo se sabe si el teléfono está cargando
-docs/investigacion.md            las preguntas abiertas de cada uno
-docs/futuro.md                   las mejoras a futuro
-experimentos/modelos-audio/      la comparación de modelos de audio, reproducible
-web/src/app/escucha/             la página de prueba del oído
-web/src/lib/escucha/             lógica pura con pruebas: nivel y compuerta, buffer circular, clases de YAMNet
+app/                          Flutter: el teléfono de la casa (oído, voz, alerta, pastillas, llamadas)
+web/                          Next.js: la web de la familia, el vigilante y los webhooks
+supabase/migrations/          el esquema, las funciones, quién puede llamar qué y el vigilante
+experimentos/modelos-audio/   la comparación de modelos de audio, reproducible
+docs/plan.md                  lo que se presenta, el demo y la venta
+docs/contexto.md              el problema, lo que ya existe y en qué nos distinguimos
+docs/riesgos.md               los muros técnicos y cómo contarlos
+docs/futuro.md                hacia dónde va
+docs/pendientes.md            lo que falta, con dónde está el código y cómo probarlo
+docs/investigacion-*.md       alertas y apagones, audio y sensores, cómo saber si el teléfono carga
 ```
-
-## Por dónde empieza cada rol
-
-| Rol | Quién | Primera tarea |
-|---|---|---|
-| Detección e IA | Abrahan | Probar `/escucha` con alarma de humo, golpe, grito y TV; YAMNet en Flutter |
-| Alertas y conexión | Josuep | Niveles de aviso, alarma de 60 s, pánico y la tabla de alertas con vencimiento en Supabase |
-| Datos y usuarios | Anttony | Las cifras con fuente y dos o tres testimonios |
-| Orquestación, UX/UI y riesgos | Rogelio | Cerrar el reparto Flutter / web, las pantallas y [docs/riesgos.md](docs/riesgos.md) |
-
-## Cómo trabajamos
-
-- Commits chicos y push seguido: el repo es lo que se juzga.
-- Cada push a `main` despliega la web de la familia en Vercel (Root Directory = `web`). Si el build
-  falla, producción no cambia: antes de subir, `cd web && bun run build`.
-- Nada de llaves ni `.env` en el repo: es público.
-- Datos de prueba inventados. Nada real de nadie.
 
 ## Equipo
 
-- Josuep Simon Turmero Brito ([@jkou02](https://github.com/jkou02))
-- Anttonny Rodelo ([@rodeloa](https://github.com/rodeloa))
-- Abrahan David Quintero Teran ([@abrahanq](https://github.com/abrahanq))
-- Luis Rogelio Gomez Montes ([@rogelio-electronic](https://github.com/rogelio-electronic))
+| Quién | Qué hizo |
+|---|---|
+| Abrahan David Quintero Teran ([@abrahanq](https://github.com/abrahanq)) | La app de la casa: el oído, la voz, las llamadas y las pastillas |
+| Josuep Simon Turmero Brito ([@jkou02](https://github.com/jkou02)) | Los avisos: Telegram, WhatsApp con Kapso y el vigilante |
+| Anttonny Rodelo ([@rodeloa](https://github.com/rodeloa)) | Las cifras con fuente y la investigación del problema |
+| Luis Rogelio Gomez Montes ([@rogelio-electronic](https://github.com/rogelio-electronic)) | La web de la familia, la base, la orquestación y el pitch |
