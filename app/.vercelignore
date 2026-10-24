@@ -1,0 +1,9 @@
+# Lo que Vercel no necesita para armar la web de la casa.
+android/
+ios/
+build/
+test/
+.dart_tool/
+.flutter-sdk/
+# El número real de emergencia nunca sale de la laptop
+config/local.json

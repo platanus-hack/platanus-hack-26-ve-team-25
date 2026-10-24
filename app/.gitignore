@@ -49,3 +49,7 @@ app.*.map.json
 
 # El número real de emergencia no se sube: el repo es público
 /config/local.json
+
+# Enlace al proyecto de Vercel de la web de la casa (make casa-deploy)
+/.vercel
+/.flutter-sdk/

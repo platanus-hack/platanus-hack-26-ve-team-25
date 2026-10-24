@@ -9,7 +9,7 @@ BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
 .DEFAULT_GOAL := ayuda
 .PHONY: ayuda devices deps run run-demo debug profile release test analyze format \
-	build-apk build-apk-debug build-appbundle install clean \
+	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
 	web-deps web-dev web-test web-lint web-build
 
 ayuda: ## Muestra estos comandos
@@ -60,6 +60,16 @@ install: build-apk ## Instala el APK de release en el teléfono conectado
 
 clean: ## Borra lo compilado de la app
 	cd $(APP) && flutter clean
+
+# La web de la casa es la vista previa de las pantallas, sin oído (TFLite no corre en el
+# navegador) y sin $(CONFIG): el número de emergencia no puede quedar en un sitio público.
+casa-web: deps ## Arma la app de la casa como web instalable, en app/build/web
+	cd $(APP) && flutter build web --release
+
+# Va a su propio proyecto de Vercel, que baja Flutter y compila allá (app/tool/vercel_build.sh):
+# no hace falta Flutter en la laptop. app/.vercel, que git ignora, se crea una vez con `vercel link`.
+casa-deploy: ## Publica la web de la casa en Vercel
+	cd $(APP) && vercel deploy --prod --yes
 
 # --- Web de la familia (Next.js) ------------------------------------------------------------
 
