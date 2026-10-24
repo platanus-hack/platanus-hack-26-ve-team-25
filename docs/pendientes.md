@@ -57,6 +57,10 @@ guarda lo que está en el récipe. Falta encenderla:
 - [ ] Guardar en disco la cola de la app de la casa: hoy, si la app se cierra sin internet, lo que
       esperaba por enviarse se pierde ([`nube.dart`](../app/lib/datos/nube.dart)).
 - [ ] En el lienzo de mockups, borrar la fila «Teléfono de la casa de pie», que es la versión vieja.
+- [ ] **Si sobra tiempo, y no para el demo:** mostrar en la pantalla de pastillas el **precio y el
+      stock reales** de cada medicamento que falta comprar, leídos de Algolia, con un enlace por
+      renglón a la búsqueda de Farmatodo (`https://www.farmatodo.com.ve/buscar?product=` con el
+      término al final). Iría en [`web/src/lib/familia/`](../web/src/lib/familia/).
 
 ## Lo que está hecho
 
@@ -124,8 +128,17 @@ Para que nadie lo retome sin saber por qué:
 - **WhatsApp por Kapso, entero:** Meta restringió la cuenta y el sandbox exige activar cada
   teléfono a mano. Los avisos van **solo por Telegram**. El código de Kapso sigue en `web/` pero no
   se usa. La **llamada** de WhatsApp de la casa al hijo sí sigue: es otra cosa, sale del teléfono.
-- **El aviso de compra por WhatsApp** y **comprar por una farmacia**: no hay API de Farmatodo ni de
-  Yummy que se pueda usar. Va como proyección.
+- **Comprar en una farmacia:** no se hace. Farmatodo no es VTEX ni Magento ni Shopify: es una SPA
+  propia en Angular 12 sobre Google Cloud. Verificado el 24-oct-2026 con fetch directo al sitio: el
+  catálogo, el precio y el stock se leen sin llave ni login (la búsqueda corre sobre Algolia, app
+  `VCOJEYD2PO`, con credenciales search-only públicas en el propio HTML), y el endpoint que agrega
+  al carrito responde sin login: devolvió 400 pidiendo campos del carrito, no 401. **Lo que falta
+  es el puente: ese carrito creado desde fuera no aparece en el navegador del usuario.** El pago
+  exige login con Firebase Auth y reCAPTCHA Enterprise, no se encontró ningún parámetro de URL que
+  precargue un carrito, y no se puede embeber (`X-Frame-Options: DENY`, `frame-ancestors 'none'`).
+  Los términos (secciones 5 y 14) prohíben violar la seguridad del sitio y el framing; no mencionan
+  scraping ni bots, así que queda como zona gris contractual. Queda como proyección.
+- **El aviso de compra por WhatsApp:** se va con Kapso, que era su canal. Queda como proyección.
 - **La pastilla olvidada** (aviso 🟡 a las 2 horas): va a [futuro.md](futuro.md).
 - **Leer el récipe por foto:** el demo lee la factura, que ya está hecha. El récipe de Carmen se
   carga con el script de demo; leerlo por foto va a [futuro.md](futuro.md#salud).
