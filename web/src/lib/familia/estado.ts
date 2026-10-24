@@ -141,7 +141,7 @@ function avisosSuaves(datos: DatosCasa, hoy: string): AvisoSuave[] {
 
   return [...falsas, ...distintos]
     .sort((a, b) => b.orden - a.orden)
-    .map(({ orden: _, ...aviso }) => aviso);
+    .map(({ hora, etiqueta, titulo, detalle }) => ({ hora, etiqueta, titulo, detalle }));
 }
 
 /**

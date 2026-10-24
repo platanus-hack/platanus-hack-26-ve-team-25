@@ -128,3 +128,24 @@
     @apply font-sans;
   }
 }
+/* Colores de la web de la familia, los mismos del lienzo de mockups. Fijos en claro: la alerta
+   tiene que verse igual de roja de día y de noche. */
+@theme {
+  --color-verde: #14532d;
+  --color-verde-claro: #d7ebdd;
+  --color-ok: #16a34a;
+  --color-rojo: #b01d16;
+  --color-rojo-tarjeta: #941710;
+  --color-rojo-texto: #fde8e7;
+  --color-rojo-borde: #f3b7b3;
+  --color-papel: #f7f7f4;
+  --color-borde: #e2e2da;
+  --color-linea: #edede6;
+  --color-tinta: #1c1c1a;
+  --color-texto: #3d3d37;
+  --color-gris: #57574f;
+  --color-pizarra-texto: #e7e7e2;
+  --color-amarillo-fondo: #fef0c7;
+  --color-amarillo-tinta: #7a2e0b;
+  --color-whatsapp: #128c4a;
+}
