@@ -14,7 +14,8 @@ y lo tache al terminar. Las preguntas de investigación por persona siguen en
   en un teléfono real con sonidos, llamadas o voz de verdad.**
 - **Web de la familia:** las cuatro pantallas, la invitación y `/demo` con el QR, con datos
   simulados (sábado 08:50).
-- **Supabase y WhatsApp:** nada todavía.
+- **Supabase:** esquema, funciones y casa de demo listos; falta que la app de la casa escriba.
+- **WhatsApp:** nada todavía.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
 ## P0: sin esto no hay demo
@@ -65,11 +66,23 @@ El contrato de datos ya existe en Dart ([`tipos.dart`](../app/lib/dominio/tipos.
 [`alerta.dart`](../app/lib/dominio/alerta.dart)) y está descrito en
 [pantallas.md](pantallas.md#el-contrato-la-misma-forma-en-dart-y-en-typescript).
 
-- [ ] Tablas `casas`, `invitaciones`, `eventos`, `alertas` y `latidos`.
-- [ ] El paso de «pendiente» a «escalada» de una alerta, con una sola escritura que gane
-      (`escalar_alerta()`).
-- [ ] **Seguridad:** el enlace de invitación lleva un token aleatorio de al menos 128 bits, guardado
-      en hash, y reglas RLS para que cada token vea solo su casa. Lo va a preguntar el jurado.
+Esquema aplicado el sábado 09:40: [`supabase/migrations/`](../supabase/migrations/). Las
+pruebas contra la base real corren con `cd web && bun run test:integracion`.
+
+- [x] Tablas `casas`, `invitaciones`, `eventos` y `alertas`. El latido es una columna de `casas`
+      (`ultimo_latido`), no una tabla: solo importa el último.
+- [x] El paso de «pendiente» a «escalada» con una sola escritura que gana (`escalar_vencidas()`).
+      Corre además cada vez que alguien lee la casa, así no depende del vigilante.
+- [x] **Seguridad:** RLS activado sin políticas: la llave pública no toca las tablas. Todo pasa
+      por funciones que piden la clave de la casa o el token de la familia, de 128 bits y
+      guardados como hash SHA-256. El token `demo` es público a propósito: es el del QR.
+- [x] Casa de demo creada (Carmen, token `demo`). Su clave la tiene Rogelio; va en
+      `app/config/local.json` (ver [`local.example.json`](../app/config/local.example.json)).
+- [ ] **La app de la casa llama a las funciones** (`POST {SUPABASE_URL}/rest/v1/rpc/<nombre>` con
+      el header `apikey`): `casa_latido(p_clave, p_enchufado, p_bateria)` cada 90 s,
+      `casa_evento(p_clave, p_tipo, p_descripcion)` → id, `casa_alerta(p_clave, p_evento,
+      p_espera_s, p_urgente)` → id, `casa_responder(p_clave, p_alerta, 'cancelar' | 'escalar' |
+      'atender')`. Ejemplos de uso: [`supabase.integracion.test.ts`](../web/src/lib/familia/supabase.integracion.test.ts).
 - [ ] La app de la casa manda eventos, alertas y el latido, con una cola local si no hay internet.
 - [ ] Decidir el latido y quién declara «sin señal»
       ([investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)).
@@ -98,9 +111,9 @@ Hecho con datos simulados: el estado se deriva en
 - [x] `/demo`, con el QR gigante para el público.
 - [x] La raíz lleva a la última casa abierta.
 - [x] Escenarios simulados por URL (`?escenario=alerta`) como respaldo del demo.
-- [ ] Cambiar [`datos.ts`](../web/src/lib/familia/datos.ts) por Supabase en tiempo real cuando
-      estén las tablas del punto 3. Las pantallas no cambian.
-- [ ] «Ya hablé con Carmen» escribe en Supabase. Hoy solo cambia la pantalla.
+- [x] Lee de Supabase cada 5 s ([`datos.ts`](../web/src/lib/familia/datos.ts)). Con
+      `?escenario=` siguen los simulados, y la casa de demo cae a ellos si la base no responde.
+- [x] «Ya hablé con Carmen» escribe en Supabase (`familia_atender`).
 
 ## P1: si P0 está listo
 

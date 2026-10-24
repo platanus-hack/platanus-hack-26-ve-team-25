@@ -9,9 +9,9 @@ const NUMERO_WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMERO?.replace(/\D/g, 
 
 export default async function Page(props: PageProps<"/f/[token]/bienvenida">) {
   const { token } = await props.params;
-  const datos = cargarCasa(token, null, new Date());
-  if (!datos) notFound();
-  const { nombre } = datos.casa;
+  const cargada = await cargarCasa(token, null, new Date());
+  if (!cargada) notFound();
+  const { nombre } = cargada.datos.casa;
   const mensaje = `Quiero cuidar a ${nombre} (casa ${token})`;
   const whatsapp = NUMERO_WHATSAPP
     ? `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`

@@ -1,3 +1,6 @@
 {
-  "TELEFONO_EMERGENCIA": "04120000000"
+  "TELEFONO_EMERGENCIA": "04120000000",
+  "SUPABASE_URL": "https://ptplltvzeuwmxoetzanv.supabase.co",
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_...",
+  "CASA_CLAVE": "la que imprime web/scripts/crear-casa-demo.ts"
 }

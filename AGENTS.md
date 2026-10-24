@@ -23,8 +23,8 @@ suele estar en otro país. El audio se procesa en el teléfono y nunca sale de �
 | App Flutter del teléfono de la casa | Horizontal como reloj de mesa: reposo con pastillas, «¿Está bien?» con deslizador, llamada directa al primer contacto y recordatorio de pastillas. Oye con YAMNet en el teléfono. 35 pruebas. Falta Supabase, WhatsApp, sonido y vibración | [`app/`](app/README.md) |
 | La app de la casa compilada para web, instalable | Publicada en https://platanus-hack-26-ve-team-25-casa.vercel.app. Sin oído ni llamadas: en web, TFLite se cambia por una versión vacía con una importación condicional. Vercel baja Flutter 3.47.5 y compila | [`app/lib/oido/tflite_web.dart`](app/lib/oido/tflite_web.dart), [`app/tool/vercel_build.sh`](app/tool/vercel_build.sh) |
 | Alarma de confirmación de 60 s, botón de pánico | Por hacer | — |
-| Alertas con vencimiento y escalamiento en Supabase | Diseñado, por hacer | [`docs/plan.md`](docs/plan.md) |
-| Web de la familia: alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR | Hecha con datos simulados (`/f/demo?escenario=alerta`). El estado se deriva en una función pura con 13 pruebas. Falta Supabase | [`web/src/lib/familia/`](web/src/lib/familia/), [`web/src/components/familia/`](web/src/components/familia/) |
+| Alertas con vencimiento y escalamiento en Supabase | Hecho: tablas con RLS sin políticas, funciones con secreto en hash y escalamiento atómico. 6 pruebas contra la base real (`bun run test:integracion`). Falta que la app de la casa las llame | [`supabase/migrations/`](supabase/migrations/), [`web/src/lib/familia/supabase.integracion.test.ts`](web/src/lib/familia/supabase.integracion.test.ts) |
+| Web de la familia: alerta urgente, todo bien, para saber, sin señal, invitación y `/demo` con el QR | Lee de Supabase cada 5 s; con `?escenario=alerta` usa datos simulados. El estado se deriva en una función pura con 13 pruebas | [`web/src/lib/familia/`](web/src/lib/familia/), [`web/src/components/familia/`](web/src/components/familia/) |
 | Aviso por WhatsApp (Kapso) | Por hacer. La invitación ya abre WhatsApp con el mensaje listo | [`web/src/app/f/[token]/bienvenida/`](web/src/app/f/[token]/bienvenida/page.tsx) |
 | Vibración del piso, rutina de la casa, otros sensores | Diseñado, por hacer | [`docs/investigacion-audio.md`](docs/investigacion-audio.md) |
 
@@ -46,7 +46,8 @@ docs/investigacion-carga.md       cómo se sabe si el teléfono está cargando: 
 docs/investigacion.md             preguntas abiertas por persona del equipo
 docs/futuro.md                    lo que va después del hackatón
 app/                              Flutter: la app del teléfono de la casa
-web/                              Next.js: la prueba /escucha (YAMNet en el navegador con MediaPipe)
+web/                              Next.js: la web de la familia y la prueba /escucha
+supabase/migrations/              el esquema: tablas, funciones y quién puede llamar qué
 experimentos/modelos-audio/       Python con uv: exportación a ONNX y comparación de modelos
 ```
 
