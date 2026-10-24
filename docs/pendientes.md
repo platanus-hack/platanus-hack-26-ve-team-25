@@ -83,7 +83,7 @@ medicamento con sus tomas del día.
 Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en el teléfono desde los
 últimos cambios.
 
-**App de la casa ([`app/`](../app/README.md)), 110 pruebas:**
+**App de la casa ([`app/`](../app/README.md)), 111 pruebas:**
 
 - [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
       en chico y «Leer récipe».

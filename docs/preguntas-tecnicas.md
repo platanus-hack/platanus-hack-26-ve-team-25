@@ -9,7 +9,7 @@ respuesta dice en qué estado está:
 - ❌ **No se hizo**, y se dice.
 
 Al sábado 24-oct-2026, 18:30. **Lo de la app de la casa está probado con pruebas automáticas
-(110) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
+(111) y contra la base real; la prueba de punta a punta en el teléfono del demo todavía no se
 repitió desde los últimos cambios.**
 
 ## El audio y la privacidad
@@ -188,7 +188,7 @@ contactos, condición de salud), nunca audio. Para el demo, todos los datos son 
 ## Cómo comprobarlo
 
 ```bash
-make test                # 110 pruebas de la app de la casa
+make test                # 111 pruebas de la app de la casa
 make test-integracion    # la app contra la base real, con una casa que se crea y se borra
 cd web && bun test       # la web: estado de la familia, audio, inventario
 cd experimentos/modelos-audio && uv sync && ./descargar.sh && uv run comparar.py
