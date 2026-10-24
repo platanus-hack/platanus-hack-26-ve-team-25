@@ -5,18 +5,24 @@ dice dónde está el código, qué falta y cómo saber que quedó. Quien tome un
 y lo tache al terminar. Las preguntas de investigación por persona siguen en
 [investigacion.md](investigacion.md), y lo que va después del hackatón, en [futuro.md](futuro.md).
 
-## Estado al cerrar la noche
+## Estado (sábado 24-oct, tarde)
 
-- **App de la casa ([`app/`](../app/README.md)):** está en horizontal como reloj de mesa. Ya
-  oye con YAMNet en el teléfono, pregunta «¿Está bien?» con deslizador, llama primero por WhatsApp
-  y si no por teléfono, y si no contestan el WhatsApp pregunta «¿Pudo hablar con…?» por botón o
-  por voz. Recuerda las pastillas del día. Tiene 51 pruebas. **Nada de eso se ha probado todavía
-  en un teléfono real con sonidos, llamadas o voz de verdad.**
-- **Web de la familia:** las cuatro pantallas, la invitación y `/demo` con el QR, con datos
-  simulados (sábado 08:50).
-- **Supabase:** esquema, funciones y casa de demo listos. La app de la casa ya escribe
-  (sábado, mediodía), probada contra la base real; falta verlo en el teléfono.
-- **WhatsApp:** nada todavía.
+Se marca `[x]` lo que está hecho y comprobado. Lo que sigue abierto lleva escrito **por qué**:
+casi nada está sin hacer por olvido, casi todo espera a algo concreto.
+
+- **App de la casa ([`app/`](../app/README.md)):** horizontal como reloj de mesa, con el oído
+  (YAMNet), los pedidos por voz (Vosk sin internet), la llamada por WhatsApp con respaldo
+  telefónico y el recordatorio de pastillas. **78 pruebas** en `app/test/`. Le manda eventos,
+  alertas y latido a Supabase, con cola si no hay internet. **Sigue sin probarse en un teléfono
+  real.**
+- **Web de la familia:** las pantallas, la invitación y `/demo` con el QR. Lee de Supabase cada 5 s
+  y `?escenario=` fuerza los datos simulados. 13 pruebas del estado derivado. El inventario de
+  pastillas desde la factura está hecho en la web y espera su migración.
+- **Supabase:** esquema, funciones, casa de demo y 6 pruebas de integración contra la base real.
+  Falta aplicar la migración de pastillas.
+- **WhatsApp (Kapso):** código escrito y **sin desplegar**. Meta restringió la cuenta
+  (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
+- **Telegram:** decidido hoy como segundo canal para llegar a todos. Sin empezar.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
 ## P0: sin esto no hay demo
@@ -26,6 +32,11 @@ y lo tache al terminar. Las preguntas de investigación por persona siguen en
 Se instala con `make run` desde la raíz. Antes hay que copiar
 `app/config/local.example.json` a `app/config/local.json` y poner el número de emergencia: ese
 archivo no se sube, porque el repo es público.
+
+**Por qué está sin empezar:** nadie ha hecho la prueba en un teléfono real. El número de
+emergencia vive en `app/config/local.json`, que solo está en la máquina de Abrahan, y la app no se
+ha instalado todavía en el teléfono que va a la tarima. Mientras esto siga abierto, todo lo demás
+está probado solo con pruebas automáticas.
 
 - [ ] Aceptar los permisos al abrir: micrófono, llamadas, contactos y «Mostrar sobre otras apps».
       El último abre una pantalla de ajustes aparte.
@@ -63,9 +74,13 @@ Decidido por Abrahan el sábado 24: **«Pedir ayuda» ocupa el panel derecho** d
 - [ ] **Probarlo en el teléfono:** decir frases del banco cerca y lejos, con la TV apagada y
       prendida. Mirar en los registros si Vosk ignora palabras que no están en su vocabulario
       («malita»), y ajustar `confianzaMinima` en [`frases.dart`](../app/lib/datos/frases.dart).
+      *Sin hacer: depende de tener la app instalada, y eso no ha pasado (punto 1).*
 - [ ] Probar el banco con voces mayores reales (ver «Probar con voces mayores»).
+      *Sin hacer: hacen falta personas mayores grabando y no se ha conseguido ninguna todavía.*
 - [ ] «Leer récipe» abre una pantalla que dice que todavía no está lista: falta la cámara y el
       OCR (ver P1, «Las pastillas desde la foto del récipe»).
+      *Sin hacer: la lectura terminó resolviéndose subiendo la foto por la web (la factura), y el
+      récipe no se ha llevado a ese mismo flujo.*
 
 ### 3. Supabase: que la casa y la familia hablen · *Josuep, alertas y conexión*
 
@@ -98,22 +113,87 @@ pruebas contra la base real corren con `cd web && bun run test:integracion`.
       que se crea y se borra; usa la llave secreta de `web/.env.local`). La clave de Carmen se
       cambió el sábado 10:30: la nueva está solo en el `app/config/local.json` de Abrahan.
 - [ ] **En el teléfono:** `make run`, disparar una alarma (toque largo en el reloj) y ver que
-      aparece en `/f/demo`.
+      aparece en `/f/demo`. *Sin hacer: es la misma prueba pendiente del punto 1; la app no se ha
+      instalado en el teléfono.*
 - [ ] Guardar la cola en disco: hoy, si la app se cierra sin internet, lo que esperaba se pierde.
+      *Sin hacer: se eligió la cola en memoria para llegar al demo, y no se ha añadido ningún
+      paquete de almacenamiento.*
 - [ ] Decidir el latido y quién declara «sin señal»
       ([investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)).
+      *Sin hacer: es una decisión de equipo (C4 y C5, ya marcadas como pendientes en esa
+      investigación). La web ya tiene la pantalla «Sin señal» y podría calcularlo con
+      `ultimoLatido`, pero nadie lo ha decidido.*
 
 ### 4. WhatsApp por Kapso · *Josuep*
 
 Decidido el sábado 08:40: **el aviso va por WhatsApp con Kapso**, usando los créditos del evento.
-Telegram sale del P0.
+Telegram salió del P0 ese día y **volvió a entrar como 4b** cuando Meta restringió la cuenta.
 
-- [ ] Número de Kapso y `KAPSO_API_KEY` en Vercel y en `web/.env.local`, nunca en el repo.
+**Estado real (sábado, tarde):** la cuenta de Meta quedó **restringida** (`#2655121`): el portafolio
+tiene una cuenta publicitaria deshabilitada desde 2019 y Meta no deja conectar un número nuevo sin
+verificación de negocio. Lo único que funciona hoy es el **sandbox de Kapso**, y el sandbox exige
+**activar cada teléfono a mano** (sesión con un código de 6 caracteres que caduca en 15 minutos).
+Sirve para el demo con los teléfonos de la tarima; no para que el público escanee el QR y reciba.
+El código ya está escrito: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
+[`api/kapso/webhook`](../web/src/app/api/kapso/webhook/route.ts),
+[`api/vigilar`](../web/src/app/api/vigilar/route.ts) y
+[`supabase/migrations/20261024180000_whatsapp.sql`](../supabase/migrations/20261024180000_whatsapp.sql).
+
+- [x] Credenciales de Kapso en `web/.env.local`: `KAPSO_PHONE_NUMBER_ID`, `KAPSO_API_KEY` y
+      `KAPSO_WEBHOOK_SECRET`, comprobadas contra la API (responde 200) y fuera de Git
+      (`.env.local` está ignorado). **Queda pendiente subirlas a Vercel**, junto con
+      `SUPABASE_SECRET_KEY`, porque las de Supabase en `web/.env.local` son todavía las del ejemplo.
+- [x] Un teléfono activado en el sandbox (*Add test number*): el de Josuep ya tiene sesión y sirve
+      para las pruebas de envío.
 - [ ] Poner el número en `NEXT_PUBLIC_WHATSAPP_NUMERO` (solo dígitos): con eso aparece el botón
       «Recibir avisos por WhatsApp» de la invitación. Hoy dice «pronto».
+      *Sin hacer: el sandbox no publica un número marcable. La API devuelve
+      `display_phone_number: null` y el dashboard solo muestra el Phone Number ID y el WABA ID,
+      que no sirven en `wa.me`. Hasta que aparezca el número, el botón se queda en «pronto» y el
+      demo no lo usa.*
 - [ ] Webhook de Kapso: el mensaje «Quiero cuidar a Carmen (casa demo)» registra el teléfono con
-      la casa. Ese mensaje abre la ventana de 24 h de Meta.
+      la casa. **La URL registrada apunta hoy a `/f/demo`**: hay que cambiarla a
+      `/api/kapso/webhook`.
+      *Sin hacer, por dos motivos encadenados: la URL está mal, y además las rutas responden
+      **404 en producción** porque `api/kapso/webhook`, `api/vigilar` y `lib/kapso.ts` siguen sin
+      commitear ni desplegar.*
 - [ ] Cuando la alerta escala, a todos les llega un WhatsApp con el enlace a `/f/[token]`.
+      *Escrito y sin ejecutar ni una vez: `/api/vigilar` escala, lee `avisos_pendientes`, manda y
+      sella. No se ha probado porque depende del deploy.*
+- [ ] Activar en el sandbox cada teléfono que vaya a la tarima, y decirlo en el guion: el público
+      no recibe.
+      *A medias: solo el teléfono de Josuep tiene sesión. Cada uno más necesita su código de 6
+      caracteres, que caduca en 15 minutos.*
+- [ ] Aplicar la migración `20261024180000_whatsapp.sql` en la base real y probar el ciclo:
+      mensaje entrante → `suscripciones` → `GET /api/vigilar` envía.
+      *Sin hacer: hay que pegarla a mano en el SQL Editor de Supabase, como la primera, y no se ha
+      pegado.*
+
+### 4b. El mismo aviso por Telegram · *por asignar*
+
+El sandbox no sirve para «que le llegue a todos»: cada teléfono necesita sesión activa y la
+apelación de Meta tarda 24-48 h. **Telegram sí llega a cualquiera sin verificación de negocio**, y
+es el canal que ya describen [plan.md](plan.md) e
+[investigacion-alertas.md](investigacion-alertas.md). Se implementa la misma dinámica que WhatsApp:
+la familia se registra desde la invitación y recibe el aviso con el enlace a su panel.
+
+Lo único que Telegram no permite: **el bot no puede escribirle primero a nadie**. Cada familiar
+tiene que abrir el bot y pulsar `/start` una vez, con un deep link `t.me/<bot>?start=<token>`.
+
+**Por qué está sin empezar:** se decidió hoy, cuando Meta restringió la cuenta de WhatsApp. No hay
+bot creado, no hay token y no hay una línea de código: los seis puntos de abajo están intactos.
+
+- [ ] Crear el bot con @BotFather y guardar el token en `TELEGRAM_BOT_TOKEN` (Vercel y
+      `web/.env.local`). Sin verificación ni cuenta de negocio.
+- [ ] `web/src/lib/telegram.ts` con el mismo contrato que `kapso.ts` (`hayTelegram`, `enviarTexto`):
+      `POST https://api.telegram.org/bot<token>/sendMessage`.
+- [ ] `web/src/app/api/telegram/webhook/route.ts`: recibe `/start <token>`, llama a
+      `familia_suscribir` y contesta. Registrar con `setWebhook`.
+- [ ] Botón «Recibir avisos por Telegram» en la invitación, junto al de WhatsApp.
+- [ ] `/api/vigilar` manda por los dos canales: Telegram a todos los suscritos y WhatsApp a los
+      teléfonos con sesión de sandbox. `avisos_pendientes` ya sirve igual para los dos.
+- [ ] Probar sin wifi: el aviso tiene que llegar por datos móviles.
+
 
 ### 5. La web de la familia · *Rogelio*
 
@@ -131,17 +211,28 @@ Hecho con datos simulados: el estado se deriva en
       `?escenario=` siguen los simulados, y la casa de demo cae a ellos si la base no responde.
 - [x] «Ya hablé con Carmen» escribe en Supabase (`familia_atender`).
 
+**Cerrada:** los ocho puntos están hechos. Lo que todavía no se puede ver es el *envío* del aviso,
+que no es de esta web: es el punto 4 (WhatsApp) y el 4b (Telegram).
+
 ## P1: si P0 está listo
+
+**Nada de esto se ha empezado.** El tiempo se fue en el oído, en las dos pantallas y en la base de
+datos. Cada punto lleva su motivo.
 
 - [ ] **El tono de 520 Hz y la vibración** en «¿Está bien?»
       ([investigacion-audio.md §1.1](investigacion-audio.md)). Ya está marcado «Por hacer» en
       [`alarma.dart`](../app/lib/ui/alarma.dart).
+      *Sin hacer: no hay paquete de audio ni de vibración en `app/pubspec.yaml`. Consecuencia para
+      el demo: la alarma de confirmación **no suena, solo se ve**.*
 - [ ] **Que la app no se muera:** servicio en primer plano tipo `microphone` con
       `flutter_foreground_task`, pantalla encendida mientras carga y la app como pantalla de
       inicio ([riesgos.md §3](riesgos.md)).
+      *Sin hacer: `flutter_foreground_task` no está en `pubspec.yaml` y el manifiesto no declara
+      ningún servicio. Hoy la app escucha solo con la pantalla encendida y la app abierta.*
 - [ ] **Pastilla olvidada:** si pasan 2 horas sin «Ya la tomé», aviso 🟡 a la familia. La lógica ya
       existe (`EstadoToma.olvidada` en [`pastillas.dart`](../app/lib/dominio/pastillas.dart)); falta
       mandarlo.
+      *Sin hacer: falta el envío, y el envío es el punto 4 o el 4b. La lógica está y probada.*
 - [ ] **Las pastillas desde la foto del récipe:** la familia sube la foto en la web, Claude la lee
       y la familia confirma antes de guardar. Hoy las pastillas son datos inventados en
       [`simulado.dart`](../app/lib/datos/simulado.dart). Sigue el mismo patrón que la factura (abajo)
@@ -183,11 +274,19 @@ Hecho con datos simulados: el estado se deriva en
   - [ ] El token `demo` es público: cualquiera puede gastar lecturas de Claude con él. Si se
         abusa en el demo, poner un tope por minuto en el route handler.
 - [ ] **La rutina:** conteos de qué suena en cada franja del día, y aviso si falta lo de siempre.
+      *Sin hacer: el oído ya produce los eventos; falta agruparlos por franja. No se empezó.*
 - [ ] **Configuración que guarde de verdad,** con el QR real de invitación.
+      *Sin hacer: la app lee datos fijos de [`simulado.dart`](../app/lib/datos/simulado.dart) y no
+      persiste nada; el QR de invitación es el token `demo`.*
 - [ ] Un `make demo` que levante la web y la conecte con el teléfono (`adb reverse tcp:3000
       tcp:3000`), para probar los avisos sin desplegar.
+      *Sin hacer: hasta ahora se probó con `next dev` y el teléfono contra Supabase directo, sin
+      necesidad de ese puente.*
 
 ## Probar con voces mayores · *Abrahan*
+
+**Sin empezar, y no por falta de tiempo:** hacen falta personas mayores grabando y un teléfono
+viejo para medir. Ninguna de las dos cosas está disponible hoy.
 
 - [ ] Clips de Common Voice de 60 años o más contra clips de 20: ¿YAMNet ve la voz igual?
 - [ ] Notas de voz donadas: la meta es 10 personas, y el mensaje para pedirlas está en
@@ -198,7 +297,7 @@ Hecho con datos simulados: el estado se deriva en
 
 ## Para el pitch y el jurado
 
-- [ ] **Cifras con fuente** ([investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)).
+- [x] **Cifras con fuente** ([investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)).
       Revisadas el sábado 10:00 contra la fuente original. **Para el pitch, solo estas:**
 
       | Cifra | Fuente |
@@ -220,11 +319,20 @@ Hecho con datos simulados: el estado se deriva en
       de Carmen».
 - [ ] **El nombre del producto.** Hoy la web instalable dice «En casa» de relleno
       ([`web/src/lib/app.ts`](../web/src/lib/app.ts)) y la app, «Casa».
+      *Sin hacer: es una decisión de equipo, no una tarea de código.*
 - [ ] Actualizar [preguntas-tecnicas.md](preguntas-tecnicas.md) con lo que ya pasó a código: el
       oído en el teléfono, la llamada por WhatsApp y su respaldo, y la respuesta por voz.
+      *Sin hacer: el canal cambió tres veces (Telegram → WhatsApp → WhatsApp con sandbox más
+      Telegram). Se actualiza cuando el 4b esté decidido, o se actualiza dos veces.*
 - [ ] Que la tabla de estado del README y la de [AGENTS.md](../AGENTS.md) digan lo mismo que el
       código.
+      *Sin hacer: cambian cada hora con los commits de todo el equipo. Es lo último que se toca
+      antes de congelar, el domingo a las 24:00.*
 - [ ] Contar las limitaciones en voz alta ([riesgos.md](riesgos.md#cómo-contar-la-verdad)): la
       llamada de WhatsApp va por una vía no oficial, y Android no dice si la contestaron.
+      *Se prepara antes del pitch; el texto ya está escrito en riesgos.md. Falta ensayarlo.*
 - [ ] En el lienzo, la fila «Teléfono de la casa de pie» es la versión anterior: se puede borrar.
+      *Sin hacer: es cosmético en un artifact externo y no bloquea nada.*
 - [ ] Llave propia para firmar el App Bundle, si se quiere subir a Google Play.
+      *Sin hacer y sin urgencia: la app se distribuye por sideload, y la investigación de alertas
+      ya documenta que la tienda no aplica a este proyecto.*
