@@ -86,7 +86,7 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 
 | Qué | Cuántas | Cómo |
 |---|---|---|
-| Web: estado de la familia, audio, inventario y factura | 51 | `cd web && bun test` |
+| Web: estado de la familia, audio, inventario, factura y el tope de lecturas | 56 | `cd web && bun test` |
 | Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
 | App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 97 | `make test` |
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |

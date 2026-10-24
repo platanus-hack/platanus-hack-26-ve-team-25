@@ -280,8 +280,9 @@ pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)
         hay nada integrado ni supuesto de ninguna API.
   - [ ] El récipe se carga hoy con `familia_recetar` (el script de demo). Cuando exista la lectura
         del récipe por foto, que llame a esa misma función después de que la familia confirme.
-  - [ ] El token `demo` es público: cualquiera puede gastar lecturas de Claude con él. Si se
-        abusa en el demo, poner un tope por minuto en el route handler.
+  - [x] El token `demo` es público: cualquiera podía gastar lecturas de Claude con él. Desde el
+        sábado 16:55, cada casa lee hasta 3 facturas por minuto y 20 por hora
+        ([`tope.ts`](../web/src/lib/familia/tope.ts), con 5 pruebas).
 - [ ] **La rutina:** conteos de qué suena en cada franja del día, y aviso si falta lo de siempre.
       *Sin hacer: el oído ya produce los eventos; falta agruparlos por franja. No se empezó.*
 - [ ] **Configuración que guarde de verdad,** con el QR real de invitación.
@@ -386,8 +387,8 @@ está probado solo con pruebas automáticas.
       Telegram). Se actualiza cuando el 4b esté decidido, o se actualiza dos veces.*
 - [ ] Que la tabla de estado del README y la de [AGENTS.md](../AGENTS.md) digan lo mismo que el
       código.
-      *Sin hacer: cambian cada hora con los commits de todo el equipo. Es lo último que se toca
-      antes de congelar, el domingo a las 24:00.*
+      *Puestas al día el sábado 16:45 (README reescrito y `AGENTS.md`), y Abrahan las sigue
+      actualizando con cada pieza. Se revisan de nuevo al congelar, el sábado a las 24:00.*
 - [ ] Contar las limitaciones en voz alta ([riesgos.md](riesgos.md#cómo-contar-la-verdad)): la
       llamada de WhatsApp va por una vía no oficial, y Android no dice si la contestaron.
       *Se prepara antes del pitch; el texto ya está escrito en riesgos.md. Falta ensayarlo.*
