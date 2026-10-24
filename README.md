@@ -14,6 +14,8 @@ Track: 🚨 Emergencias · Producción: https://platanus-hack-26-ve-team-25.verc
 - Dónde puede fallar y cómo lo evitamos: [docs/riesgos.md](docs/riesgos.md)
 - Las preguntas abiertas de cada uno: [docs/investigacion.md](docs/investigacion.md)
 - Lo que va después del hackatón: [docs/futuro.md](docs/futuro.md)
+- Preguntas técnicas, con la evidencia de cada respuesta: [docs/preguntas-tecnicas.md](docs/preguntas-tecnicas.md)
+- Comparación de modelos de audio: [experimentos/modelos-audio](experimentos/modelos-audio/README.md)
 
 ## Estado
 
