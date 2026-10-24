@@ -162,12 +162,17 @@ descuenta dos veces ([migración](../supabase/migrations/20261024160000_pastilla
 probado contra la base real con `make test-integracion`). Los días que alcanzan los calcula
 [`inventario.ts`](../web/src/lib/familia/inventario.ts).
 
-### ¿Cómo se carga el récipe?
+### ¿Cómo sabe qué se compró?
 
-⏳ Se le toma una foto al récipe en la web de la familia, Claude lo lee con salida estructurada y
-la familia confirma antes de guardar con `familia_recetar`. Está en construcción
-([pendientes.md](pendientes.md)); la lectura de facturas ya existe con el mismo patrón. La foto no
-se guarda: va a Claude y se olvida.
+✅ La familia le toma una foto a la factura de la farmacia en la web. Claude la lee con salida
+estructurada ([`route.ts`](../web/src/app/f/[token]/pastillas/factura/leer/route.ts)), cada renglón
+se cruza con el récipe ([`factura.ts`](../web/src/lib/familia/factura.ts)) y la familia confirma:
+**solo se guarda lo que está en el récipe**. La foto no se guarda: va a Claude y se olvida. Cada
+casa lee hasta 3 facturas por minuto y 20 por hora, porque el token del demo es público
+([`tope.ts`](../web/src/lib/familia/tope.ts)).
+
+📐 El récipe se carga hoy con un script; leerlo por foto, con el mismo patrón, es lo siguiente
+([futuro.md](futuro.md#salud)).
 
 ## Seguridad
 

@@ -60,6 +60,7 @@ Los números van en `app/config/local.json`, que no se sube al repo:
 
 | # | Qué se hace en el Infinix | Qué tiene que pasar |
 |---|---|---|
+| 0 | En el Samsung, `/f/demo/pastillas/factura`: foto de la factura impresa y confirmar | Sube el losartán y cambian los días que alcanzan; lo que no está en el récipe no se guarda |
 | 1 | Mantener presionado «Pastillas de hoy» y decir «ya me la tomé» | Se quita el recordatorio; en `/f/demo/pastillas` del Samsung el losartán baja uno |
 | 2 | Un golpe fuerte cerca y decir «Lucero, estoy bien» | Suena el tono de 520 Hz, habla la voz, y se calla sin avisar a nadie |
 | 3 | Otro golpe y no responder | A los 40 s la voz dice que va a llamar a Josuep; a los 60 s el Samsung se pone rojo, le llega el Telegram y suena el WhatsApp |

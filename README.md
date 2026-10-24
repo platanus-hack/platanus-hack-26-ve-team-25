@@ -44,7 +44,7 @@ SUPABASE · Postgres
 FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
   /f/[token] lee familia_casa cada 5 s ─► 🔴 alerta · 🟡 para saber · 🟢 todo bien · sin señal
   Telegram (/start <token>) ◄─ el aviso del vigilante
-  Pastillas: foto del récipe ─► Claude ─► la familia confirma · «Ya me la tomé» descuenta
+  Pastillas: foto de la factura ─► Claude ─► se cruza con el récipe ─► la familia confirma
 ```
 
 ## Las decisiones, y por qué
