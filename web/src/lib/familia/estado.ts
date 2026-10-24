@@ -97,7 +97,7 @@ function vistaAlerta(casa: Casa, alerta: Alerta, evento: Evento | undefined): Vi
 
   const explicacion = lo_pidio
     ? `Lo pidió desde su pantalla a las ${hora(alerta.creada)}.`
-    : `Sonó a las ${hora(alerta.creada)}. Le preguntamos si estaba bien y no respondió en ${espera} segundos.`;
+    : `${evento?.descripcion ?? "Oímos algo"} a las ${hora(alerta.creada)}. Le preguntamos si estaba bien y no respondió en ${espera} segundos.`;
 
   const hecho = [
     ...(lo_pidio ? [] : ["Le preguntamos en su casa si estaba bien"]),

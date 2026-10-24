@@ -67,17 +67,19 @@ export function simular(escenario: Escenario, ahora: Date): DatosCasa {
       return { casa: casaDemo(new Date(ahora.getTime() - MIN)), eventos: eventosDelDia(ahora), alertas: [] };
 
     case "alerta": {
-      const humo: Evento = {
-        id: "ev-humo",
+      // El caso del pitch: un golpe y nadie responde. Se dice «golpe», no «caída»: el modelo oye el
+      // golpe, no sabe si fue una caída, y por eso le pregunta antes de avisar.
+      const golpe: Evento = {
+        id: "ev-golpe-fuerte",
         casaId: "demo",
         hora: t(2),
-        tipo: "alarma",
-        descripcion: "Oímos una alarma de humo",
+        tipo: "golpe",
+        descripcion: "Oímos un golpe fuerte",
       };
       const alerta: Alerta = {
-        id: "al-humo",
+        id: "al-golpe-fuerte",
         casaId: "demo",
-        eventoId: humo.id,
+        eventoId: golpe.id,
         nivel: "rojo",
         estado: "escalada",
         creada: t(2),
@@ -86,7 +88,7 @@ export function simular(escenario: Escenario, ahora: Date): DatosCasa {
       };
       return {
         casa: casaDemo(new Date(ahora.getTime() - 20_000)),
-        eventos: [...eventosDelDia(ahora, 5), humo],
+        eventos: [...eventosDelDia(ahora, 5), golpe],
         alertas: [alerta],
       };
     }

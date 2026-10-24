@@ -146,6 +146,25 @@ Hecho con datos simulados: el estado se deriva en
 ## Para el pitch y el jurado
 
 - [ ] **Cifras con fuente** ([investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)).
+      Revisadas el sábado 10:00 contra la fuente original. **Para el pitch, solo estas:**
+
+      | Cifra | Fuente |
+      |---|---|
+      | 7,9 millones de venezolanos fuera del país (nov-2024) | [R4V](https://www.r4v.info/es/situaciones/platform), vía [El Diario](https://eldiario.com/2024/12/06/r4v-mas-4-millones-venezolanos-regularizaron-su-situacion-migratoria-desde-2019-latam/) |
+      | Entre 300.000 y 380.000 mayores viven solos en Venezuela (may-2026) | [Convite, vía El Diario](https://eldiario.com/2026/05/29/adultos-mayores-solos-venezuela/) |
+      | Las caídas son la 2.ª causa de muerte por lesión no intencional: 684.000 al año | [OMS](https://www.who.int/news-room/fact-sheets/detail/falls) |
+      | De los mayores de 90 años, el 30 % quedó una hora o más en el piso tras caerse | [Fleming y Brayne, BMJ 2008](https://pmc.ncbi.nlm.nih.gov/articles/PMC2590903) |
+
+      **No usar** hasta encontrar la fuente original (vienen de
+      [`dashboard/investigacion_sustento_problematica.md`](../dashboard/investigacion_sustento_problematica.md)):
+      «842.000 muertes por caídas» (la OMS dice 684.000), «el long lie duplica la mortalidad, según
+      el NIH» (viene de un estudio de 1997 con hospitalizados, no del NIH), los porcentajes de causas
+      de accidentes, la tabla de tiempos de respuesta, los porcentajes de mayores solos por país, los
+      31 millones del mercado global y el 65,6 % con hijos fuera. Ese documento también dice
+      Telegram y latido por minuto: hoy son WhatsApp con Kapso y latido cada 90 s.
+- [ ] **En el pitch se dice «golpe», no «caída».** El modelo oye un golpe y por eso pregunta antes
+      de avisar. El escenario de demo (`/f/demo?escenario=alerta`) ya es «Un golpe fuerte en casa
+      de Carmen».
 - [ ] **El nombre del producto.** Hoy la web instalable dice «En casa» de relleno
       ([`web/src/lib/app.ts`](../web/src/lib/app.ts)) y la app, «Casa».
 - [ ] Actualizar [preguntas-tecnicas.md](preguntas-tecnicas.md) con lo que ya pasó a código: el

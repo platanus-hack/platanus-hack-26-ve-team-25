@@ -29,16 +29,16 @@ describe("derivarVista", () => {
   test("la alerta urgente cuenta qué pasó y cuánto se esperó", () => {
     const vista = derivarVista(simular("alerta", AHORA), AHORA);
     if (vista.tipo !== "alerta") throw new Error(vista.tipo);
-    expect(vista.titular).toBe("Alarma de humo en casa de Carmen");
+    expect(vista.titular).toBe("Un golpe fuerte en casa de Carmen");
     expect(vista.explicacion).toBe(
-      "Sonó a las 14:05. Le preguntamos si estaba bien y no respondió en 60 segundos.",
+      "Oímos un golpe fuerte a las 14:05. Le preguntamos si estaba bien y no respondió en 60 segundos.",
     );
     expect(vista.hecho).toContain("Desde su casa llamamos a Josuep, su hijo");
   });
 
   test("el pánico no dice que se le preguntó: lo pidió ella", () => {
     const datos = simular("alerta", AHORA);
-    datos.eventos = datos.eventos.map((e) => (e.id === "ev-humo" ? { ...e, tipo: "panico" } : e));
+    datos.eventos = datos.eventos.map((e) => (e.id === "ev-golpe-fuerte" ? { ...e, tipo: "panico" } : e));
     const vista = derivarVista(datos, AHORA);
     if (vista.tipo !== "alerta") throw new Error(vista.tipo);
     expect(vista.titular).toBe("Carmen pidió ayuda");
