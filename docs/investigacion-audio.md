@@ -51,39 +51,29 @@ modelos de audio y de habla se entrenaron casi siempre con voces jóvenes.
 | **El reconocimiento de voz se equivoca más** con personas mayores, sobre todo con hombres | [Vipperla, tesis de Edimburgo, 2011](https://era.ed.ac.uk/handle/1842/5725); [JAMIA 2023, entrevistas en residencias](https://cris.maastrichtuniversity.nl/en/publications/the-development-of-an-automatic-speech-recognition-model-using-in/) | La palabra clave «¡auxilio!» se prueba con voces mayores reales antes de prometerla. Nunca es la única vía: la pantalla y los botones siguen |
 | **Oye peor los agudos** (pérdida de audición con la edad) | En pruebas de la NFPA, el tono de 520 Hz en onda cuadrada despertó al 92% de las personas con pérdida auditiva, contra el 56% del tono de 3.100 Hz ([Wikipedia, con las pruebas de 1970](https://en.wikipedia.org/wiki/Fire_alarm_notification_appliance)) | **La alarma de confirmación de 60 s usa 520 Hz en onda cuadrada**, no un pitido agudo. La voz de «¿Está bien?» es grave, lenta y fuerte, y además la pantalla destella y el teléfono vibra |
 
-**Cómo lo probamos.** Hay que grabar voces mayores reales: los abuelos del equipo, con su permiso.
-Diez frases dichas normal, un «¡ayuda!» débil, un quejido y una tos. Las grabaciones se quedan en la
-máquina de quien grabó y no se suben al repo, que es público. Con eso se mide si YAMNet y la
-palabra clave las detectan a 1 m y a 4 m del teléfono.
+**Cómo lo probamos sin abuelos propios.** Ninguno del equipo tiene abuelos a mano, así que se
+combinan cuatro fuentes. Las grabaciones de personas reales nunca se suben al repo, que es público.
 
-## 1.2 Limpiar el audio antes de YAMNet
+| Fuente | Qué da | Cuidado |
+|---|---|---|
+| [Mozilla Common Voice](https://datacollective.mozillafoundation.org/datasets/cmn4z1n52000knv07h01532dd) (CC0, libre) | Miles de frases leídas, con la edad de quien habla por década. En español hay voces de sesenta años o más; los setenta y ochenta aparecen sobre todo en otros idiomas | Es voz leída y tranquila: sirve para medir si YAMNet ve la voz mayor, no para gritos ni quejidos. Para eventos que no son palabras, el idioma importa poco |
+| Notas de voz de WhatsApp | Abuelos de amigos y familiares diciendo cinco frases: «Estoy bien», un «¡ayuda!» débil, un quejido, una tos, «Huele a gas» | Pedir permiso explícito, explicar para qué es y borrarlas después del hackatón |
+| Personas mayores en el evento | Mentores, staff o personal del edificio, con su permiso | Lo mismo: permiso y nada al repo |
+| Voces del equipo envejecidas a propósito | Las mismas frases del equipo, con menos volumen (−10 a −20 dB), el tono corrido (más grave en mujeres, un poco más agudo en hombres), temblor y aire de fondo | Sirve para probar robustez, no como prueba de que funciona con voces mayores |
 
-El objetivo de estudiar las frecuencias es limpiar la señal para que YAMNet reconozca mejor. Hay
-una trampa: **YAMNet se entrenó con audio crudo y ruidoso** (videos de YouTube de AudioSet). Su
-propio frente convierte el audio a 16 kHz mono y a 64 bandas mel entre 125 y 7.500 Hz. Si lo
-limpiamos de más, le llega un sonido que nunca vio y puede acertar menos.
+En el pitch se dice tal cual: «Probado con voces mayores de Common Voice y voces reales donadas.
+La prueba en casas de verdad es el siguiente paso».
 
-Y un supresor de ruido de voz borra justo lo que buscamos: los modelos como RNNoise o DeepFilterNet
-dejan pasar solo la voz y tratan como ruido la alarma, el vidrio y el golpe.
+## 1.2 El audio llega crudo a YAMNet
 
-**Por eso van dos caminos desde el mismo micrófono:**
+**Decidido: no se limpia el audio.** YAMNet se entrenó con audio crudo y ruidoso (videos de
+YouTube de AudioSet) y tiene su propio frente: lo pasa a 16 kHz mono y a 64 bandas mel entre 125 y
+7.500 Hz. Si lo limpiamos, le llega un sonido que nunca vio. Y los supresores de ruido de voz,
+como RNNoise, tratan como ruido justo lo que buscamos: la alarma, el vidrio y el golpe.
 
-```text
-micrófono ─► limpieza suave ─┬─► YAMNet (eventos: alarma, vidrio, golpe, quejido, rutina)
-                             └─► realce de voz ─► palabra clave «¡auxilio!» y detector de voz
-```
-
-| Paso | Dónde | Qué hace | Por qué |
-|---|---|---|---|
-| Pedirle a Android el audio sin procesar | Los dos caminos | Fuente de audio `UNPROCESSED` o `VOICE_RECOGNITION`, no la de llamadas | El modo de llamadas trae su propio supresor de ruido y control de volumen, que borra los sonidos que no son voz |
-| Filtro pasa-altos a ~80 Hz | Los dos | Quita el retumbo y el zumbido de la red eléctrica (60 Hz en Venezuela) | No toca voces ni alarmas. YAMNet empieza en 125 Hz de todas formas |
-| Normalizar el volumen | Los dos | Sube una voz débil hasta un nivel de referencia | La voz del adulto mayor es más baja: sin esto, sus energías en las bandas de YAMNet quedan por debajo de lo que vio entrenando |
-| Restar el fondo de esa casa | Los dos | Aprende el ruido constante (nevera, ventilador, aire) y lo descuenta | Es ruido estable. Se resta suave para no deformar la señal |
-| Realce de voz (RNNoise) | Solo el camino de la voz | Deja solo la voz | Ayuda a la palabra clave con voces débiles. Nunca va hacia YAMNet |
-
-**Esto no se decide por intuición, se mide** (pregunta 6): las mismas grabaciones de voces mayores,
-crudas y con cada paso, y se compara el puntaje de YAMNet en las clases que importan. Se queda
-solo el paso que sube el puntaje.
+La única regla es **que Android tampoco lo limpie**. El modo de llamadas del micrófono trae su
+propio supresor de ruido y control de volumen. Hay que pedir la fuente de audio `UNPROCESSED` o
+`VOICE_RECOGNITION`. Falta confirmar cómo se elige con el paquete `record` (sección 4).
 
 ## 2. Plan: modelos tipo YAMNet y personalización por casa
 
@@ -118,7 +108,7 @@ micrófono ─► detectores clásicos (dB, alarma, aspereza)
 | 3 | ¿Los embeddings separan las falsas alarmas de una casa? | Grabar 20 sonidos reales por clase (ollas, puerta, TV, golpe, grito) y medir el kNN con validación cruzada | 1,5 h |
 | 4 | ¿El modelo de rutina detecta un día anómalo? | Simular 7 días de eventos con un generador y verificar que marca el día sin actividad matutina | 1 h |
 | 5 | ¿Los detectores clásicos aciertan? | Probar la alarma de 3.100 Hz y 520 Hz y gritos contra TV con gritos | 1 h |
-| 6 | ¿La limpieza ayuda o estorba a YAMNet? | Grabaciones de voces mayores, crudas y con cada paso de la sección 1.2. Comparar el puntaje en «Speech», «Wail, moan» y «Shout» | 1 h |
+| 6 | ¿YAMNet ve las voces mayores? | Clips de Common Voice de sesenta años o más, contra clips de veinte. Comparar el puntaje en «Speech» a volumen normal y bajo | 1 h |
 | 7 | ¿Qué sienten los sensores de un teléfono de 2019? | Ver la sección 3: registrar cada sensor 10 min con la casa quieta, y luego con una caída simulada, una puerta y la luz | 1,5 h |
 
 ### Candidatos a comparar
@@ -126,8 +116,14 @@ micrófono ─► detectores clásicos (dB, alarma, aspereza)
 Hay que confirmar la licencia y el formato de cada uno en su repositorio antes de elegir.
 
 Todos hacen lo mismo que YAMNet: escuchan una ventana corta y dicen qué sonidos hay, con las
-clases de AudioSet. La diferencia está en cuánto aciertan y cuánto pesan. El mAP mide el acierto
-en AudioSet: más alto es mejor.
+clases de AudioSet. La diferencia está en cuánto aciertan y cuánto pesan.
+
+**Qué es el mAP.** Para cada clase, por ejemplo «alarma de humo», se le dan al modelo miles de clips
+de prueba de AudioSet y se ordenan por su puntaje. La precisión promedio (AP) mide qué tan arriba
+de esa lista quedan los clips que de verdad tienen alarma: 1 es perfecto, todos primero. El mAP es
+el promedio de las 527 clases. No es un «porcentaje de aciertos»: un mAP de 0,47 contra 0,31
+quiere decir que el modelo ordena mucho mejor. Además promedia clases que no nos importan, como los
+géneros de música, así que lo que vale para nosotros se mide con nuestras propias grabaciones.
 
 | Modelo | Qué es | Tamaño | mAP | Licencia | Para nosotros |
 |---|---|---|---|---|---|
@@ -164,7 +160,7 @@ persona sigue siendo el sensor que confirma.
 | Acelerómetro | Todos | Vibraciones: golpes y pasos fuertes en el piso | Fusión con el sonido: un golpe que suena *y* hace vibrar. Funciona mejor con el teléfono pegado a la pared o al piso que sobre una mesa |
 | Giroscopio | Casi todos | Que alguien movió o levantó el teléfono | Señal de vida para la rutina. También detecta si el teléfono se cayó |
 | Sensor de luz | Todos | Si las luces del cuarto se prenden o se apagan | **Rutina sin micrófono y sin problema de privacidad**: «prendió la luz a las 6:50». Una luz prendida a las 3 a. m. por mucho rato es una alerta amarilla |
-| Proximidad | Todos | Algo a pocos centímetros de la pantalla | **Apagar la alarma pasando la mano por encima**, sin tener que atinarle a un botón. Pensado para quien ve mal o tiene temblor |
+| Proximidad | Casi todos. Algunos modelos recientes lo simulan por software y responden mal | Algo a pocos centímetros de la parte de arriba de la pantalla | **Decidido: la alarma se apaga pasando la mano por encima**, sin atinarle a un botón. Pensado para quien ve mal o tiene temblor. El botón grande sigue, por si el sensor falla |
 | Carga de batería | Todos | Si el teléfono dejó de cargar | Detecta el apagón, que el plan ya usa para no confundirlo con una emergencia |
 | Barómetro | Solo algunos | Cambios de presión, por ejemplo al abrir una puerta en un espacio cerrado | Extra solo si el teléfono lo trae. No se promete |
 | Magnetómetro | Casi todos | Cerca de metal que se mueve | Poco útil en casa. Fuera del alcance |
@@ -173,10 +169,40 @@ persona sigue siendo el sensor que confirma.
 **Lo que limita a todos: Android en segundo plano.** Desde Android 9, una app en segundo plano no
 puede usar el micrófono y deja de recibir los sensores continuos, como el acelerómetro y el
 giroscopio. La app de la casa tiene que correr como servicio en primer plano, con una notificación
-fija y el teléfono enchufado. Eso se resuelve en Flutter con un servicio en primer plano. Falta
-confirmar los paquetes: `sensors_plus` para el acelerómetro y el giroscopio, y paquetes aparte
-para la luz y la proximidad.
+fija y el teléfono enchufado. Los paquetes están en la sección 4.
 
 **Cómo encaja con la rutina de la sección 2.** El modelo de rutina cuenta por franja del día
 todas las señales, no solo los sonidos: luz, movimiento del teléfono, agua, cocina, TV. Mientras
 más fuentes tenga la rutina, menos depende de que el micrófono oiga bien la voz del abuelo.
+
+## 4. Paquetes de Flutter
+
+Confirmados en pub.dev el 24-oct-2026.
+
+| Para qué | Paquete | Versión | Licencia | Nota |
+|---|---|---|---|---|
+| **Servicio en primer plano y notificación fija** | [`flutter_foreground_task`](https://pub.dev/packages/flutter_foreground_task) | 11.0.3 (hace ~1,5 meses) | MIT | **El elegido.** Notificación con título, texto y botones. Acepta el tipo `microphone`. Sigue corriendo con la app cerrada y puede arrancar al encender el teléfono. 583 likes |
+| Alternativa al anterior | [`flutter_background_service`](https://pub.dev/packages/flutter_background_service) | 5.1.0 (hace 22 meses) | MIT | Funciona, pero lleva casi dos años sin versión nueva |
+| Micrófono en vivo | [`record`](https://pub.dev/packages/record) | 7.1.2 | BSD-3 | Entrega PCM de 16 bits en vivo con `startStream`. Falta confirmar cómo pedir la fuente `UNPROCESSED` |
+| YAMNet en el teléfono | [`tflite_flutter`](https://pub.dev/packages/tflite_flutter) | 0.12.1 (hace 12 meses) | Apache 2.0 | Publicado por tensorflow.org. Acelera con NNAPI o GPU en Android |
+| Acelerómetro, giroscopio, barómetro | [`sensors_plus`](https://pub.dev/packages/sensors_plus) | 7.1.1 | BSD-3 | No trae luz ni proximidad |
+| Proximidad | [`proximity_sensor`](https://pub.dev/packages/proximity_sensor) | 2.0.0 | MIT | Avisa cerca o lejos. Su autor advierte que los sensores simulados de algunos modelos recientes no son confiables |
+| Luz ambiente | [`light`](https://pub.dev/packages/light) o [`ambient_light`](https://pub.dev/packages/ambient_light) | 5.0.0 / 0.2.1 | Por confirmar | Hay que probar cuál responde en el teléfono viejo |
+| Carga y batería | `battery_plus` | Por confirmar | Por confirmar | Para detectar el apagón |
+
+**Las reglas de Android que cambian el diseño**
+
+1. **Android 14 o más**: el servicio tiene que declarar el tipo `microphone`, con los permisos
+   `FOREGROUND_SERVICE_MICROPHONE` y `RECORD_AUDIO`
+   ([Android Developers](https://developer.android.com/guide/components/fg-service-types)). Y un
+   servicio de micrófono no puede arrancar mientras la app está en segundo plano: **se arranca
+   con la app abierta**, en la configuración inicial de la casa.
+2. **Android 15 o más: el servicio de micrófono no puede arrancar solo al encender el teléfono**
+   ([flutter_foreground_task](https://pub.dev/packages/flutter_foreground_task)). En Venezuela,
+   si se va la luz y el teléfono se apaga, al volver deja de escuchar. Lo que hacemos:
+    - El latido se corta y la familia ve «la casa se reinició, sin escuchar», en amarillo.
+    - Al encender, la app muestra en pantalla «Toque para volver a cuidar».
+    - Se recomienda dejar el teléfono enchufado con su batería sana, para que aguante el apagón
+      sin apagarse.
+3. **iOS no sirve como teléfono de la casa**: no permite escuchar todo el día en segundo plano. La
+   casa es un Android. La familia puede usar Android o iPhone, porque solo recibe avisos.

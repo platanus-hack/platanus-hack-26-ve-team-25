@@ -57,6 +57,9 @@ Ninguno de los proyectos anteriores de Platanus Hack lo hace.
 | Una sola app con dos roles: la casa y la familia | El mismo instalable sirve para el teléfono viejo del abuelo y para el del familiar que recibe el aviso |
 | La rutina de cada casa se cuenta, no se entrena | Conteos de qué suena en cada franja del día. Lo que más dice que algo pasó es que falte lo de siempre, y eso cubre las caídas silenciosas |
 | El demo muestra dos momentos | A la casa le pasa algo en la tarima, y a alguien del público le llega el aviso en su teléfono |
+| El audio llega crudo al modelo | YAMNet se entrenó con audio ruidoso. Limpiarlo le muestra un sonido que nunca vio, y los supresores de voz borran la alarma y el golpe |
+| La alarma se apaga pasando la mano por encima | El sensor de proximidad evita tener que atinarle a un botón a quien ve mal o tiene temblor. El botón grande queda por si el sensor falla |
+| El teléfono de la casa es Android | iOS no deja escuchar todo el día en segundo plano. La familia puede usar cualquier teléfono |
 
 ## Pendiente
 
