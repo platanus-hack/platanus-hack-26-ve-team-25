@@ -37,7 +37,9 @@ docs/plan.md                      decisiones del equipo, prioridades P0–P2, de
 docs/pantallas.md                 plan para pasar los mockups a código: contrato de datos, estructura y orden
 docs/contexto.md                  el problema, la competencia y las decisiones de diseño
 docs/riesgos.md                   muros técnicos (kiosco, apagones, batería), riesgos del demo
+docs/investigacion-alertas.md     capa de alertas: transporte, escalamiento, apagones y perfil energético
 docs/investigacion-audio.md       voz del adulto mayor, modelos, sensores y paquetes de Flutter
+docs/investigacion-carga.md       cómo se sabe si el teléfono está cargando: señales de Android y battery_plus
 docs/investigacion.md             preguntas abiertas por persona del equipo
 docs/futuro.md                    lo que va después del hackatón
 web/                              Next.js: la prueba /escucha (YAMNet en el navegador con MediaPipe)

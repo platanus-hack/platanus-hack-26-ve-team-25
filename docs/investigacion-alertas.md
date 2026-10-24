@@ -83,6 +83,15 @@ El teléfono permanece enchufado permanentemente. La señal fiable del apagón e
 
 **El nivel lo pone el perfil, no el evento.** Un apagón en una casa con concentrador de oxígeno es 🔴 inmediato; en una casa sin equipo eléctrico es 🟡 ([`investigacion.md`](investigacion.md#el-perfil-de-salud), [`plan.md`](plan.md#demo)). El evento no fuerza urgencia por sí solo: si lo hiciera, se perdería la demostración de «el mismo apagón, dos avisos».
 
+### Cómo se sabe si el teléfono está cargando
+
+La elección de la señal de carga tiene investigación propia en [`investigacion-carga.md`](investigacion-carga.md). Lo que este documento usa de ella:
+
+- **`BatteryManager.EXTRA_PLUGGED`** (¿hay fuente de alimentación?) es la señal. `isCharging()` está descartado: se apaga al llegar al límite de carga del 80 % y convertiría cada apagón en permanente.
+- `ACTION_POWER_CONNECTED` / `ACTION_POWER_DISCONNECTED` disparan el cambio, con antirrebote de 5 s y lectura *sticky* al arrancar.
+- En Flutter, `battery_plus` da el nivel (`bateria`); el estado de la fuente va por un `EventChannel` nativo dentro del `ForegroundService`, para no depender de que el motor de Flutter siga vivo.
+- `enchufado` significa «hay fuente de alimentación», no «la batería sube».
+
 ### Medición de consumo y autonomía en chips económicos
 En procesadores gama baja (Unisoc/MediaTek), `BATTERY_PROPERTY_CURRENT_NOW` devuelve con frecuencia `Integer.MIN_VALUE`. La estimación de autonomía se calcula midiendo el tiempo entre deltas reales de porcentaje:
 
@@ -204,7 +213,8 @@ Cinco cosas que hay que decir en voz alta durante el demo:
 | **Llamada saliente** | `Intent.ACTION_CALL` + `TelephonyManager.getCallState()` | Marca al contacto local, mantiene el altavoz y detecta cuándo termina la llamada; **no** distingue si contestaron |
 | **Gestión Dual SIM** | `android.telephony.SubscriptionManager` | Selección de ranura celular activa y extracción de `subId` |
 | **Red y conectividad** | `android.net.ConnectivityManager.NetworkCallback` | Detección de pérdida de Wi-Fi en tiempo real mediante `onLost()` |
-| **Estado de carga** | `android.content.Intent.ACTION_POWER_DISCONNECTED` | Detección inmediata de pérdida de suministro eléctrico |
+| **Estado de carga** | `BatteryManager.EXTRA_PLUGGED` vía `EventChannel` nativo; `ACTION_BATTERY_CHANGED` en modo *sticky* para la lectura inicial ([`investigacion-carga.md`](investigacion-carga.md)) | Detección de apagón por pérdida de fuente. `isCharging()` está descartado: confunde «límite de carga» con «desenchufado» |
+| **Nivel de batería** | `battery_plus` 7.1.2 (Flutter) | Nivel (0–100) y `BatteryState` para el contrato; no sustituye a la señal nativa |
 | **Persistencia local** | SQLite / Room Database | Cola persistente transaccional con estados `PENDING` y `ACK` |
 | **Servicio continuo** | Android `ForegroundService` (`dataSync` / `specialUse`) | Ejecución continua inmune al cierre de interfaz de usuario |
 
@@ -217,6 +227,8 @@ Cinco cosas que hay que decir en voz alta durante el demo:
   * *Foreground Services & Background Execution Restrictions:* [developer.android.com/about/versions/oreo/background](https://developer.android.com/about/versions/oreo/background)
   * *ConnectivityManager.NetworkCallback:* [developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback](https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback)
   * *Battery Monitoring Guide:* [developer.android.com/training/monitoring-device-state/battery-monitoring](https://developer.android.com/training/monitoring-device-state/battery-monitoring)
+* **Investigación propia**:
+  * *Señal de carga (`EXTRA_PLUGGED`, `battery_plus`, antirrebote y lectura al arrancar):* [`investigacion-carga.md`](investigacion-carga.md)
 * **Android Open Source Project (AOSP)**:
   * *Low-RAM Configuration & lmkd Tuning:* [source.android.com/docs/core/perf/low-ram](https://source.android.com/docs/core/perf/low-ram)
 * **Google Play Policy (Referencia de sideloading vs. Store)**:

@@ -32,11 +32,16 @@ Alerta                        un evento que pidió confirmación
   id, casaId, eventoId, nivel: rojo | amarillo | verde
   estado: pendiente → cancelada        (la persona tocó «Estoy bien»)
           pendiente → escalada → atendida  (nadie respondió, o «Necesito ayuda» o pánico)
-  creada, venceEn (creada + 60 s; 15 s en modo demo), escaladaEn, atendidaPor
+  creada, venceEn (creada + 60 s), escaladaEn, atendidaPor
 ```
 
 El estado de la pantalla de la familia **se deriva** de esos datos: si hay una alerta roja
 escalada sin atender, es «Alerta urgente»; si no, «Todo bien», con los amarillos del día debajo.
+
+`enchufado` significa **«hay una fuente de alimentación conectada»** (`BatteryManager.EXTRA_PLUGGED`
+distinto de 0), no «la batería está subiendo». Son cosas distintas: con el límite de carga al 80 %
+el teléfono está enchufado y la batería no sube, y el apagón se detecta igual. La elección de la
+señal está en [`investigacion-carga.md`](investigacion-carga.md).
 
 ## App de la casa (Flutter)
 
@@ -69,7 +74,7 @@ app/
 
 | # | Pantalla | Qué tiene que hacer | Detalle | Terminada cuando |
 |---|---|---|---|---|
-| 1 | **¿Está bien?** (`alarma.dart`) | Cuenta regresiva de 60 s (15 s en modo demo), «Estoy bien» cancela, «Necesito ayuda» escala ya | Tono de 520 Hz en onda cuadrada en bucle, vibración, el fondo destella. Pasar la mano por encima (sensor de proximidad) cuenta como «Estoy bien» | Se dispara con un botón de prueba, cuenta, y cada salida lleva al estado correcto |
+| 1 | **¿Está bien?** (`alarma.dart`) | Cuenta regresiva de 60 s, «Estoy bien» cancela, «Necesito ayuda» escala ya | Tono de 520 Hz en onda cuadrada en bucle, vibración, el fondo destella. Pasar la mano por encima (sensor de proximidad) cuenta como «Estoy bien» | Se dispara con un botón de prueba, cuenta, y cada salida lleva al estado correcto |
 | 2 | **Avisando a la familia** (`ayuda.dart`) | Muestra a quién se avisó y su estado. «Fue sin querer» cancela | Los estados de los contactos vienen de los datos, simulados por ahora | Llega desde 1 o desde el pánico y vuelve a reposo al cancelar |
 | 3 | **En reposo** (`reposo.dart`) | Reloj, estado «Cuidando la casa», pánico y los tres botones de la persona | Fondo negro y brillo bajo. «Pedir ayuda» va directo a 2. «Huele a gas» y «Me siento mal» son 🔴. «Estoy bien hoy» es el 🟢 del día | Cada botón crea el evento correcto |
 | 4 | **Configuración** (`configurar.dart`) | Nombre, contactos, salud y QR | Para el demo puede quedar con datos fijos. El QR lleva el enlace de invitación | P1: el demo funciona sin ella |

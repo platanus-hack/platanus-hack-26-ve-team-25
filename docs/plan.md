@@ -92,7 +92,8 @@ Todo lo demás está en [futuro.md](futuro.md).
 1. Un teléfono en la tarima es la casa de «la señora Carmen» (inventada). El público escanea el QR
    y su teléfono pasa a ser la familia.
 2. Suena una alarma de humo. En la tarima suena la alarma de confirmación, nadie la apaga y a los
-   60 s (15 s en modo demo) les llega el aviso a todos los teléfonos.
+   60 s les llega el aviso a todos los teléfonos. Los tiempos del demo son los del producto: nada
+   se acelera.
 3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» toca «Estoy bien» y se
    ve que no escala.
 4. Se prende la TV con una escena de gritos: no dispara, porque el piso no tembló.
