@@ -29,6 +29,15 @@ android {
         versionName = flutter.versionName
     }
 
+    // Solo teléfonos ARM, que son todos los Android reales: sin las copias x86 de Vosk, JNA y
+    // TFLite (solo sirven en emuladores) el APK pesa menos y por depuración inalámbrica se instala
+    // sin cortarse. abiFilters no sirve aquí: el plugin de Flutter lo pisa.
+    packaging {
+        jniLibs {
+            excludes += listOf("lib/x86/**", "lib/x86_64/**")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
