@@ -470,6 +470,61 @@ void main() {
       await _cerrar(tester, c);
     });
 
+    testWidgets('«Lucero, estoy bien» calla «¿Está bien?»', (tester) async {
+      await abrir(tester);
+      c.oirEvento(TipoEvento.golpe);
+      await tester.pump();
+      expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
+      await decir(tester, ['lucero estoy bien']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      expect(t.porWhatsApp, isEmpty);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«estoy bien» sin «Lucero» no calla la alarma', (tester) async {
+      await abrir(tester);
+      c.oirEvento(TipoEvento.golpe);
+      await decir(tester, ['estoy bien']);
+      expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«me caí» durante la alarma llama al hijo de una vez', (
+      tester,
+    ) async {
+      await abrir(tester);
+      c.oirEvento(TipoEvento.golpe);
+      await decir(tester, ['me caí']);
+      expect(t.porWhatsApp, ['04120000000']);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('«no» a «¿Está bien?» también llama de una vez', (
+      tester,
+    ) async {
+      await abrir(tester);
+      c.oirEvento(TipoEvento.golpe);
+      await decir(tester, ['no']);
+      expect(t.porWhatsApp, ['04120000000']);
+      await _cerrar(tester, c);
+    });
+
+    testWidgets('si ya estaba llamando, «Lucero, estoy bien» cierra el aviso', (
+      tester,
+    ) async {
+      await abrir(tester);
+      c.pedirAyuda(TipoEvento.panico);
+      await tester.pump();
+      expect(t.porWhatsApp, ['04120000000']);
+      await decir(tester, ['lucero estoy bien']);
+      expect(find.text('Cuidando la casa'), findsOneWidget);
+      // Ya no sale la llamada por teléfono que sigue a un WhatsApp sin respuesta.
+      t.terminarWhatsApp(40);
+      await pasan(tester, 20);
+      expect(t.porTelefono, isEmpty);
+      await _cerrar(tester, c);
+    });
+
     testWidgets('«ya me la tomé» quita el recordatorio de la pastilla', (
       tester,
     ) async {

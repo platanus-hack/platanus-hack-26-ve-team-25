@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dominio/alerta.dart';
+import '../dominio/comandos.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
 import 'componentes/deslizador.dart';
@@ -85,6 +86,11 @@ class _AlarmaState extends State<Alarma> with SingleTickerProviderStateMixin {
                           fontSize: 22,
                           color: Colores.tinta,
                         ),
+                      ),
+                      // Para quien está lejos del teléfono o en el suelo.
+                      const Text(
+                        'O diga «$nombreDeLaCasa, estoy bien»',
+                        style: TextStyle(fontSize: 20, color: Colores.tinta),
                       ),
                       const SizedBox(height: 18),
                       Row(

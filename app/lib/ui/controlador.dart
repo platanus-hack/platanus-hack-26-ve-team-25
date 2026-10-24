@@ -258,12 +258,10 @@ class Controlador extends ChangeNotifier {
   }
 
   /// YAMNet oye a una persona hablar, y no es la TV. No se pide que la compuerta esté abierta:
-  /// un «ayuda» débil de una persona mayor puede no pasar el umbral de dB.
+  /// un «ayuda» débil de una persona mayor puede no pasar el umbral de dB. También durante la
+  /// alarma: ahí se puede decir «Lucero, estoy bien» o pedir ayuda.
   bool _hablanEnLaCasa(Escucha e) {
-    if (frases == null ||
-        microfono == null ||
-        alerta != null ||
-        _reconociendo) {
+    if (frases == null || microfono == null || escuchandoVoz || _reconociendo) {
       return false;
     }
     final antes = _ultimoPedido;
@@ -307,7 +305,13 @@ class Controlador extends ChangeNotifier {
       final orden = ordenPorVoz(versiones);
       if (orden != null && _obedecer(orden)) return;
       final pedido = pedidoPorVoz(versiones);
-      if (pedido != null) oirEvento(pedido);
+      if (pedido == null) return;
+      // Pedir ayuda mientras «¿Está bien?» pregunta es la respuesta: no está bien. Llama ya.
+      if (_alerta?.estado == EstadoAlerta.pendiente) {
+        necesitoAyuda();
+      } else {
+        oirEvento(pedido);
+      }
     } finally {
       _reconociendo = false;
       notifyListeners();
@@ -318,8 +322,24 @@ class Controlador extends ChangeNotifier {
   bool _obedecer(Orden orden) {
     switch (orden) {
       case Orden.cancelar:
-        if (porLlamar == null) return false;
-        noLlamar();
+        // «No» a «¿Está bien?» es que no está bien.
+        if (porLlamar == null) {
+          if (_alerta?.estado != EstadoAlerta.pendiente) return false;
+          necesitoAyuda();
+        } else {
+          noLlamar();
+        }
+      case Orden.estoyBien:
+        switch (_alerta?.estado) {
+          case EstadoAlerta.pendiente:
+            estoyBien();
+          // Ya estaba llamando: queda atendida por la casa y no sale la llamada por teléfono que
+          // sigue al WhatsApp. Un WhatsApp que ya está timbrando no se puede colgar desde aquí.
+          case EstadoAlerta.escalada:
+            fueSinQuerer();
+          default:
+            return false;
+        }
       case Orden.yaMeLaTome:
         final p = recordatorio;
         if (p == null) return false;

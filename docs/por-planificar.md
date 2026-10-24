@@ -295,7 +295,8 @@ en una novela, la casa llamaría. Por eso propongo dos reglas:
 | «Cuelga» | Termina la llamada | Mismo permiso, o ser la app de teléfono predeterminada |
 | «¿Qué hora es?», «¿Qué pastilla me toca?» | La casa lo dice en voz alta | Acompaña sin pantalla; usa la voz del teléfono (TTS) |
 | «Ya me la tomé» | Marca la pastilla | **Hecho.** Abrahan lo quiso por voz: así no tiene que pararse de donde esté. Es muy raro que la TV diga justo eso mientras suena el recordatorio |
-| «Estoy bien» en «¿Está bien?» | Apagaría la alarma | Propongo que no: la alarma se apaga deslizando justo para que no se apague por reflejo ni por la TV |
+| «Lucero, estoy bien» en «¿Está bien?» | Calla la alarma; si ya estaba llamando, cierra el aviso y no sale la llamada por teléfono | **Hecho** (Abrahan, sábado 24). Con «Lucero» delante: sin el nombre, «estoy bien» no apaga nada, para que la TV o un reflejo no puedan callarla. Un WhatsApp que ya timbra no se puede colgar |
+| «Ayuda», «me caí» o «no» durante «¿Está bien?» | Llama al hijo de una vez | **Hecho.** Es la respuesta «no estoy bien»; si fue la TV, solo adelanta una llamada que iba a salir |
 
 - [x] El nombre de la casa: **«Lucero»** (sábado 24). Por ahora fijo en
       [`comandos.dart`](../app/lib/dominio/comandos.dart); a futuro lo elige la familia.

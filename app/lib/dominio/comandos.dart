@@ -16,6 +16,9 @@ enum Orden {
 
   /// «Ya me la tomé», mientras suena el recordatorio de la pastilla.
   yaMeLaTome,
+
+  /// «Lucero, estoy bien»: calla «¿Está bien?», o cierra el aviso si ya estaba llamando.
+  estoyBien,
 }
 
 const _llamar = ['llama', 'llame', 'llamen', 'llamar'];
@@ -67,6 +70,18 @@ const _cancelar = [
 
 const _yaMeLaTome = ['ya me la tomé', 'me la tomé', 'ya la tomé'];
 
+/// Después del nombre de la casa: «Lucero, estoy bien». Sin el nombre no cuenta, para que la TV no
+/// pueda callar la alarma.
+const _estoyBien = [
+  'estoy bien',
+  'ya estoy bien',
+  'todo bien',
+  'todo está bien',
+  'no pasó nada',
+  'fue sin querer',
+  'no me pasó nada',
+];
+
 /// Todas las palabras de las órdenes, para la gramática de Vosk.
 List<String> get frasesDeOrdenes => [
   for (final destinos in _destinos.values)
@@ -74,6 +89,7 @@ List<String> get frasesDeOrdenes => [
       for (final l in _llamar) '${nombreDeLaCasa.toLowerCase()} $l $d',
   ..._cancelar,
   ..._yaMeLaTome,
+  for (final f in _estoyBien) '${nombreDeLaCasa.toLowerCase()} $f',
 ];
 
 /// La orden que se dijo, o null. Las llamadas solo cuentan si antes se dijo el nombre de la
@@ -89,6 +105,11 @@ Orden? ordenPorVoz(List<String> versiones) {
     if (enNombre >= 0) {
       // Lo que viene después del nombre: «Lucero, llama a mi hijo».
       final despues = ' ${texto.substring(enNombre + nombre.length + 2)}';
+      if (_estoyBien.any(
+        (f) => despues.contains(' ${normalizar(f).join(' ')} '),
+      )) {
+        return Orden.estoyBien;
+      }
       for (final MapEntry(key: orden, value: destinos) in _destinos.entries) {
         for (final l in _llamar) {
           if (destinos.any(

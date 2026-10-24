@@ -116,6 +116,8 @@ El oído ya escucha. Además hay dos toques largos de prueba:
 | Tocar «Pedir ayuda» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
 | Decir «me huele a gas», «me siento mal» o «ayuda» | Abre «¿Está bien?» con ese motivo, 1,5 s después de terminar la frase |
 | Decir «Lucero, llama a mi hijo» (o «al vecino», «a emergencias») | Cuenta 5 s y llama. «No» lo cancela |
+| En «¿Está bien?», decir «Lucero, estoy bien» | Calla la alarma, como deslizar. Si ya estaba llamando, cierra el aviso |
+| En «¿Está bien?», decir «ayuda», «me caí» o «no» | Llama al hijo de una vez |
 
 Si la cuenta regresiva llega a cero, la alerta escala sola y **la casa llama de verdad** al número
 configurado. En modo debug, debajo de la fecha se ve lo que oye el modelo y su puntaje.

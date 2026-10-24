@@ -43,4 +43,11 @@ void main() {
     expect(ordenPorVoz(['llamen a mi hijo']), isNull);
     expect(pedidoPorVoz(['llamen a mi hijo']), isNotNull);
   });
+
+  test('«Lucero, estoy bien» con el nombre; sin el nombre, no', () {
+    expect(ordenPorVoz(['lucero estoy bien']), Orden.estoyBien);
+    expect(ordenPorVoz(['ay lucero ya estoy bien']), Orden.estoyBien);
+    expect(ordenPorVoz(['lucero no pasó nada']), Orden.estoyBien);
+    expect(ordenPorVoz(['estoy bien']), isNull);
+  });
 }
