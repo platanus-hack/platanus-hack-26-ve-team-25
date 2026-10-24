@@ -87,7 +87,7 @@ class Configurar extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  '${contacto.donde} · ${contacto.canal == Canal.telegram ? 'Telegram y la web' : 'llamada en altavoz'}',
+                  '${contacto.donde} · ${contacto.canal == Canal.whatsapp ? 'WhatsApp y la web' : 'llamada en altavoz'}',
                 ),
               ),
             ),

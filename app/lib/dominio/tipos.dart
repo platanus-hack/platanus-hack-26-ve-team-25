@@ -1,7 +1,7 @@
 // El contrato compartido con la web de la familia (web/src/lib/familia/tipos.ts).
 // Si cambia aquí, cambia allá en el mismo commit. Ver docs/pantallas.md.
 
-enum Canal { telegram, llamada }
+enum Canal { whatsapp, llamada }
 
 class Contacto {
   const Contacto({
