@@ -22,7 +22,9 @@ casi nada está sin hacer por olvido, casi todo espera a algo concreto.
   Falta aplicar la migración de pastillas.
 - **WhatsApp (Kapso):** código escrito y **sin desplegar**. Meta restringió la cuenta
   (`#2655121`); lo único operativo es el sandbox, con el teléfono de Josuep ya activado.
-- **Telegram:** decidido hoy como segundo canal para llegar a todos. Sin empezar.
+- **Telegram:** cortado el sábado 14:30. Va como proyección ([futuro.md](futuro.md)).
+- **Alcance congelado el sábado 14:30:** lo que se presenta y quién hace qué está en
+  [plan.md](plan.md#alcance-congelado-lo-que-se-presenta). Lo que no está ahí no se construye.
 - **Lienzo de mockups:** [claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2](https://claude.ai/artifact/BgbTMPcFXsC9qxitsmk1f2).
 
 ## P0: sin esto no hay demo
@@ -169,7 +171,10 @@ El código ya está escrito: [`web/src/lib/kapso.ts`](../web/src/lib/kapso.ts),
       *Sin hacer: hay que pegarla a mano en el SQL Editor de Supabase, como la primera, y no se ha
       pegado.*
 
-### 4b. El mismo aviso por Telegram · *por asignar*
+### 4b. El mismo aviso por Telegram · *cortado el sábado 14:30*
+
+**Fuera del alcance:** el público ve la alerta en la web y el WhatsApp de Kapso llega a la tarima.
+Lo de abajo queda como guía si se retoma.
 
 El sandbox no sirve para «que le llegue a todos»: cada teléfono necesita sesión activa y la
 apelación de Meta tarda 24-48 h. **Telegram sí llega a cualquiera sin verificación de negocio**, y
@@ -218,6 +223,9 @@ que no es de esta web: es el punto 4 (WhatsApp) y el 4b (Telegram).
 
 **Nada de esto se ha empezado.** El tiempo se fue en el oído, en las dos pantallas y en la base de
 datos. Cada punto lleva su motivo.
+
+**Sábado 14:30:** del P1 entran al alcance solo el tono y la vibración, y conectar el inventario de
+pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)).
 
 - [ ] **El tono de 520 Hz y la vibración** en «¿Está bien?»
       ([investigacion-audio.md §1.1](investigacion-audio.md)). Ya está marcado «Por hacer» en

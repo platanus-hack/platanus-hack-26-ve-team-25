@@ -34,7 +34,8 @@ contacto de emergencia.
 | Google Nest | Oye la alarma de humo y el vidrio roto, pero pide un parlante, suscripción y dirección en EE. UU. No detecta caídas ni gritos |
 | Sound Notifications de Android | Reconoce la alarma de humo y los gritos, pero el aviso no sale del mismo teléfono |
 | AlfredCamera | Convierte el teléfono viejo en cámara: es video de la persona y solo detecta movimiento |
-| Colgantes y sensores dedicados | Hardware que hay que comprar e instalar |
+| Colgantes y sensores dedicados | Hardware que hay que comprar e instalar. En EE. UU. cuestan unos USD 40 al mes ([NCOA](https://www.ncoa.org/product-resources/medical-alert-systems/medical-alert-systems-cost/)) |
+| asistensi y Venemergencia | Venden la respuesta (médico a domicilio, ambulancia, clínica) y la paga la familia que está afuera ([Bloomberg Línea](https://www.bloomberglinea.com/2022/08/18/una-plataforma-de-seguros-se-extiende-desde-venezuela-con-la-mirada-puesta-en-las-remesas/)). No detectan nada: alguien tiene que llamar. Somos el aviso que dispara su respuesta, y pueden ser un canal de venta |
 | Investigación y patentes | Detectan caídas con sonido ambiente, y con vibración del piso más sonido. Nadie lo llevó al teléfono viejo |
 
 Ninguno de los proyectos anteriores de Platanus Hack lo hace.

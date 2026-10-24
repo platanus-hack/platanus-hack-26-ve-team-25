@@ -1,6 +1,8 @@
 # Plan: un teléfono viejo que cuida a los que se quedaron solos
 
 > Decidido el sábado 24-oct a las 00:30 y validado con el mentor. Si cambia, se reescribe aquí.
+> **El sábado a las 14:30 se recortó el alcance:** [lo que se presenta](#alcance-congelado-lo-que-se-presenta)
+> y [la venta](#la-venta-para-el-pitch). Lo que se cortó va como proyección en [futuro.md](futuro.md#hacia-dónde-va).
 > El porqué, lo que ya existe y las decisiones de diseño están en [contexto.md](contexto.md).
 > Lo que puede fallar: [riesgos.md](riesgos.md). Las preguntas de cada uno: [investigacion.md](investigacion.md).
 > Lo que no hacemos ahora pero sí en el producto: [futuro.md](futuro.md).
@@ -20,94 +22,98 @@
   ([riesgos.md](riesgos.md#la-regla-de-oro-despreocupar-no-angustiar)).
 - **El perfil de salud cambia las reglas.** Un apagón no es igual para una persona hipertensa que
   para una que usa oxígeno. Reglas generales por condición más calibración por casa
-  ([investigacion.md](investigacion.md#el-perfil-de-salud)).
+  ([investigacion.md](investigacion.md#el-perfil-de-salud)). *(Sábado 14:30: va como proyección,
+  no entra en el demo.)*
 - **El cliente es el que cuida**, el hijo o el familiar que está lejos. El adulto mayor confía
   porque su familia confía.
-- **Aviso real por Telegram:** es gratis y suena en iOS y en Android. *(Propuesta del sábado
-  06:00: WhatsApp por Kapso con los créditos nuevos, y Telegram de respaldo. Ver
-  [créditos](#propuesta-qué-hace-cada-crédito).)*
+- **El aviso real sale por dos vías.** La casa llama por WhatsApp al primer contacto, con respaldo
+  por llamada normal, y Kapso le manda el WhatsApp a los teléfonos activados en su sandbox. El
+  público ve la alerta en la web. *(Telegram se cortó el sábado 14:30: Meta restringió la cuenta de
+  WhatsApp, y no había una línea de Telegram escrita.)*
 - **Se vende como un acompañante del día a día, y el oído sigue siendo el centro.** El pitch abre
   con lo de todos los días (la pastilla, la llamada con un toque) y llega a la alarma. No es un
   asistente médico: ya hubo proyectos así en Platanus (Tata y Memo, PH25), el track es Emergencias
   y lo original es el oído. No se construye nada nuevo hasta que P0 esté desplegado.
+- **Poco y sólido antes que todo a medias.** Se presenta lo que ya está escrito en código, probado
+  en el teléfono. Lo demás no se construye: se cuenta como hacia dónde va el producto.
 
 ## Reloj (hora de Caracas)
 
 | Cuándo | Qué |
 |---|---|
-| Sáb 12:00 | P0 desplegado y funcionando |
-| Sáb 20:00 | Taller «Cómo hacer un buen demo» (va todo el equipo) |
-| Sáb 24:00 | Alcance congelado y video de respaldo grabado |
+| Sáb 17:00 | La app en el teléfono de la tarima, la alarma suena y el ciclo casa → web probado |
+| Sáb 20:00 | Kapso y pastillas conectados. Taller «Cómo hacer un buen demo» (va todo el equipo) |
+| Sáb 21:00–24:00 | Nombre, README, ensayo y video de respaldo |
+| Sáb 24:00 | Alcance congelado: desde aquí solo arreglos y ensayo |
 | **Dom 08:30** | **Fin del hacking. Lo que no esté pusheado no existe.** |
 | Dom 10:00 | Presentaciones |
 
 ## El flujo del MVP
 
-1. El teléfono de la casa oye (y siente el piso) un posible evento: alarma de humo, vidrio roto,
-   golpe con vibración, grito.
-2. Suena una alarma fuerte en la casa: «¿Está bien?», con dos botones grandes: **Estoy bien** y
-   **Necesito ayuda**. La pantalla destella y vibra.
-3. Si nadie responde en 60 s, se avisa al contacto de emergencia: en la web de la familia y por
-   Telegram.
-4. Cada alarma que la persona apaga queda anotada como falsa alarma de esa casa y ajusta sus
-   umbrales.
+1. El teléfono de la casa oye un posible evento: alarma de humo, vidrio roto, golpe, grito, o una
+   frase de ayuda dicha en voz alta.
+2. Suena una alarma fuerte en la casa: «¿Está bien?». La pantalla destella y vibra.
+3. Si nadie responde en 60 s, la alerta escala: la web de la familia se pone roja, la casa llama
+   por WhatsApp al primer contacto y Kapso manda el WhatsApp.
+4. Cada «Estoy bien» queda anotado en la base. Que ajuste los umbrales de esa casa es proyección.
 
-## Prioridades
+## Alcance congelado: lo que se presenta
 
-Se trabaja de arriba hacia abajo. Nada de P1 hasta que P0 esté desplegado.
+> Recortado el sábado 24-oct a las 14:30. Lo que no está aquí no se construye: se cuenta como
+> proyección ([futuro.md](futuro.md#hacia-dónde-va)). Desde las 24:00 del sábado solo entran
+> arreglos y ensayo. El detalle de cada punto, con dónde está el código, sigue en
+> [pendientes.md](pendientes.md).
 
-### P0 · El núcleo (meta: sábado 12:00, desplegado)
+Todo esto ya está escrito. Falta probarlo en el teléfono y conectarlo:
 
-1. **El oído.** Micrófono → compuerta de dB → YAMNet en la app de la casa. Se suma el
-   acelerómetro para la vibración del piso y se combinan las dos señales en un evento con su
-   confianza. La prueba en web ya existe en `/escucha`.
-2. **La confirmación en la casa.** Alarma, cuenta regresiva de 60 s, «Estoy bien» y «Necesito
-   ayuda». Siempre en pantalla: el **botón de pánico** (🔴 directo, sin los 60 s).
-3. **El escalamiento que no depende de un solo teléfono.** La casa registra la alerta con su hora
-   de vencimiento. Si nadie la cancela, el primero que vea el vencimiento (la casa o cualquier
-   teléfono de la familia) la escala, y solo una vez: el cambio de estado es atómico.
-4. **El latido.** La casa reporta cada pocos minutos. Si deja de hacerlo, la familia ve «sin
-   señal desde las 14:05».
-5. **El aviso real:** WhatsApp por Kapso si pasa la prueba de las 08:00; si no, Telegram
-   ([créditos](#propuesta-qué-hace-cada-crédito)).
-6. **La web de la familia.** Estado de la casa en vivo, alertas e historial del día. Sin login: se
-   entra con un enlace de invitación, que en el demo es un QR.
+| # | Qué falta | Quién | Para | Por qué |
+|---|---|---|---|---|
+| 1 | Instalar la app en el teléfono de la tarima y pasar la lista de prueba ([pendientes.md](pendientes.md), punto 1) | Abrahan | 17:00 | Nada se ha probado en un teléfono real. Sin esto no hay demo |
+| 2 | Que «¿Está bien?» suene (520 Hz) y vibre | Abrahan | 17:00 | Hoy solo se ve. Una alarma muda no convence en la tarima |
+| 3 | El ciclo casa → Supabase → `/f/demo` abierta en 5 a 10 teléfonos a la vez | Rogelio | 17:00 | Es lo que vive el público |
+| 4 | Kapso: migración `whatsapp`, deploy, webhook apuntando a `/api/kapso/webhook` y un cron que llame `/api/vigilar` | Josuep | 20:00 | El código está escrito. Es la integración real que ven los jueces |
+| 5 | Pastillas: migración, `ANTHROPIC_API_KEY` en Vercel y `casa_tomar` desde la app | Abrahan y Rogelio | 20:00 | La web está hecha, falta conectarla |
+| 6 | Nombre del producto, README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
 
-### P1 · Si P0 está listo (sábado en la tarde)
-
-- **Perfil de salud y apagón.** Se detecta el apagón porque el teléfono deja de cargar, y el
-  perfil decide si es 🔴 o 🟡. Es el paso 5 del demo.
-- **Los tres niveles de aviso** con su tope diario.
-- **La persona como sensor:** «Huele a gas», «Huele a quemado», «Me siento mal».
-- **El recordatorio de pastillas:** la misma pregunta y los mismos botones de la alarma («¿Ya se
-  tomó la de las 8?»). Sin respuesta, aviso 🟡. Cada respuesta cuenta como señal de que está bien.
-- **Modo kiosco nivel 1:** la app como pantalla de inicio, con servicio en primer plano
-  ([riesgos.md](riesgos.md#3-el-modo-kiosco-que-la-app-no-se-muera)).
-- **Sin conexión:** cola local que se reenvía al volver la señal, y aviso de batería baja y de
-  temperatura.
-- **La rutina:** conteos por franja del día, y aviso si falta lo de siempre.
-
-### P2 · Solo si sobra tiempo antes de las 24:00
-
-- Palabra clave por voz («¡auxilio!») con el reconocimiento del sistema, sin conexión.
-- Llamada en altavoz o SMS al vecino desde el chip cuando no hay internet (APK fuera de Play).
-- El resumen 🟢 de cada mañana.
-- Voz: «Carmen, ¿está bien?», y que pueda responder hablando.
-
-Todo lo demás está en [futuro.md](futuro.md).
+**Se cortó y va como proyección:** Telegram, la vibración del piso, el apagón con el perfil de
+salud, la ficha de emergencia, el teléfono personal de la persona con la pregunta del ánimo, el
+pedido de las pastillas a domicilio, la cámara, el modo kiosco, la rutina y la lectura del récipe
+por foto.
 
 ## Demo
 
 1. Un teléfono en la tarima es la casa de «la señora Carmen» (inventada). El público escanea el QR
    y su teléfono pasa a ser la familia.
-2. Suena una alarma de humo. En la tarima suena la alarma de confirmación, nadie la apaga y a los
-   60 s les llega el aviso a todos los teléfonos. Los tiempos del demo son los del producto: nada
-   se acelera.
-3. Cae un morral junto al teléfono: golpe más vibración. Esta vez «Carmen» toca «Estoy bien» y se
-   ve que no escala.
-4. Se prende la TV con una escena de gritos: no dispara, porque el piso no tembló.
-5. *(P1)* Se desenchufa el teléfono: «se fue la luz». En la casa de Carmen, que usa oxígeno, es
-   🔴. En otra casa del demo es solo 🟡. El mismo evento, dos avisos.
+2. **El día a día.** Suena el recordatorio de la pastilla y «Carmen» toca «Ya me la tomé». En la
+   web de la familia se ve cuántos días de losartán le quedan.
+3. **La falsa alarma.** Un golpe fuerte junto al teléfono. Sale «¿Está bien?», «Carmen» dice que
+   está bien y no escala. Es el filtro: despreocupar, no angustiar.
+4. **La alerta.** Otro golpe y nadie responde. Mientras corren los 60 s se cuenta el problema, con
+   las cifras. Al vencer, se pone roja la web de todos los que escanearon, la casa llama por
+   WhatsApp al hijo y a la tarima le llega el WhatsApp de Kapso. Los tiempos son los del producto:
+   nada se acelera.
+
+Si algo falla en vivo, `/f/demo?escenario=alerta` muestra lo mismo con datos simulados, y queda el
+video de respaldo.
+
+## La venta (para el pitch)
+
+Lo básico, sin profundizar. Es la propuesta del sábado 14:30; el precio lo cierra el equipo.
+
+- **Quién paga:** el que cuida desde afuera. La diáspora ya paga por la salud de sus padres con
+  parte de las remesas: en 2022, asistensi tenía afiliados en al menos 40 países
+  ([Bloomberg Línea](https://www.bloomberglinea.com/2022/08/18/una-plataforma-de-seguros-se-extiende-desde-venezuela-con-la-mirada-puesta-en-las-remesas/)).
+- **Precio: USD 5 al mes por casa**, con varios familiares. No hay equipo que comprar: el teléfono
+  viejo ya está en una gaveta.
+- **Contra qué se compara:** un sistema de alerta médica en EE. UU. cuesta unos USD 40 al mes en
+  promedio ([NCOA](https://www.ncoa.org/product-resources/medical-alert-systems/medical-alert-systems-cost/)),
+  más USD 50 a 200 de equipo ([The Senior List](https://www.theseniorlist.com/medical-alert-system-buyers-guide/)).
+- **Por qué el margen aguanta:** el oído corre en el teléfono, así que no hay un servidor de audio
+  que pagar por minuto. Lo que cuesta por casa son los mensajes de WhatsApp y alguna lectura de
+  Claude, de 2 a 4 centavos cada una.
+- **Segundo canal:** las aseguradoras y los servicios de emergencia (asistensi, Venemergencia) lo
+  suman a su plan y pagan por afiliado. Ellos venden la respuesta; nosotros, el aviso a tiempo que
+  la dispara.
 
 ## Roles
 
@@ -122,9 +128,11 @@ Todo lo demás está en [futuro.md](futuro.md).
 
 | Pieza | Quién |
 |---|---|
-| App Flutter de la casa | Los dos con experiencia en Flutter *(nombres por confirmar)* |
-| Web de la familia y UI/UX de las dos pantallas | Rogelio |
-| Supabase y Telegram | *(por confirmar)* |
+| App Flutter de la casa | Abrahan |
+| Web de la familia y UI/UX de las dos pantallas | Rogelio. Las pastillas, Abrahan |
+| Supabase | Rogelio y Abrahan |
+| WhatsApp (Kapso) y el vigilante | Josuep |
+| Cifras y la venta | Anttony |
 
 ## Infra y créditos de los patrocinantes
 
@@ -148,7 +156,12 @@ Lo que ya hay, sin costo:
   sin oído: https://platanus-hack-26-ve-team-25-casa.vercel.app (`make casa-deploy`).
 - **Estado y tiempo real:** Supabase, plan gratis.
 - **Detección:** corre en el teléfono, sin costo por uso. El audio nunca sale del teléfono.
-- **Aviso de respaldo:** bot de Telegram, gratis.
+- **Aviso de respaldo:** si no contestan el WhatsApp, la casa llama por teléfono normal.
+
+> **Cómo quedó el sábado en la tarde:** Meta restringió la cuenta de WhatsApp y solo funciona el
+> sandbox de Kapso, con cada teléfono activado a mano. El vigilante quedó como `/api/vigilar` en la
+> web y le falta un cron que lo llame. De Claude se usa la lectura de la factura de la farmacia; el
+> resumen de la mañana y las preguntas por WhatsApp van como proyección.
 
 ### Propuesta: qué hace cada crédito
 
@@ -189,11 +202,11 @@ alcance. Las llaves van en `web/.env.local` y en las variables de Vercel y Rende
 
 ## Pendiente
 
-- [ ] Nombres de quién construye cada pieza
+- [x] Nombres de quién construye cada pieza
 - [ ] Contarle a Víctor el enfoque del día a día
+- [ ] Hablar con Adrián, gerente de IA de Yummy: Víctor lo recomendó para revisar la idea
 - [ ] **Volver a probar `/escucha` con la música alta de la oficina, ya con las clases nuevas.**
   Ojo: el clasificador devuelve solo las 10 clases más probables (`maxResults: 10`). Con música
   fuerte, las 10 pueden ser todas de música y la alarma de humo quedar fuera aunque suene. Si
   pasa, se filtra por nuestras clases (`categoryAllowlist`) en vez de pedir el top 10
-- [ ] Probar la vibración en piso de cerámica o concreto, que es el de las casas venezolanas
 - [ ] Cifras con fuente: ver [investigacion.md](investigacion.md#anttony--antecedentes-y-usuarios)

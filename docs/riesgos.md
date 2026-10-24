@@ -17,7 +17,7 @@
 | 7 | El canal real de aviso no está construido | Josuep | Sáb 12:00 | Llega un mensaje de Telegram a un iPhone y a un Android | Telegram: decidido |
 | 8 | Que el familiar no confíe | Rogelio | Sáb 20:00 | Hay una respuesta de una línea para cada duda, en la web y en el pitch | Abierto |
 | 9 | ¿Quién paga y cómo, desde afuera? | Anttony | Sáb 20:00 | Hay un precio, un comprador y un testimonio | Abierto |
-| 10 | Alcance que crece con cada idea buena | Rogelio | Sáb 24:00 | El alcance queda congelado | Prioridades P0, P1 y P2 en el [plan](plan.md#prioridades) |
+| 10 | Alcance que crece con cada idea buena | Rogelio | Sáb 24:00 | El alcance queda congelado | Recortado el sábado 14:30: [alcance congelado](plan.md#alcance-congelado-lo-que-se-presenta) |
 
 ## La regla de oro: despreocupar, no angustiar
 
