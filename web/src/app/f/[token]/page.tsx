@@ -8,5 +8,13 @@ export default async function Page(props: PageProps<"/f/[token]">) {
   const cargada = await cargarCasa(token, escenario, new Date());
   if (!cargada) notFound();
   // La clave reinicia la pantalla al cambiar de escenario, sin arrastrar lo que se tocó antes.
-  return <VistaFamilia key={String(escenario)} token={token} inicial={cargada.datos} origen={cargada.origen} />;
+  return (
+    <VistaFamilia
+      key={String(escenario)}
+      token={token}
+      inicial={cargada.datos}
+      origen={cargada.origen}
+      escenario={typeof escenario === "string" && cargada.origen === "simulado" ? escenario : null}
+    />
+  );
 }

@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Origen } from "@/lib/familia/datos";
 import { atender, derivarVista } from "@/lib/familia/estado";
+import { resumenPastillas } from "@/lib/familia/inventario";
 import { atenderAlerta, leerCasa } from "@/lib/familia/supabase";
 import type { DatosCasa } from "@/lib/familia/tipos";
 import { AlertaUrgente, SinSenal, TodoBien } from "./pantallas";
+import { enlace } from "./pastillas";
 
 /** Dónde recuerda el teléfono la última casa abierta, para que la web instalada abra ahí. */
 export const CLAVE_ULTIMA_CASA = "familia:ultima-casa";
@@ -24,10 +26,13 @@ export function VistaFamilia({
   token,
   inicial,
   origen,
+  escenario,
 }: {
   token: string;
   inicial: DatosCasa;
   origen: Origen;
+  /** El escenario simulado, para que los enlaces lo conserven. */
+  escenario: string | null;
 }) {
   const [datos, setDatos] = useState(inicial);
   const [ahora, setAhora] = useState(() => new Date());
@@ -71,6 +76,8 @@ export function VistaFamilia({
   }, [token]);
 
   const vista = useMemo(() => derivarVista(datos, ahora), [datos, ahora]);
+  const resumen = useMemo(() => resumenPastillas(datos.inventario ?? [], ahora), [datos, ahora]);
+  const pastillas = resumen ? { texto: resumen, href: enlace(token, "/pastillas", escenario) } : null;
 
   const alAtender = (alertaId: string) => {
     // Se marca en pantalla al instante; con Supabase, la próxima lectura trae lo que quedó en la base.
@@ -87,6 +94,6 @@ export function VistaFamilia({
     case "sin_senal":
       return <SinSenal casa={datos.casa} vista={vista} ahora={ahora} />;
     case "bien":
-      return <TodoBien casa={datos.casa} vista={vista} ahora={ahora} />;
+      return <TodoBien casa={datos.casa} vista={vista} ahora={ahora} pastillas={pastillas} />;
   }
 }

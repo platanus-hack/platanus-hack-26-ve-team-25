@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { avisosDeCompra, derivarVista } from "./estado";
-import { AVISO_DIAS, contar, contarTodo, cuandoSeAcaba, mensajeDeCompra, pedido, quedanTexto } from "./inventario";
+import { AVISO_DIAS, compraDe, contar, cuantoComprar, contarTodo, cuandoSeAcaba, mensajeDeCompra, pedido, quedanTexto, resumenPastillas } from "./inventario";
 import { simular } from "./simulado";
 import type { Medicamento } from "./tipos";
 
@@ -89,7 +89,7 @@ describe("contar", () => {
   test("sin saber de cuántas viene la caja, se sugieren pastillas", () => {
     const c = contar(metformina(3), AHORA);
     expect(c.cajas).toBeNull();
-    expect(c.faltanMes).toBe(27);
+    expect(cuantoComprar(compraDe(c))).toBe("27 pastillas");
   });
 });
 
@@ -121,6 +121,14 @@ describe("qué comprar", () => {
 });
 
 describe("el aviso en /f/[token]", () => {
+  test("la línea de pastillas dice lo que se acaba primero", () => {
+    expect(resumenPastillas([], AHORA)).toBeNull();
+    expect(resumenPastillas([losartan(9), metformina(20)], AHORA)).toBe("Sus pastillas alcanzan para 4 días");
+    expect(resumenPastillas([metformina(5000)], AHORA)).toBe("Sus pastillas alcanzan de sobra");
+    expect(resumenPastillas([losartan(null)], AHORA)).toBe("Sus pastillas: falta saber cuántas quedan");
+    expect(resumenPastillas([losartan(0)], AHORA)).toBe("Sus pastillas: una se acaba hoy");
+  });
+
   test("dice cuántas quedan, cuándo se acaban y qué comprar", () => {
     expect(avisosDeCompra([losartan(9)], AHORA)).toEqual([
       {

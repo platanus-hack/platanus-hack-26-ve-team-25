@@ -120,6 +120,11 @@ export function contarTodo(inventario: Medicamento[], ahora: Date): Cuenta[] {
   return inventario.map((m) => contar(m, ahora)).sort((a, b) => orden(a) - orden(b));
 }
 
+/** Cuánto comprar para un mes, en pastillas y, si se sabe de cuántas viene la caja, en cajas. */
+export function compraDe(c: Cuenta): Pick<Pedido, "pastillas" | "cajas" | "porCaja"> {
+  return { pastillas: c.faltanMes, cajas: c.cajas, porCaja: c.medicamento.ultimaCompra?.porCaja ?? null };
+}
+
 /**
  * Qué comprar ahora: solo lo que tiene aviso, para un mes. Es el punto de enganche para el WhatsApp
  * a la familia y, más adelante, para mandar el pedido a una farmacia con entrega (docs/pendientes.md).
@@ -131,10 +136,19 @@ export function pedido(inventario: Medicamento[], ahora: Date): Pedido[] {
       nombre: c.medicamento.nombre,
       concentracion: c.medicamento.concentracion,
       comerciales: c.medicamento.comerciales,
-      pastillas: c.faltanMes,
-      cajas: c.cajas,
-      porCaja: c.medicamento.ultimaCompra?.porCaja ?? null,
+      ...compraDe(c),
     }));
+}
+
+/** Una línea para la pantalla principal: lo que se acaba primero manda. null si no hay récipe. */
+export function resumenPastillas(inventario: Medicamento[], ahora: Date): string | null {
+  const cuentas = contarTodo(inventario, ahora).filter((c) => c.dias !== null);
+  if (inventario.length === 0) return null;
+  if (cuentas.length === 0) return "Sus pastillas: falta saber cuántas quedan";
+  const dias = cuentas[0].dias!;
+  if (dias === Infinity) return "Sus pastillas alcanzan de sobra";
+  if (dias === 0) return "Sus pastillas: una se acaba hoy";
+  return `Sus pastillas alcanzan para ${dias} ${dias === 1 ? "día" : "días"}`;
 }
 
 /** «Losartán 50 mg» */
@@ -180,7 +194,7 @@ export function mensajeDeCompra(nombreCasa: string, inventario: Medicamento[], a
   if (cuentas.length === 0) return null;
   const lineas = cuentas.map(
     (c) =>
-      `• ${nombreCompleto(c.medicamento)}: ${quedanTexto(c.quedan ?? 0).toLowerCase()}, alcanza hasta ${cuandoSeAcaba(c.seAcaba!, ahora)}. Para un mes: ${cuantoComprar({ ...c, porCaja: c.medicamento.ultimaCompra?.porCaja ?? null })}.`,
+      `• ${nombreCompleto(c.medicamento)}: ${quedanTexto(c.quedan ?? 0).toLowerCase()}, alcanza hasta ${cuandoSeAcaba(c.seAcaba!, ahora)}. Para un mes: ${cuantoComprar(compraDe(c))}.`,
   );
   return [`Hay que comprar pastillas para ${nombreCasa}:`, ...lineas].join("\n");
 }

@@ -1,6 +1,6 @@
 // Qué pantalla ve la familia, derivado de los datos de la casa. Es una función pura: los mismos
 // datos y la misma hora dan siempre la misma pantalla, y por eso se prueba sin navegador.
-import { contarTodo, cuandoSeAcaba, cuantoComprar, nombreCompleto, quedanTexto } from "./inventario";
+import { compraDe, contarTodo, cuandoSeAcaba, cuantoComprar, nombreCompleto, quedanTexto } from "./inventario";
 import type { Alerta, Casa, DatosCasa, Evento, Medicamento, TipoEvento } from "./tipos";
 
 /** Dos latidos perdidos (cada 90 s) y la casa se declara sin señal. Ver investigacion-alertas.md. */
@@ -153,12 +153,11 @@ export function avisosDeCompra(inventario: Medicamento[], ahora: Date): AvisoSua
     .filter((c) => c.hayQueComprar)
     .map((c) => {
       const toma = hora(c.seAcaba!);
-      const porCaja = c.medicamento.ultimaCompra?.porCaja ?? null;
       return {
         hora: "",
         etiqueta: "HAY QUE COMPRAR",
         titulo: `${quedanTexto(c.quedan ?? 0)} de ${nombreCompleto(c.medicamento)}`,
-        detalle: `Se acaban ${cuandoSeAcaba(c.seAcaba!, ahora)}, en la toma de las ${toma}. Para un mes: ${cuantoComprar({ ...c, porCaja })}.`,
+        detalle: `Se acaban ${cuandoSeAcaba(c.seAcaba!, ahora)}, en la toma de las ${toma}. Para un mes: ${cuantoComprar(compraDe(c))}.`,
         enlace: "pastillas" as const,
       };
     });

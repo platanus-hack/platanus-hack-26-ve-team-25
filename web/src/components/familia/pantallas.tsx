@@ -19,7 +19,7 @@ function segundoContacto(casa: Casa): Contacto | undefined {
   return [...casa.contactos].sort((a, b) => a.orden - b.orden)[1];
 }
 
-function Pantalla({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Pantalla({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <main
       className={`mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 px-5 pt-12 pb-6 ${className}`}
@@ -38,7 +38,7 @@ function Cabecera({ casa, ahora }: { casa: Casa; ahora: Date }) {
   );
 }
 
-function Boton({
+export function Boton({
   href,
   onClick,
   variante,
@@ -177,10 +177,13 @@ export function TodoBien({
   casa,
   vista,
   ahora,
+  pastillas,
 }: {
   casa: Casa;
   vista: Extract<Vista, { tipo: "bien" }>;
   ahora: Date;
+  /** La línea de pastillas y a dónde lleva, si la casa tiene récipe. */
+  pastillas?: { texto: string; href: string } | null;
 }) {
   const hayAvisos = vista.paraSaber.length > 0;
   const dia = (
@@ -227,17 +230,32 @@ export function TodoBien({
           {haceCuanto(casa.ultimoLatido, ahora)}
         </span>
       </div>
+      {pastillas && (
+        <a
+          href={pastillas.href}
+          className="flex items-center justify-between gap-2.5 rounded-[14px] border-[1.5px] border-borde bg-white px-3.5 py-3 text-[15px] text-texto"
+        >
+          <span>{pastillas.texto}</span>
+          <span aria-hidden="true" className="text-[19px] font-bold text-verde">›</span>
+        </a>
+      )}
 
       {hayAvisos && (
         <>
           <h2 className="mt-1.5 text-[19px] font-bold">Para saber</h2>
           {vista.paraSaber.map((a) => (
-            <article key={a.hora + a.etiqueta} className="flex flex-col gap-2 rounded-[18px] bg-amarillo-fondo px-[18px] py-4 text-amarillo-tinta">
+            <article key={a.hora + a.etiqueta + a.titulo} className="flex flex-col gap-2 rounded-[18px] bg-amarillo-fondo px-[18px] py-4 text-amarillo-tinta">
               <span className="text-sm font-bold">
-                {a.hora} · {a.etiqueta}
+                {a.hora && `${a.hora} · `}
+                {a.etiqueta}
               </span>
               <span className="text-[19px] font-bold text-tinta">{a.titulo}</span>
               <span className="text-base leading-[1.35] text-texto">{a.detalle}</span>
+              {a.enlace === "pastillas" && pastillas && (
+                <a href={pastillas.href} className="text-base font-bold underline underline-offset-4">
+                  Ver sus pastillas
+                </a>
+              )}
             </article>
           ))}
           <p className="text-[15px] leading-[1.4] text-gris">
