@@ -98,8 +98,9 @@ La carga se midió el sábado 24-oct contra producción, desde una laptop en Car
 
 ## Lo que todavía no hace
 
-- La app de la casa escucha con la pantalla encendida y la app abierta: falta el servicio en
-  primer plano para que Android no la cierre.
+- La app de la casa sigue oyendo con la pantalla apagada gracias a un servicio en primer plano,
+  pero todavía no es la pantalla de inicio del teléfono: si el teléfono se reinicia, alguien tiene
+  que abrirla.
 - La llamada de WhatsApp va por una vía no oficial (la fila de «llamada de voz» que WhatsApp crea
   en la agenda), y Android no dice si contestaron: por eso, si la llamada termina rápido, la casa
   pregunta «¿Pudo hablar con…?» y llama por teléfono normal.

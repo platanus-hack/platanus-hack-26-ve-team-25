@@ -228,11 +228,16 @@ pastillas. Lo demás va como proyección ([futuro.md](futuro.md#hacia-dónde-va)
       ritmo. En Kotlin, sin paquetes: [`Sirena.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Sirena.kt).
       Después de callarse, el oído ignora los sonidos 5 s, para no oír su propio tono.
       Falta oírlo en el teléfono: si satura el parlante, bajar `AMPLITUD`.
-- [ ] **Que la app no se muera:** servicio en primer plano tipo `microphone` con
-      `flutter_foreground_task`, pantalla encendida mientras carga y la app como pantalla de
-      inicio ([riesgos.md §3](riesgos.md)).
-      *Sin hacer: `flutter_foreground_task` no está en `pubspec.yaml` y el manifiesto no declara
-      ningún servicio. Hoy la app escucha solo con la pantalla encendida y la app abierta.*
+- [x] **Que la app no se muera** (sábado 24, nivel 1 de [riesgos.md §3](riesgos.md)): servicio
+      en primer plano de tipo `microphone` en Kotlin, sin paquetes
+      ([`Guardia.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Guardia.kt)), con su
+      aviso fijo; Atrás ya no cierra la app; la pantalla queda encendida mientras está enchufado
+      y se deja apagar en un apagón; y pide salir de la optimización de batería.
+- [ ] Que la app sea la **pantalla de inicio** del teléfono de mesa, para que vuelva sola tras un
+      reinicio. No se hizo en el teléfono de prueba de Abrahan porque es su teléfono personal:
+      cada vez que tocara Inicio le preguntaría cuál usar. Va en el teléfono de mesa de verdad.
+- [ ] **Prueba en el teléfono:** apagar la pantalla 1 hora y comprobar que sigue oyendo; y
+      reiniciarlo.
 - [ ] **Pastilla olvidada:** si pasan 2 horas sin «Ya la tomé», aviso 🟡 a la familia. La lógica ya
       existe (`EstadoToma.olvidada` en [`pastillas.dart`](../app/lib/dominio/pastillas.dart)); falta
       mandarlo.

@@ -37,6 +37,46 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/energia").setMethodCallHandler { call, result ->
             if (call.method == "leer") result.success(leerEnergia()) else result.notImplemented()
         }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "casa/guardia").setMethodCallHandler { call, result ->
+            if (call.method == "iniciar") {
+                startForegroundService(Intent(this, Guardia::class.java))
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
+    }
+
+    // La pantalla encendida mientras está enchufado: el teléfono de mesa es un reloj, con fondo
+    // negro y la hora tenue para no gastar ni calentar. Desenchufado (un apagón), se deja apagar
+    // para que la batería dure.
+    private val alEnchufar = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: Intent?) {
+            pantallaSegunEnergia(intent?.action == Intent.ACTION_POWER_CONNECTED)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(alEnchufar, IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        })
+        // Los avisos de enchufar no son sticky: el estado de ahora se lee aparte.
+        pantallaSegunEnergia(leerEnergia()["enchufado"] == true)
+    }
+
+    override fun onPause() {
+        unregisterReceiver(alEnchufar)
+        super.onPause()
+    }
+
+    private fun pantallaSegunEnergia(enchufado: Boolean) {
+        if (enchufado) {
+            window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
 
     /**

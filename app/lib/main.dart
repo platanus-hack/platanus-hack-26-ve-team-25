@@ -47,14 +47,26 @@ Future<void> main() async {
   nube?.iniciar();
 
   // Los permisos se piden con la app ya en pantalla: Android solo los muestra así.
-  await [Permission.phone, Permission.contacts].request();
+  await [
+    Permission.phone,
+    Permission.contacts,
+    Permission.notification,
+  ].request();
   // «Mostrar sobre otras apps»: para volver sola al frente cuando termina el WhatsApp. Android lo
   // pide en una pantalla de ajustes aparte; se activa una vez al configurar la casa.
   if (!await Permission.systemAlertWindow.isGranted) {
     await Permission.systemAlertWindow.request();
   }
-  await oido.iniciar();
+  // El servicio en primer plano (Guardia.kt) mantiene vivo el oído con la pantalla apagada.
+  // Android solo deja arrancarlo con el permiso de micrófono ya dado y la app a la vista.
+  if (await oido.iniciar()) {
+    await const MethodChannel('casa/guardia').invokeMethod<void>('iniciar');
+  }
   await frases?.iniciar();
+  // El teléfono de mesa es dedicado: que el ahorro de batería no lo mate (docs/riesgos.md §3).
+  if (!await Permission.ignoreBatteryOptimizations.isGranted) {
+    await Permission.ignoreBatteryOptimizations.request();
+  }
 }
 
 /// Supabase, si local.json trae la URL, la llave pública y la clave de la casa. La web de la casa
@@ -89,7 +101,9 @@ class AppCasa extends StatelessWidget {
       title: 'Casa',
       debugShowCheckedModeBanner: false,
       theme: temaCasa(),
-      home: Raiz(c: controlador),
+      // Atrás no cierra la app: si se cierra, la casa deja de oír. Las pantallas que se abren
+      // encima (configurar, leer récipe) sí vuelven con Atrás.
+      home: PopScope(canPop: false, child: Raiz(c: controlador)),
     );
   }
 }

@@ -59,7 +59,7 @@ Para el pitch, en tres pasos. El precio y el modelo están en [la venta](plan.md
 
 | Mejora | Por qué | Qué hace falta |
 |---|---|---|
-| **Servicio en primer plano** | Hoy la app escucha solo con la pantalla encendida y la app abierta | `flutter_foreground_task` con tipo `microphone` y la app como pantalla de inicio ([riesgos.md](riesgos.md#3-el-modo-kiosco-que-la-app-no-se-muera)) |
+| **Servicio en primer plano** | Hecho el sábado 24 ([`Guardia.kt`](../app/android/app/src/main/kotlin/ve/equipo25/casa/Guardia.kt)); falta que la app sea la pantalla de inicio | `flutter_foreground_task` con tipo `microphone` y la app como pantalla de inicio ([riesgos.md](riesgos.md#3-el-modo-kiosco-que-la-app-no-se-muera)) |
 | **Kiosco completo (*Device Owner*)** | La app no se puede cerrar, arranca sola tras reiniciar y controla la pantalla | Configurar el teléfono reiniciado de fábrica con un QR en la pantalla de bienvenida |
 | **Encendido automático al volver la luz** | Hoy, si la batería se agota en un apagón, el teléfono queda apagado | Encendido programado donde el teléfono lo traiga, o una guía por modelo |
 
