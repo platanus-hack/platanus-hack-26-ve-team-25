@@ -2,6 +2,8 @@
 // 5 s directo de Supabase, como hace vista-familia.tsx. Solo usa la llave pública y el token `demo`.
 // Uso: cd web && bun --env-file=.env.local scripts/carga.ts [telefonos=50] [segundos=120] [web]
 // Resultado del sábado 24-oct, desde la laptop en Caracas: docs/pendientes.md («Para el pitch»).
+export {};
+
 const URL_BASE = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const PUBLICA = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 if (!URL_BASE || !PUBLICA) throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
