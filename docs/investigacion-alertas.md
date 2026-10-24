@@ -12,7 +12,7 @@ En un teléfono de menos de 100 USD (típicamente Android Go con 1–2 GB de RAM
 |---|:---:|:---:|---|---|---|:---:|---|---|
 | **HTTP/REST (Webhook)** | No | **No** | `INTERNET`, `ACCESS_NETWORK_STATE` | Mínimo (datos/Wi-Fi) | 200–800 ms | **Alta** (si hay enlace IP) | Inoperante si cae el router durante un corte o no hay datos móviles | **Canal primario** (con red activa) |
 | **SMS directo (`SmsManager`)** | **Sí** | **No** | `SEND_SMS`, `READ_PHONE_STATE` | Tarifa SMS local | 2–10 s | **Alta** (canal de señalización 2G) | Rate limiting del SO (~30 SMS/min); no pasa la tienda sin exención (no aplica en sideload); **ningún acuse sirve de compuerta** | **Último recurso pasivo** (offline) |
-| **Heartbeat inverso (Dead Man's Switch)** | N/A (servidor infiere) | **No** | `INTERNET` (en pings) | Tráfico despreciable | Configurable (p.ej. 180 s) | **Muy alta** | Si el intervalo es muy corto satura la radio; depende del backend en la nube | **Obligatorio** para fallos catastróficos |
+| **Heartbeat inverso (Dead Man's Switch)** | N/A (servidor infiere) | **No** | `INTERNET` (en pings) | Tráfico despreciable | Configurable (p.ej. 180 s) | **Muy alta** | Si el intervalo es muy corto satura la radio; depende del backend en la nube | **Pendiente de decidir** (#4): no hay backend con cron |
 | **Llamada saliente (`ACTION_CALL`)** | **Sí** | **No** | `CALL_PHONE` | Tarifa de voz local | 5–15 s | Media | `CALL_STATE_OFFHOOK` está activo mientras suena, así que **no se puede saber si contestaron**; en 2G corta los datos; no se usa para llamar al exterior | **Canal que despierta a un humano** (offline), sin acuse fiable |
 | **FCM High-Priority** | No | **Sí** | GMS Play Services | Gratuito | 1–5 s | Media (Doze en Go) | Inútil en AOSP puro sin certificar; requiere cuenta Google activa en el dispositivo | **Descartado** en el dispositivo emisor |
 | **USSD (`sendUssdRequest`)** | **Sí** | **No** | `CALL_PHONE` | Bajo/Gratuito | 3–8 s | **Muy baja** | APIs inestables o bloqueadas en SoCs de bajo coste; sintaxis atada al operador | **Descartado** |
@@ -23,7 +23,7 @@ En un teléfono de menos de 100 USD (típicamente Android Go con 1–2 GB de RAM
 1. **Dual-Stack en orden de urgencia (HTTP → llamada → SMS)**: El canal primario es HTTP por rapidez y densidad de telemetría. Si el socket no responde en **10 s** o el sistema reporta desconexión de red, se pasa a la llamada al contacto local, que es el único canal que hace sonar un teléfono ajeno. El SMS queda al final. En 2G/EDGE un POST con TLS tarda más de 3 s, así que un timeout corto mandaba SMS innecesarios y gastaba saldo.
 2. **Ningún canal celular confirma solo**: `SMS_SENT` dice que el PDU salió de la antena y `SMS_DELIVERED` depende del operador: llega tarde o no llega. En la llamada, `CALL_STATE_OFFHOOK` se activa al marcar y sigue activo mientras el otro teléfono **suena**, así que no distingue «contestó» de «está sonando». La única compuerta fiable es un humano: que alguien marque la alerta como atendida en la web o en Telegram.
 3. **Dual SIM resuelto por API de bajo nivel**: Para terminales con dos ranuras SIM, se consulta `SubscriptionManager.getActiveSubscriptionInfoList()` y se obtiene `SmsManager.getSmsManagerForSubscriptionId(subId)`. Si falla o no hay datos, se usa `SmsManager.getDefault()`.
-4. **El Heartbeat Inverso no es un fallback del teléfono**: El teléfono no "salta" al heartbeat si todo falla; el heartbeat corre como monitor pasivo paralelo en el servidor. Si el hardware sufre un daño físico, se apaga o la celda celular colapsa, **el silencio es la alerta**.
+4. **El Heartbeat Inverso no es un fallback del teléfono**: El teléfono no "salta" al heartbeat si todo falla; el heartbeat corre como monitor pasivo paralelo en el servidor. Si el hardware sufre un daño físico, se apaga o la celda celular colapsa, **el silencio es la alerta**. Quién lo declara y con qué mecanismo está sin decidir: ver el bloque pendiente de §4.
 
 ---
 
@@ -160,12 +160,22 @@ La salida para el aviso directo al exterior es una pasarela de SMS o llamadas (T
 
 `investigacion-audio.md` ya decidió el tono: **520 Hz en onda cuadrada, no un pitido agudo**, porque es el que despierta al 92 % de las personas con pérdida auditiva. La voz de «¿Está bien?» va grave, lenta y fuerte, con la pantalla destellando y el teléfono vibrando. La duración es de **60 s**, también en el demo: lo que se muestra en la tarima es el producto, no una versión comprimida.
 
-### El Dead Man's Switch en el Servidor (Paralelo)
+### El Dead Man's Switch (pendiente de decidir)
 
-* El teléfono envía un ping ligero (`{"id":25,"bat":95,"pwr":1}`) cada **90 segundos**.
-* Si el backend acumula **180 segundos continuos** (2 pings perdidos) sin contacto:
-  * El servidor asume pérdida de enlace o fallo crítico del terminal.
-  * Dispara alerta autónoma a los familiares: *"Pérdida total de conexión con el dispositivo en la casa desde hace 3 minutos"*.
+**Esto no está decidido y no se debe implementar como estaba escrito.** Los números de abajo son una propuesta, no un acuerdo del equipo.
+
+Lo que sí está claro: el teléfono manda un ping ligero (`{"id":25,"bat":95,"pwr":1}`) y **el silencio es la alerta**. Si el teléfono se muere no puede mandar el T1, así que a la familia en el exterior solo le queda el silencio (§4, «Los contactos son locales»).
+
+Lo que falta cerrar:
+
+| Pregunta abierta | Por qué importa | Propuesta |
+|---|---|---|
+| ¿Cada cuánto el latido? | Cierra una pregunta de [`investigacion.md`](investigacion.md) que sigue abierta. Un intervalo muy corto despierta la radio sin necesidad | 90 s |
+| ¿Cuánto silencio es «sin señal»? | Muy corto genera falsos avisos por una caída de datos; muy largo llega tarde | 180 s (dos pings perdidos) |
+| ¿Quién lo declara? | El documento decía «el servidor», y **no existe ningún servidor con cron**: en el hackatón hay Supabase | Un job de `pg_cron` con `pg_net` hacia Telegram, o que la web lo calcule al leer `ultimoLatido` |
+| ¿El silencio es alerta o solo estado? | Si es alerta, alguien tiene que mandarla; si es estado, solo se ve al abrir la web, y el que está lejos puede no enterarse | Por decidir |
+
+Nadie debe implementar esto sin cerrar la tabla. Cuando se decida, se escribe aquí y se marca la casilla de [`investigacion.md`](investigacion.md#josuep--alertas-y-conexión).
 
 ---
 

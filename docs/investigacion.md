@@ -27,7 +27,7 @@
 **Por resolver:**
 
 - [ ] Canal real: Telegram (recomendado: gratis y suena en iOS sin cuenta de Apple paga) o correo
-- [ ] Cada cuánto el latido, y cuánto silencio es «sin señal» sin gastar la batería
+- [ ] **Latido y silencio** (C4 y C5): cada cuánto late el teléfono, cuánto silencio es «sin señal» y **quién lo declara**. Hoy no hay servidor con cron que lo haga. La tabla de lo que falta y la propuesta de 90 s / 180 s están en [investigacion-alertas.md](investigacion-alertas.md#el-dead-mans-switch-pendiente-de-decidir)
 - [ ] Probar el SMS desde el chip en Android con Flutter
 
 ## Abrahan · La IA
