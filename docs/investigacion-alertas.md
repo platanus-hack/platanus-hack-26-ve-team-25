@@ -11,18 +11,19 @@ En un teléfono de menos de 100 USD (típicamente Android Go con 1–2 GB de RAM
 | Canal | Funciona sin datos | Requiere GMS | Permisos Android | Coste | Latencia | Fiabilidad | Caveat | Veredicto |
 |---|:---:|:---:|---|---|---|:---:|---|---|
 | **HTTP/REST (Webhook)** | No | **No** | `INTERNET`, `ACCESS_NETWORK_STATE` | Mínimo (datos/Wi-Fi) | 200–800 ms | **Alta** (si hay enlace IP) | Inoperante si cae el router durante un corte o no hay datos móviles | **Canal primario** (con red activa) |
-| **SMS directo (`SmsManager`)** | **Sí** | **No** | `SEND_SMS`, `READ_PHONE_STATE` | Tarifa SMS local plana | 2–10 s | **Alta** (canal de señalización 2G) | Rate limiting del SO (~30 SMS/min); no pasa la tienda sin exención (no aplica en sideload) | **Canal crítico de contingencia** (offline) |
+| **SMS directo (`SmsManager`)** | **Sí** | **No** | `SEND_SMS`, `READ_PHONE_STATE` | Tarifa SMS local | 2–10 s | **Alta** (canal de señalización 2G) | Rate limiting del SO (~30 SMS/min); no pasa la tienda sin exención (no aplica en sideload); **ningún acuse sirve de compuerta** | **Último recurso pasivo** (offline) |
 | **Heartbeat inverso (Dead Man's Switch)** | N/A (servidor infiere) | **No** | `INTERNET` (en pings) | Tráfico despreciable | Configurable (p.ej. 180 s) | **Muy alta** | Si el intervalo es muy corto satura la radio; depende del backend en la nube | **Obligatorio** para fallos catastróficos |
-| **Llamada saliente (`ACTION_CALL`)** | **Sí** | **No** | `CALL_PHONE` | Tarifa de voz | 5–15 s | Media | Puede degradar/cortar datos en 2G/3G; requiere saldo de voz en la SIM | **Escalamiento** acústico final |
+| **Llamada saliente (`ACTION_CALL`)** | **Sí** | **No** | `CALL_PHONE` | Tarifa de voz local | 5–15 s | Media | `CALL_STATE_OFFHOOK` está activo mientras suena, así que **no se puede saber si contestaron**; en 2G corta los datos; no se usa para llamar al exterior | **Canal que despierta a un humano** (offline), sin acuse fiable |
 | **FCM High-Priority** | No | **Sí** | GMS Play Services | Gratuito | 1–5 s | Media (Doze en Go) | Inútil en AOSP puro sin certificar; requiere cuenta Google activa en el dispositivo | **Descartado** en el dispositivo emisor |
 | **USSD (`sendUssdRequest`)** | **Sí** | **No** | `CALL_PHONE` | Bajo/Gratuito | 3–8 s | **Muy baja** | APIs inestables o bloqueadas en SoCs de bajo coste; sintaxis atada al operador | **Descartado** |
 | **BLE a vecino** | **Sí** | **No** | `BLUETOOTH_ADVERTISE`, `ACCESS_FINE_LOCATION` | Gratuito | N/A | **Nula** | Requiere receptor preinstalado a <10 m; hardware RF de gama baja es errático | **Descartado** |
 
 ### Decisiones de diseño en transporte
 
-1. **Dual-Stack Híbrido (HTTP + SMS local)**: El canal primario es HTTP por rapidez y densidad de telemetría. Si el socket no responde en 3 segundos o el sistema reporta desconexión de red, conmuta de inmediato a `SmsManager`. Al ser un APK sideloaded, se aprovecha el permiso directo `SEND_SMS` sin riesgo de rechazo por política de Google Play.
-2. **Dual SIM resuelto por API de bajo nivel**: Para terminales con dos ranuras SIM, se consulta `SubscriptionManager.getActiveSubscriptionInfoList()` y se obtiene `SmsManager.getSmsManagerForSubscriptionId(subId)`. Si falla o no hay datos, se usa `SmsManager.getDefault()`.
-3. **El Heartbeat Inverso no es un fallback del teléfono**: El teléfono no "salta" al heartbeat si todo falla; el heartbeat corre como monitor pasivo paralelo en el servidor. Si el hardware sufre un daño físico, se apaga o la celda celular colapsa, **el silencio es la alerta**.
+1. **Dual-Stack en orden de urgencia (HTTP → llamada → SMS)**: El canal primario es HTTP por rapidez y densidad de telemetría. Si el socket no responde en **10 s** o el sistema reporta desconexión de red, se pasa a la llamada al contacto local, que es el único canal que hace sonar un teléfono ajeno. El SMS queda al final. En 2G/EDGE un POST con TLS tarda más de 3 s, así que un timeout corto mandaba SMS innecesarios y gastaba saldo.
+2. **Ningún canal celular confirma solo**: `SMS_SENT` dice que el PDU salió de la antena y `SMS_DELIVERED` depende del operador: llega tarde o no llega. En la llamada, `CALL_STATE_OFFHOOK` se activa al marcar y sigue activo mientras el otro teléfono **suena**, así que no distingue «contestó» de «está sonando». La única compuerta fiable es un humano: que alguien marque la alerta como atendida en la web o en Telegram.
+3. **Dual SIM resuelto por API de bajo nivel**: Para terminales con dos ranuras SIM, se consulta `SubscriptionManager.getActiveSubscriptionInfoList()` y se obtiene `SmsManager.getSmsManagerForSubscriptionId(subId)`. Si falla o no hay datos, se usa `SmsManager.getDefault()`.
+4. **El Heartbeat Inverso no es un fallback del teléfono**: El teléfono no "salta" al heartbeat si todo falla; el heartbeat corre como monitor pasivo paralelo en el servidor. Si el hardware sufre un daño físico, se apaga o la celda celular colapsa, **el silencio es la alerta**.
 
 ---
 
@@ -36,21 +37,28 @@ En Android Go, el daemon de memoria del kernel (`lmkd`) liquida procesos sin pre
          ▼
 [ Escritura en SQLite / Room ] ──► Estado: PENDING, attempts: 0, UUIDv4
          │
-         ├──► ¿Socket IP disponible?
-         │       ├── SÍ ──► POST /alerta (timeout 3 s) ──► 200 OK ──► Estado: ACK_SERVER
-         │       └── NO / Timeout
-         │               │
-         ▼               ▼
-[ Envío vía SmsManager (PDU codificado) ]
+         ▼
+[ T1 · POST /alerta (timeout 10 s) ]
          │
+         ├── 2xx ──► Estado: ACK_SERVER ──► fin de la cadena
+         │
+         └── NO / timeout / error
+                 │
+                 ▼
+[ T2 · ACTION_CALL al contacto local ] ──► hasta 25 s, sin acuse posible
+                 │
+                 └── al terminar la llamada, o a los 25 s
+                         │
+                         ▼
+[ T3 · SmsManager (PDU) al contacto local y al vecino ] ──► Estado: SENT
          ├── BroadcastReceiver (SMS_SENT) ──► Confirmación de salida de antena
-         └── BroadcastReceiver (SMS_DELIVERED) ──► Confirmación de la central (SMSC)
+         └── BroadcastReceiver (SMS_DELIVERED) ──► Informativo: no detiene ni avanza nada
 ```
 
 | Mecanismo | Implementación | Propósito |
 |---|---|---|
 | **Persistencia pre-envío** | SQLite plano o Room antes de tocar la radio de red | Si el SO mata el proceso durante la transmisión, el evento no se pierde |
-| **Idempotencia (Deduplicación)** | Cada evento genera un `UUIDv4` inmutable en el teléfono | Si se disparan reintentos por HTTP y SMS a la vez, el backend procesa el primero y descarta duplicados |
+| **Idempotencia (Deduplicación)** | Cada evento genera un `UUIDv4` inmutable en el teléfono | Si se reintenta el POST mientras el escalamiento ya hizo la llamada o el SMS, el backend procesa el primero y descarta duplicados |
 | **Muerte del proceso y reinicio** | `RECEIVE_BOOT_COMPLETED` en el Manifest + `START_STICKY` en el `ForegroundService` | Al encender o reiniciar el teléfono tras agotamiento de batería, se barre la base local y se reintentan los `PENDING` |
 | **Reintentos con Backoff** | $t_{\text{espera}} = \min(60\text{ s}, 2^{\text{intentos}} \times 2\text{ s})$ | Evita saturar el canal de señalización o agotar el saldo de la SIM ante caídas de la antena |
 
@@ -58,13 +66,22 @@ En Android Go, el daemon de memoria del kernel (`lmkd`) liquida procesos sin pre
 
 ## 3. Detección de corte eléctrico y perfil energético
 
-El teléfono permanece enchufado permanentemente. Distinguir si se cortó el suministro general o si se aflojó el cable de carga se resuelve correlacionando la carga con el router Wi-Fi, sin incurrir en escaneos activos de red (que Android limita a 1 vez cada 30 minutos en segundo plano).
+El teléfono permanece enchufado permanentemente. La señal fiable del apagón es que **deja de cargar** (`ACTION_POWER_DISCONNECTED`): es barata, llega al instante y no requiere escanear la red. El Wi-Fi del router sirve para **desambiguar el texto del aviso**, no para autorizar el evento. En los dos casos el evento sale; el perfil de salud decide el nivel.
 
-| Condición | Evento de carga (`BatteryManager`) | Estado Wi-Fi local (`ConnectivityManager`) | Interpretación | Acción |
+| Condición | Evento de carga (`BatteryManager`) | Estado Wi-Fi (`ConnectivityManager`) | Texto del aviso | Nivel |
 |---|---|---|---|---|
-| **Apagón general confirmado** | `ACTION_POWER_DISCONNECTED` | `NetworkCallback.onLost` simultáneo | Se cortó la luz general (router y cargador sin corriente al unísono) | Disparo inmediato de evento **CORTE_LUZ_CONFIRMADO** |
-| **Desconexión local / Falla de cargador** | `ACTION_POWER_DISCONNECTED` | Wi-Fi sigue conectado y con enlace | El router tiene energía; el cargador se soltó o falló | Se inicia timer de gracia de 60 s antes de emitir alerta leve |
-| **Caída aislada de ISP** | `ACTION_POWER_CONNECTED` | `NetworkCapabilities.NET_CAPABILITY_VALIDATED` perdido | Hay luz pero falló el proveedor de internet | Conmutación silenciosa a SMS para emergencias |
+| **Apagón general** | `ACTION_POWER_DISCONNECTED` | `NetworkCallback.onLost` dentro de la ventana de 40 s | «Se fue la luz en la casa» | Lo decide el perfil |
+| **Corte de energía sin confirmar** (cargador flojo, o router con UPS) | `ACTION_POWER_DISCONNECTED` | Wi-Fi sigue conectado, o el teléfono está en datos móviles | «El teléfono dejó de cargar» | Lo decide el perfil |
+| **Caída aislada de ISP** | `ACTION_POWER_CONNECTED` | `NET_CAPABILITY_VALIDATED` perdido | Sin aviso: se anota como estado | — |
+
+**Cuatro reglas de esta detección:**
+
+1. **El Wi-Fi nunca es requisito.** Si el teléfono está en datos móviles —lo normal si el router no llega al pasillo, que es donde va el teléfono— no hay `onLost` que correlacionar y el evento sale igual, con el texto sin confirmar. Perder el evento por no tener Wi-Fi sería peor que no distinguir la causa.
+2. **La ventana es de 40 s**, no «simultáneo». `ACTION_POWER_DISCONNECTED` llega al instante, pero Android tarda entre 5 y 30 s en declarar perdido un Wi-Fi cuya baliza desapareció. Sin ventana explícita, dos implementaciones distintas dan resultados distintos.
+3. **El router puede tener respaldo.** En Venezuela es común tener el router en una UPS o un inversor y el cargador del teléfono en un tomacorriente normal: se va la luz, el Wi-Fi sobrevive y el cargador muere. Ese caso cae en «sin confirmar», y por eso el texto **no afirma** que se fue la luz.
+4. **No se escanea la red.** Solo se usa `NetworkCallback`, porque Android limita los escaneos activos a uno cada 30 minutos en segundo plano. La correlación sale gratis.
+
+**El nivel lo pone el perfil, no el evento.** Un apagón en una casa con concentrador de oxígeno es 🔴 inmediato; en una casa sin equipo eléctrico es 🟡 ([`investigacion.md`](investigacion.md#el-perfil-de-salud), [`plan.md`](plan.md#demo)). El evento no fuerza urgencia por sí solo: si lo hiciera, se perdería la demostración de «el mismo apagón, dos avisos».
 
 ### Medición de consumo y autonomía en chips económicos
 En procesadores gama baja (Unisoc/MediaTek), `BATTERY_PROPERTY_CURRENT_NOW` devuelve con frecuencia `Integer.MIN_VALUE`. La estimación de autonomía se calcula midiendo el tiempo entre deltas reales de porcentaje:
@@ -77,26 +94,62 @@ En procesadores gama baja (Unisoc/MediaTek), `BATTERY_PROPERTY_CURRENT_NOW` devu
 
 ## 4. Política y máquina de estados de escalamiento
 
-El sistema minimiza falsos positivos en el recinto antes de escalar a la familia en el exterior o a los contactos locales.
+El sistema minimiza falsos positivos en el recinto antes de escalar a la familia en el exterior o a los contactos locales. **El escalamiento no empieza a los 0 s: empieza a los 60 s**, cuando la alarma de la casa ya venció y nadie la apagó. Y los canales van por urgencia: primero el que llega a una pantalla, después el que hace sonar un teléfono ajeno, al final el que espera a que alguien lo lea.
 
 ```text
-[ T0: Detección local (0 s) ]
+[ T0 · Alarma en la casa (0 s) ]  (520 Hz + vibración, 60 s)
        │
-       ▼ (Alarma audible 520 Hz + vibración por 15 s)
-¿Cancelado por usuario? ──SÍ──► [ ALERTA CANCELADA ]
-       │ NO (Timeout: 15 s)
+       ├── La persona la apaga ──► [ CANCELADA ] ──► 🟡 y calibra los umbrales de esa casa
+       │
+       ▼ NO la apaga (vence a los 60 s)
+[ T1 · HTTP/REST (60 s) ]  POST /alerta, timeout 10 s
+       │
+       ├── 2xx ──► [ ACK_SERVER ] ──► fin: no se llama ni se manda SMS
+       │
+       └── sin socket · timeout · error
+               │
+               ▼
+[ T2 · Llamada (≈70 s) ]  ACTION_CALL al contacto local, en altavoz
+       │  (hasta 25 s, o hasta que la llamada termine sola)
+       │
        ▼
-[ T1: Canal Digital (15 s) ] ──► POST /alerta al backend (Push/Telegram/WhatsApp al familiar)
-       │
-       ▼ (Sin confirmación tras 30 s)
-[ T2: Canal Celular (45 s) ] ──► SMS Directo desde el teléfono a números de emergencia
-       │
-       ▼ (Sin confirmación tras 60 s)
-[ T3: Canal de Voz (105 s) ] ──► Llamada automatizada desde backend o ACTION_CALL local
-       │
-       ▼ (Sin contestar tras 120 s)
-[ T4: Contacto Vecinal (225 s) ] ──► SMS/Llamada a vecino o contacto de apoyo local
+[ T3 · SMS (≈95 s) ]  al contacto local y al vecino. Último escalón: no se confirma
 ```
+
+Entre el T1 y el T2 **no hay espera**: el T2 es la rama de fallo del POST, no un temporizador. **La llamada tampoco decide nada**, y eso hay que decirlo claro: Android no expone si el otro lado contestó. `CALL_STATE_OFFHOOK` se activa al marcar y permanece activo mientras el teléfono del vecino suena, así que un tono de llamada de 20 s es indistinguible de una conversación de 20 s. Por eso la llamada tiene un tope de 25 s y **el SMS sale siempre después**, conteste quien conteste.
+
+Lo único que detiene la cadena es un humano: que alguien marque la alerta como atendida en la web o en Telegram, o que la persona en la casa apriete «Estoy bien». Si nadie acusa, la cadena llega hasta el final. El aviso digital del T1 sale a los 60 s cumplidos, no antes; adelantarlo anularía el filtro humano que es la defensa principal contra falsos positivos.
+
+Después del T3 la cadena automática termina: no hay un T4, porque no habría con qué condicionarlo. Lo que sigue es la familia actuando.
+
+### Quién avanza de un escalón al siguiente
+
+La alerta se guarda como una fila con `estado`, `paso`, `vence_en` y `escalado_por`. El paso cambia con un update atómico (`UPDATE … WHERE id = ? AND paso = 'T1' AND estado = 'ABIERTA'`), así que dos clientes que vean lo mismo no escalan dos veces. Es el mismo patrón de vencimiento que ya usa el P0 para la alerta de 60 s.
+
+| Situación | Quién avanza |
+|---|---|
+| El POST responde 2xx | Nadie: el backend se encarga de la web y de Telegram |
+| La casa tiene señal de voz | La propia casa, porque el chip está ahí: el T2 y el T3 solo los puede disparar ella |
+| La casa se quedó sin datos pero con señal | La casa igual: la llamada y el SMS no necesitan internet |
+| La casa perdió todo | No hay escalón posible desde el teléfono; la familia lo ve por el silencio del latido |
+
+### Los contactos son locales
+
+El cliente que paga vive fuera del país, pero **el chip de la casa no lo alcanza**. La cadena celular existe para los que están cerca, y esto hay que decirlo en el pitch antes de que lo pregunte el jurado.
+
+| Canal | Destinatario | Qué pasa con la familia en el exterior |
+|---|---|---|
+| **T1 · HTTP → backend** | Web de la familia y Telegram | **Es el único canal que llega afuera**, y solo con internet |
+| **T2 · Llamada** | Contacto local (vecino, familiar en la ciudad) | Una llamada desde un chip venezolano al exterior cuesta y no siempre cursa: no se usa así |
+| **T3 · SMS** | Contacto local y vecino | Igual: no se asume que un SMS al exterior llegue, ni que sea barato |
+
+Consecuencia, que es la parte incómoda: **si el T1 falla, la familia en el exterior no recibe la alerta**. Lo que recibe es el silencio: el latido deja de llegar y la web muestra «sin señal desde las 14:05», con un botón para escribirle al vecino. La alerta accionable la recibe el que está cerca; el que está lejos se entera de que algo pasa y a quién llamar.
+
+La salida para el aviso directo al exterior es una pasarela de SMS o llamadas (Twilio o similar), que está en [`futuro.md`](futuro.md) y depende de ingresos. En el hackatón no existe, y el documento no debe sugerir lo contrario.
+
+### La alarma de confirmación
+
+`investigacion-audio.md` ya decidió el tono: **520 Hz en onda cuadrada, no un pitido agudo**, porque es el que despierta al 92 % de las personas con pérdida auditiva. La voz de «¿Está bien?» va grave, lenta y fuerte, con la pantalla destellando y el teléfono vibrando. La duración es de **60 s**, también en el demo: lo que se muestra en la tarima es el producto, no una versión comprimida.
 
 ### El Dead Man's Switch en el Servidor (Paralelo)
 
@@ -109,17 +162,27 @@ El sistema minimiza falsos positivos en el recinto antes de escalar a la familia
 
 ## 5. Plan de demo (3 minutos, sin depender del Wi-Fi del venue)
 
-El objetivo es demostrar que la alerta sale aun cuando se cortan la luz y los datos móviles al mismo tiempo.
+El objetivo es demostrar que la alerta sale aun cuando se cortan la luz y los datos móviles al mismo tiempo. **Los tiempos son los del producto**: 60 s de alarma, 10 s de timeout del POST y hasta 25 s de llamada. Nada comprimido.
 
-* **Requisitos:** El teléfono Android de la prueba (con SIM y saldo SMS), el teléfono del evaluador o juez registrado como contacto, y un router Wi-Fi portátil conectado a la misma regleta que el cargador del teléfono.
+* **Requisitos:** El teléfono Android de la prueba (con SIM y saldo de voz y SMS), el teléfono del evaluador o juez registrado como contacto local, y un router Wi-Fi portátil conectado a la misma regleta que el cargador del teléfono.
 
 | Tiempo | Qué se hace | Qué muestra la pantalla / Qué ocurre | Qué se demuestra |
 |---|---|---|---|
-| **0:00 – 0:30** | Estado nominal | Teléfono en pantalla fija: "Monitoreando: AC conectado, Wi-Fi OK". El teléfono del evaluador en reposo sobre la mesa | Sistema operativo en régimen normal |
-| **0:30 – 1:15** | Desconexión física de la regleta | Se desenchufa la regleta completa: caen el cargador y el router portátil al mismo tiempo. En <2 s la pantalla cambia a: *"Corte de energía detectado (Wi-Fi + AC caídos)"* | Correlación inteligente de apagón sin escaneo pesado de Wi-Fi |
-| **1:15 – 2:00** | Aislamiento de datos | Se desactivan los datos móviles en el Android Go. Queda en modo celular básico (icono de red 2G/llamadas) | Pérdida inducida del canal IP |
-| **2:00 – 2:30** | Golpe o botón de pánico | Se pulsa el botón de pánico / impacto. Se activa la pre-alarma ruidosa de 15 s sin interactuar | Conteo de pre-alarma para mitigar falsos positivos |
-| **2:30 – 3:00** | Salida por SMS y recepción | Expira el tiempo, falla el HTTP de inmediato y el teléfono despacha por `SmsManager`. Suena el teléfono del evaluador con el SMS de auxilio | **Entrega garantizada offline sin GMS ni internet** |
+| **0:00 – 0:20** | Estado nominal | Teléfono en pantalla fija: "Monitoreando: AC conectado, Wi-Fi OK". El teléfono del evaluador en reposo sobre la mesa | Sistema operativo en régimen normal |
+| **0:20 – 0:45** | Desconexión física de la regleta | Se desenchufa la regleta completa: caen el cargador y el router portátil al mismo tiempo. En <2 s la pantalla cambia a: *"Se fue la luz en la casa"*. Se desactivan además los datos móviles | Apagón confirmado por la caída del Wi-Fi, y pérdida inducida del canal IP |
+| **0:45 – 0:55** | Se dispara el evento | Se deja caer el morral junto al teléfono (golpe + vibración). Arranca la alarma de confirmación | El evento nace en la casa, sin intervención de nadie |
+| **0:55 – 1:55** | La alarma de 60 s | 520 Hz en onda cuadrada, la voz «¿Está bien?», la pantalla destella y el teléfono vibra. Nadie la apaga | El filtro humano: la familia no se enteró de nada todavía |
+| **1:55 – 2:05** | El POST falla | La pantalla pasa a *"Sin red. Escalando"*. El POST se corta a los 10 s sin datos | El canal primario se agota y no se insiste |
+| **2:05 – 2:25** | La llamada | El teléfono de la casa llama en altavoz al contacto local. Suena unos 20 s en el teléfono del evaluador y la red la corta | La llamada hace sonar un teléfono ajeno sin depender de internet |
+| **2:25 – 2:35** | El SMS | Salen los SMS al contacto local y al vecino. Suenan los dos teléfonos con el mensaje de auxilio | **La cadena llega al último recurso sin GMS ni internet** |
+
+Cinco cosas que hay que decir en voz alta durante el demo:
+
+1. **Aunque el evaluador conteste, el SMS sale igual.** Android no distingue una llamada contestada de una que está sonando, así que la llamada no puede ser la compuerta. Lo que detiene la cadena es que alguien marque la alerta como atendida en la web o en Telegram.
+2. **Si se usara el botón de pánico, la cadena arrancaría sin los 60 s**, porque es 🔴 directo. El demo usa un golpe detectado justamente para que se vea la alarma de confirmación.
+3. **La llamada dura lo que dura el tono.** En la prueba del 24-oct sonó 20 s y la red la cortó sola; la contestadora no entró nunca. Hay que repetir la prueba con la SIM que va a estar en la tarima, porque el corte del tono depende del operador.
+4. **Margen de sobra:** el SMS llega alrededor de 2:25 y quedan unos 35 s para el cierre. Si la llamada se corta antes, el SMS sale antes.
+5. **La llamada y el SMS van a números locales.** La familia en el exterior no los recibe: si el POST falló, lo que le llega es el «sin señal» de la web. Es la limitación real del chip de la casa, y se dice antes de que la pregunten.
 
 ---
 
@@ -137,7 +200,8 @@ El objetivo es demostrar que la alerta sale aun cuando se cortan la luz y los da
 
 | Componente | API nativa / Paquete | Rol en la arquitectura |
 |---|---|---|
-| **Telefonía y SMS** | `android.telephony.SmsManager` | Envío directo de PDU celular saltándose la pila IP |
+| **Telefonía y SMS** | `android.telephony.SmsManager` | Envío directo de PDU celular saltándose la pila IP. Último escalón, sin acuse |
+| **Llamada saliente** | `Intent.ACTION_CALL` + `TelephonyManager.getCallState()` | Marca al contacto local, mantiene el altavoz y detecta cuándo termina la llamada; **no** distingue si contestaron |
 | **Gestión Dual SIM** | `android.telephony.SubscriptionManager` | Selección de ranura celular activa y extracción de `subId` |
 | **Red y conectividad** | `android.net.ConnectivityManager.NetworkCallback` | Detección de pérdida de Wi-Fi en tiempo real mediante `onLost()` |
 | **Estado de carga** | `android.content.Intent.ACTION_POWER_DISCONNECTED` | Detección inmediata de pérdida de suministro eléctrico |
