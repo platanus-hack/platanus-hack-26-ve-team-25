@@ -11,12 +11,16 @@ import 'ui/raiz.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // El teléfono de la casa vive de pie y enchufado; el reloj de mesa acostado va después.
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // El teléfono de la casa vive acostado y enchufado, como un reloj de mesa.
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   final oido = Oido();
   final controlador = Controlador(
     casa: casaSimulada,
+    pastillas: pastillasSimuladas,
     escuchas: oido.escuchas,
     // Llamada telefónica normal, directa, sin pasar por el marcador. WhatsApp va a futuro.
     llamar: (numero) => FlutterPhoneDirectCaller.callNumber(numero),

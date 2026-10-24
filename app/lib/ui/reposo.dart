@@ -5,6 +5,7 @@ import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../tema.dart';
 import 'componentes/boton_grande.dart';
+import 'componentes/capsula.dart';
 import 'configurar.dart';
 import 'controlador.dart';
 
@@ -32,12 +33,14 @@ const _meses = [
   'diciembre',
 ];
 
-/// Casi siempre la casa está así: un reloj grande y tenue sobre negro, que gasta poco y no
-/// calienta, y abajo los botones con los que la persona avisa.
+/// El teléfono acostado como reloj de mesa. A la izquierda la hora, grande y tenue sobre negro
+/// (gasta poco y no calienta), y abajo los botones para pedir ayuda, siempre visibles. A la
+/// derecha, las pastillas del día.
 ///
-/// Mientras no exista el oído, dos toques largos sirven para probar:
+/// Toques largos de prueba:
 /// - mantener el reloj simula una alarma de humo;
-/// - mantener «Cuidando la casa» abre la configuración (la usa el familiar).
+/// - mantener «Cuidando la casa» abre la configuración (la usa el familiar);
+/// - mantener «Pastillas de hoy» recuerda ya la próxima pastilla.
 class Reposo extends StatelessWidget {
   const Reposo({super.key, required this.c});
 
@@ -54,105 +57,222 @@ class Reposo extends StatelessWidget {
       backgroundColor: Colores.noche,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-          child: Column(
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 18),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: GestureDetector(
-                  onLongPress: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => Configurar(casa: c.casa),
-                    ),
-                  ),
-                  child: const _Estado(),
-                ),
-              ),
               Expanded(
-                child: GestureDetector(
-                  onLongPress: () => c.oirEvento(TipoEvento.alarma),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        child: Text(
-                          hora,
-                          style: const TextStyle(
-                            fontSize: 112,
-                            height: 1,
-                            letterSpacing: -2,
-                            color: Colores.relojTenue,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onLongPress: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => Configurar(casa: c.casa),
                           ),
                         ),
+                        child: const _Estado(),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        fecha,
-                        style: const TextStyle(
-                          fontSize: 26,
-                          color: Colores.textoTenue,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onLongPress: () => c.oirEvento(TipoEvento.alarma),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: FittedBox(
+                                child: Text(
+                                  hora,
+                                  style: const TextStyle(
+                                    fontSize: 116,
+                                    height: 1,
+                                    letterSpacing: -3,
+                                    color: Colores.relojTenue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              fecha,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colores.textoTenue,
+                              ),
+                            ),
+                            // Solo en debug: lo que oye el teléfono, para probar el modelo.
+                            if (kDebugMode)
+                              Text(
+                                _diagnostico(c.ultimaEscucha),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colores.textoTenue,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                      // Solo en debug: lo que oye el teléfono, para probar el modelo.
-                      if (kDebugMode) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          _diagnostico(c.ultimaEscucha),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Colores.textoTenue,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: BotonGrande(
+                            texto: 'Pedir ayuda',
+                            alto: 84,
+                            tamano: 24,
+                            fondo: Colores.rojo,
+                            color: Colors.white,
+                            alTocar: () => c.pedirAyuda(TipoEvento.panico),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _BotonPersona(
+                            'Huele a gas',
+                            alTocar: () => c.pedirAyuda(TipoEvento.hueleGas),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _BotonPersona(
+                            'Me siento mal',
+                            alTocar: () => c.pedirAyuda(TipoEvento.meSientoMal),
                           ),
                         ),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 22),
+              SizedBox(width: 300, child: _Pastillas(c: c)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Pastillas extends StatelessWidget {
+  const _Pastillas({required this.c});
+
+  final Controlador c;
+
+  @override
+  Widget build(BuildContext context) {
+    final toca = c.pastillaQueToca;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            GestureDetector(
+              onLongPress: c.recordarAhora,
+              child: const Text(
+                'Pastillas de hoy',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                  color: Colores.textoClaro,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (final p in c.plan.pastillas)
+              if (p == toca) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F3A2A),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Capsula(colores: p.colores),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${p.horaTexto} · ${p.nombre}',
+                              style: const TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const Text(
+                              'Le toca ahora',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colores.verdeClaro,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ),
-              BotonGrande(
-                texto: 'Pedir ayuda',
-                icono: Icons.warning_amber_rounded,
-                alto: 128,
-                tamano: 34,
-                fondo: Colores.rojo,
-                color: Colors.white,
-                alTocar: () => c.pedirAyuda(TipoEvento.panico),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: _BotonPersona(
-                      'Huele a gas',
-                      alTocar: () => c.pedirAyuda(TipoEvento.hueleGas),
-                    ),
+                const SizedBox(height: 10),
+                BotonGrande(
+                  texto: 'Ya la tomé',
+                  icono: Icons.check_rounded,
+                  alto: 72,
+                  tamano: 24,
+                  fondo: const Color(0xFF16A34A),
+                  color: Colors.white,
+                  alTocar: () => c.yaLaTome(p),
+                ),
+                const SizedBox(height: 6),
+              ] else
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _BotonPersona(
-                      'Me siento mal',
-                      alTocar: () => c.pedirAyuda(TipoEvento.meSientoMal),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _BotonPersona(
-                      'Estoy bien hoy',
-                      verde: true,
-                      alTocar: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Gracias. Que tenga buen día.',
-                            style: TextStyle(fontSize: 20),
+                  child: Row(
+                    children: [
+                      Capsula(colores: p.colores, ancho: 40, alto: 18),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${p.horaTexto} · ${p.nombre}',
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colores.textoTenue,
+                            decoration: c.plan.tomada(p)
+                                ? TextDecoration.lineThrough
+                                : null,
                           ),
                         ),
                       ),
-                    ),
+                      if (c.plan.tomada(p))
+                        const Icon(
+                          Icons.check_rounded,
+                          color: Colores.verdePunto,
+                          size: 22,
+                        ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+          ],
         ),
       ),
     );
@@ -165,7 +285,7 @@ class _Estado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
         color: Colores.verdeFondo,
         borderRadius: BorderRadius.circular(999),
@@ -178,7 +298,7 @@ class _Estado extends StatelessWidget {
           Flexible(
             child: Text(
               'Cuidando la casa',
-              style: TextStyle(fontSize: 18, color: Colores.verdeClaro),
+              style: TextStyle(fontSize: 16, color: Colores.verdeClaro),
             ),
           ),
         ],
@@ -188,21 +308,20 @@ class _Estado extends StatelessWidget {
 }
 
 class _BotonPersona extends StatelessWidget {
-  const _BotonPersona(this.texto, {required this.alTocar, this.verde = false});
+  const _BotonPersona(this.texto, {required this.alTocar});
 
   final String texto;
   final VoidCallback alTocar;
-  final bool verde;
 
   @override
   Widget build(BuildContext context) {
     return BotonGrande(
       texto: texto,
-      alto: 104,
-      tamano: 20,
-      fondo: verde ? const Color(0xFF142019) : Colores.nocheBoton,
-      color: verde ? Colores.verdeClaro : Colores.textoClaro,
-      borde: verde ? const Color(0xFF2F5A3F) : Colores.nocheBorde,
+      alto: 84,
+      tamano: 19,
+      fondo: Colores.nocheBoton,
+      color: Colores.textoClaro,
+      borde: Colores.nocheBorde,
       alTocar: alTocar,
     );
   }
@@ -213,5 +332,5 @@ String _diagnostico(Escucha? e) {
   final top = e.top
       .map((c) => '${c.nombre} ${(c.puntaje * 100).round()}%')
       .join(' · ');
-  return '${e.db.round()} dB (fondo ${e.fondo.round()})${e.compuerta ? ' · compuerta abierta' : ''}\n$top';
+  return '${e.db.round()} dB (fondo ${e.fondo.round()})${e.compuerta ? ' · compuerta abierta' : ''} · $top';
 }

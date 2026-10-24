@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../dominio/alerta.dart';
+import '../dominio/pastillas.dart';
 import '../dominio/tipos.dart';
 import '../oido/oido.dart';
 import '../oido/sonidos.dart';
@@ -17,7 +18,9 @@ class Controlador extends ChangeNotifier {
     DateTime Function()? reloj,
     Stream<Escucha>? escuchas,
     this.llamar,
-  }) : _reloj = reloj ?? DateTime.now {
+    List<Pastilla> pastillas = const [],
+  }) : _reloj = reloj ?? DateTime.now,
+       plan = PlanDelDia(pastillas) {
     _tic = Timer.periodic(
       const Duration(seconds: 1),
       (_) => _alPasarUnSegundo(),
@@ -29,6 +32,10 @@ class Controlador extends ChangeNotifier {
   static const _repetir = Duration(seconds: 3);
 
   final Casa casa;
+
+  /// Las pastillas del día y cuáles ya tomó.
+  final PlanDelDia plan;
+  Pastilla? _forzada;
   final DateTime Function() _reloj;
   final Llamar? llamar;
   late final Timer _tic;
@@ -44,6 +51,30 @@ class Controlador extends ChangeNotifier {
 
   /// La alerta que manda en pantalla, o null si la casa está en reposo.
   Alerta? get alerta => (_alerta?.abierta ?? false) ? _alerta : null;
+
+  /// La pastilla que le toca ahora, para resaltarla en el reposo.
+  Pastilla? get pastillaQueToca => _forzada ?? plan.leToca(ahora);
+
+  /// La pastilla que se recuerda en pantalla completa, o null.
+  Pastilla? get recordatorio => _forzada ?? plan.recordar(ahora);
+
+  /// Para probar sin esperar a la hora: la próxima pastilla pendiente se recuerda ya.
+  void recordarAhora() {
+    _forzada = plan.siguientePendiente(ahora);
+    notifyListeners();
+  }
+
+  void yaLaTome(Pastilla p) {
+    plan.marcarTomada(p, ahora);
+    if (_forzada == p) _forzada = null;
+    notifyListeners();
+  }
+
+  void recordarLuego(Pastilla p) {
+    plan.posponer(p, ahora);
+    if (_forzada == p) _forzada = null;
+    notifyListeners();
+  }
 
   /// El primero de la lista, al que se llama cuando la alerta escala.
   Contacto get primerContacto =>

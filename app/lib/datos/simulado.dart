@@ -1,3 +1,4 @@
+import '../dominio/pastillas.dart';
 import '../dominio/tipos.dart';
 
 // Datos inventados para ver las pantallas sin backend. Cuando Supabase esté listo, esto se
@@ -29,3 +30,31 @@ const casaSimulada = Casa(
     ),
   ],
 );
+
+const pastillasSimuladas = [
+  Pastilla(
+    id: 'losartan-manana',
+    nombre: 'Losartán',
+    dosis: '50 mg',
+    hora: 8,
+    minuto: 0,
+    colores: [0xFFF4F4F0, 0xFF60A5FA],
+  ),
+  Pastilla(
+    id: 'metformina',
+    nombre: 'Metformina',
+    dosis: '500 mg',
+    hora: 14,
+    minuto: 0,
+    colores: [0xFFF4F4F0],
+    indicacion: '1 pastilla, con la comida',
+  ),
+  Pastilla(
+    id: 'losartan-noche',
+    nombre: 'Losartán',
+    dosis: '50 mg',
+    hora: 20,
+    minuto: 0,
+    colores: [0xFFF4F4F0, 0xFF60A5FA],
+  ),
+];

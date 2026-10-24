@@ -25,105 +25,112 @@ class Ayuda extends StatelessWidget {
       backgroundColor: Colores.rojoOscuro,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          padding: const EdgeInsets.fromLTRB(28, 22, 28, 22),
+          child: Row(
             children: [
-              Text(
-                conNumero
-                    ? 'Estamos llamando a ${contacto.nombre}'
-                    : 'Pida ayuda a alguien cerca',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 42,
-                  height: 1.1,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                conNumero
-                    ? 'Si contesta, puede hablarle desde aquí.'
-                    : 'Este teléfono todavía no tiene un número de emergencia.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 22,
-                  height: 1.35,
-                  color: Colores.rojoTexto,
-                ),
-              ),
               Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        conNumero
+                            ? 'Estamos llamando a ${contacto.nombre}'
+                            : 'Pida ayuda a alguien cerca',
+                        style: const TextStyle(
+                          fontSize: 42,
+                          height: 1.08,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colores.rojoTarjeta,
-                        borderRadius: BorderRadius.circular(22),
+                      const SizedBox(height: 12),
+                      Text(
+                        conNumero ? 'Si contesta, puede hablarle desde aquí.' : 'Este teléfono todavía no tiene un número de emergencia.',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          height: 1.35,
+                          color: Colores.rojoTexto,
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.call_rounded,
-                            size: 34,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${contacto.nombre}, ${contacto.relacion}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  conNumero
-                                      ? 'Llamada desde las $hora'
-                                      : 'Sin número',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colores.rojoTexto,
-                                  ),
-                                ),
-                              ],
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colores.rojoTarjeta,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.call_rounded,
+                              size: 32,
+                              color: Colors.white,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 16),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${contacto.nombre}, ${contacto.relacion}',
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    conNumero
+                                        ? 'Llamada desde las $hora'
+                                        : 'Sin número',
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      color: Colores.rojoTexto,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
-              if (conNumero) ...[
-                BotonGrande(
-                  texto: 'Volver a llamar',
-                  icono: Icons.call_rounded,
-                  alto: 112,
-                  tamano: 32,
-                  fondo: Colors.white,
-                  color: Colores.rojoOscuro,
-                  alTocar: c.llamarPrimerContacto,
+              const SizedBox(width: 28),
+              SizedBox(
+                width: 320,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (conNumero) ...[
+                      BotonGrande(
+                        texto: 'Volver a llamar',
+                        alto: 112,
+                        tamano: 30,
+                        fondo: Colors.white,
+                        color: Colores.rojoOscuro,
+                        alTocar: c.llamarPrimerContacto,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    BotonGrande(
+                      texto: 'Fue sin querer, estoy bien',
+                      alto: 72,
+                      tamano: 21,
+                      fondo: Colors.transparent,
+                      color: Colors.white,
+                      borde: const Color(0xFFF3B7B3),
+                      alTocar: c.fueSinQuerer,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-              ],
-              BotonGrande(
-                texto: 'Fue sin querer, estoy bien',
-                alto: 64,
-                tamano: 22,
-                fondo: Colors.transparent,
-                color: Colors.white,
-                borde: const Color(0xFFF3B7B3),
-                alTocar: c.fueSinQuerer,
               ),
             ],
           ),

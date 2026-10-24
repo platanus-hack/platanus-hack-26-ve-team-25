@@ -6,24 +6,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  // El tamaño de un teléfono, como en los mockups: 390 × 844 puntos.
-  void comoTelefono(WidgetTester tester) {
-    tester.view.physicalSize = const Size(1170, 2532);
+  // Un teléfono acostado, como en los mockups: 844 × 390 puntos.
+  void comoRelojDeMesa(WidgetTester tester) {
+    tester.view.physicalSize = const Size(2532, 1170);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
   }
 
+  // Las 6:00, antes de la primera pastilla, para que el reposo no muestre un recordatorio.
+  DateTime temprano() => DateTime(2026, 10, 24, 6);
+
   testWidgets('del reposo a «¿Está bien?» y de vuelta deslizando', (
     tester,
   ) async {
-    comoTelefono(tester);
-    final c = Controlador(casa: casaSimulada);
+    comoRelojDeMesa(tester);
+    final c = Controlador(
+      casa: casaSimulada,
+      pastillas: pastillasSimuladas,
+      reloj: temprano,
+    );
     await tester.pumpWidget(AppCasa(controlador: c));
 
     expect(find.text('Cuidando la casa'), findsOneWidget);
+    expect(find.text('Pastillas de hoy'), findsOneWidget);
 
     await tester.longPress(
-      find.textContaining(':').first,
+      find.text('6:00'),
     ); // el reloj simula una alarma de humo
     await tester.pump();
     expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
@@ -45,7 +53,7 @@ void main() {
   testWidgets('el pánico llama al primer contacto una sola vez', (
     tester,
   ) async {
-    comoTelefono(tester);
+    comoRelojDeMesa(tester);
     final llamadas = <String>[];
     final c = Controlador(
       casa: const Casa(
@@ -62,6 +70,7 @@ void main() {
           ),
         ],
       ),
+      reloj: temprano,
       llamar: (numero) async => llamadas.add(numero),
     );
     await tester.pumpWidget(AppCasa(controlador: c));
@@ -83,14 +92,52 @@ void main() {
   });
 
   testWidgets('sin número configurado no promete una llamada', (tester) async {
-    comoTelefono(tester);
-    final c = Controlador(casa: casaSimulada);
+    comoRelojDeMesa(tester);
+    final c = Controlador(casa: casaSimulada, reloj: temprano);
     await tester.pumpWidget(AppCasa(controlador: c));
 
     await tester.tap(find.text('Pedir ayuda'));
     await tester.pump();
     expect(find.text('Pida ayuda a alguien cerca'), findsOneWidget);
     expect(find.textContaining('llamando'), findsNothing);
+    await _cerrar(tester, c);
+  });
+
+  testWidgets('a la hora de la pastilla la recuerda y «Ya la tomé» la marca', (
+    tester,
+  ) async {
+    comoRelojDeMesa(tester);
+    final c = Controlador(
+      casa: casaSimulada,
+      pastillas: pastillasSimuladas,
+      reloj: () => DateTime(2026, 10, 24, 8, 2),
+    );
+    await tester.pumpWidget(AppCasa(controlador: c));
+
+    expect(find.text('Es hora de la losartán'), findsOneWidget);
+    await tester.tap(find.text('Ya la tomé'));
+    await tester.pump();
+
+    expect(find.text('Cuidando la casa'), findsOneWidget);
+    expect(find.text('Le toca ahora'), findsNothing);
+    expect(c.plan.tomada(pastillasSimuladas.first), isTrue);
+    await _cerrar(tester, c);
+  });
+
+  testWidgets('una alarma gana sobre el recordatorio de la pastilla', (
+    tester,
+  ) async {
+    comoRelojDeMesa(tester);
+    final c = Controlador(
+      casa: casaSimulada,
+      pastillas: pastillasSimuladas,
+      reloj: () => DateTime(2026, 10, 24, 8, 2),
+    );
+    await tester.pumpWidget(AppCasa(controlador: c));
+
+    c.oirEvento(TipoEvento.alarma);
+    await tester.pump();
+    expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
     await _cerrar(tester, c);
   });
 }

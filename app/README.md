@@ -1,17 +1,21 @@
 # App de la casa (Flutter, Android)
 
-El teléfono viejo que queda enchufado en la casa del adulto mayor. Hoy tiene:
+El teléfono viejo que queda enchufado y **acostado como reloj de mesa** en la casa del adulto
+mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
 
 - **El oído:** micrófono → nivel y compuerta → YAMNet en el teléfono, en otro isolate. Si oye una
   alarma, un vidrio, un golpe, un grito o un quejido, pregunta «¿Está bien?». El audio entra crudo
   (fuente `UNPROCESSED`) y nunca sale del teléfono.
 - **La alerta:** una máquina de estados en Dart puro. «Estoy bien» se desliza para no apagarla por
   reflejo; «Necesito ayuda» es un toque.
+- **Las pastillas del día:** el reloj muestra cuál le toca y «Ya la tomé». A la hora, una pantalla
+  verde la recuerda («Es hora de la losartán») con la pastilla dibujada en sus colores. Se puede
+  posponer 10 minutos; pasadas 2 horas sin tomarla queda como olvidada.
 - **La llamada de emergencia:** al escalar, la casa hace una llamada telefónica normal y directa al
   primer contacto, una sola vez. WhatsApp queda como opción futura ([futuro.md](../docs/futuro.md)).
 
-Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y la vista horizontal de
-reloj de mesa: ver [docs/pantallas.md](../docs/pantallas.md).
+Falta Supabase, el aviso por Telegram, el tono de 520 Hz, la vibración y cargar las pastillas desde
+la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).
 
 ## Correrla en un Android
 
@@ -53,6 +57,7 @@ El oído ya escucha. Además hay dos toques largos de prueba:
 | Hacer sonar una alarma, romper algo o gritar cerca | El oído lo detecta y abre «¿Está bien?» |
 | Mantener presionado el reloj | Simula una alarma de humo sin hacer ruido |
 | Mantener presionado «Cuidando la casa» | Abre la configuración, que en el producto usa el familiar |
+| Mantener presionado «Pastillas de hoy» | Recuerda ya la próxima pastilla, sin esperar a su hora |
 | Tocar «Pedir ayuda», «Huele a gas» o «Me siento mal» | No espera los 60 s: llama al primer contacto y abre la pantalla de ayuda |
 
 Si la cuenta regresiva llega a cero, la alerta escala sola y **la casa llama de verdad** al número
