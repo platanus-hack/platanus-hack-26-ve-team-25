@@ -145,7 +145,7 @@ class Reposo extends StatelessWidget {
                   children: [
                     Expanded(
                       child: BotonGrande(
-                        texto: 'Pedir ayuda',
+                        texto: c.textoDelBotonRojo,
                         alto: double.infinity,
                         tamano: 44,
                         fondo: Colores.rojo,

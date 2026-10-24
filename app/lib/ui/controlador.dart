@@ -140,6 +140,12 @@ class Controlador extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Lo que dice el botón rojo del reposo: a quién llama de verdad. Sin número configurado no
+  /// promete una llamada.
+  String get textoDelBotonRojo => primerContacto.telefono.isNotEmpty
+      ? 'Llamar a ${primerContacto.nombre}'
+      : 'Pedir ayuda';
+
   /// El primero de la lista, al que se llama cuando la alerta escala.
   Contacto get primerContacto =>
       ([...casa.contactos]..sort((a, b) => a.orden.compareTo(b.orden))).first;

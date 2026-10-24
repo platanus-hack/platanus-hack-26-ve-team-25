@@ -7,6 +7,7 @@ library;
 import 'dart:io';
 
 import 'package:casa/datos/simulado.dart';
+import 'package:casa/dominio/tipos.dart';
 import 'package:casa/main.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 Future<void> _fuente(String familia, List<String> archivos) async {
   final f = FontLoader(familia);
   for (final a in archivos) {
-    f.addFont(
-      Future.value(ByteData.sublistView(File(a).readAsBytesSync())),
-    );
+    f.addFont(Future.value(ByteData.sublistView(File(a).readAsBytesSync())));
   }
   await f.load();
 }
@@ -39,8 +38,23 @@ void main() {
     tester.view.physicalSize = const Size(2436, 1080);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
+    // La casa del demo, con el número de Josuep (inventado).
+    const casa = Casa(
+      id: 'demo',
+      nombre: 'Carmen',
+      condiciones: [],
+      contactos: [
+        Contacto(
+          nombre: 'Josuep',
+          relacion: 'hijo',
+          canal: Canal.whatsapp,
+          orden: 1,
+          telefono: '04120000000',
+        ),
+      ],
+    );
     final c = Controlador(
-      casa: casaSimulada,
+      casa: casa,
       pastillas: pastillasSimuladas,
       reloj: () => DateTime(2026, 10, 24, 10, 50),
     );

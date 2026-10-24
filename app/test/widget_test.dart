@@ -83,7 +83,7 @@ void main() {
       t = TelefonoFalso();
       c = Controlador(casa: casaConNumero, reloj: () => ahora, telefono: t);
       await tester.pumpWidget(AppCasa(controlador: c));
-      await tester.tap(find.text('Pedir ayuda'));
+      await tester.tap(find.text('Llamar a Josuep'));
       await tester.pump();
     }
 
@@ -185,7 +185,7 @@ void main() {
         microfono: mic,
       );
       await tester.pumpWidget(AppCasa(controlador: c));
-      await tester.tap(find.text('Pedir ayuda'));
+      await tester.tap(find.text('Llamar a Josuep'));
       await tester.pump();
       t.terminarWhatsApp(40);
       await tester.pump();
