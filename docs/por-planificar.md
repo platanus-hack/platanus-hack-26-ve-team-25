@@ -17,6 +17,7 @@
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
 | 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |
 | 8 | [Comandos de voz: «llama a emergencias», «llama a mi hijo»](#8-comandos-de-voz) | Producto | Hecho: emergencias, hijo, vecino y «ya me la tomé» |
+| 9 | [La voz de «¿Está bien?»](#9-la-voz-de-está-bien) | Producto | Propuesta, esperando a Abrahan |
 
 ## 1. Proyección para el pitch
 
@@ -301,3 +302,24 @@ en una novela, la casa llamaría. Por eso propongo dos reglas:
       911 de verdad**.
 - [ ] Ver en el teléfono si Vosk conoce «Lucero» y si la marca respeta el altavoz.
 - [ ] Probar en el teléfono si Vosk oye durante una llamada.
+
+## 9. La voz de «¿Está bien?»
+
+**La pregunta de Abrahan:** ¿qué voz acompaña al tono de 520 Hz, frases fijas o una IA que
+responda?
+
+**Propuesta: frases fijas, no una IA.** En la alarma la voz tiene que ser predecible: una IA
+puede tardar, inventar o quedarse sin internet justo en la emergencia.
+
+- Se alternan: dos ciclos del tono, la voz, y otra vez el tono. «Carmen, ¿está bien? Deslice el
+  botón si está bien.» Cerca del final: «Si no responde, voy a llamar a Josuep.»
+- Voz grave, lenta y fuerte, con frases cortas y con su nombre
+  ([investigacion-audio.md §1.1](investigacion-audio.md)).
+- Con el texto a voz de Android, sin internet (tono más bajo, velocidad 0,85). Sin paquetes.
+- **A futuro, la voz del hijo,** grabada al configurar: «Mamá, soy Josuep, ¿estás bien?». Una voz
+  conocida se atiende más. Queda solo en el teléfono, nunca en el repo.
+
+Una IA que habla sí sirve en otros momentos: describir la foto de la emergencia (punto 4) o
+acompañar en el día.
+
+- [ ] Que Abrahan elija: frases fijas con texto a voz, la voz del hijo grabada, o las dos.
