@@ -86,8 +86,8 @@ build-apk: deps ## Arma el APK de release, para instalar a mano
 
 # El APK que se publica en el repo: sin $(CONFIG), porque local.json trae los números del equipo y
 # la clave de la casa de demo. Oye y pregunta, pero sin números no llama ni escribe en la base.
-apk-publico: deps ## Arma el APK para el Release de GitHub, sin local.json (app/build/en-casa.apk)
-	cd $(APP) && flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/en-casa.apk
+apk-publico: deps ## Arma el APK para el Release de GitHub, sin local.json (app/build/presente.apk)
+	cd $(APP) && flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/presente.apk
 
 build-appbundle: deps ## Arma el App Bundle (.aab) de release, para Google Play
 	cd $(APP) && flutter build appbundle $(CONFIG) --release

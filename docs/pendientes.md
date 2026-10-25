@@ -70,7 +70,7 @@ guarda lo que está en el récipe. Falta encenderla:
       enlazado en el README. Va con 60 s y se compila con **`make apk-publico`**, sin
       `config/local.json`: con él se publicarían los números del equipo y la clave de la casa de
       demo. Ningún valor de `local.json` aparece dentro del APK. Si cambia la app antes del gong,
-      se vuelve a subir con `gh release upload casa-v0.1.0 app/build/en-casa.apk --clobber`.
+      se vuelve a subir con `gh release upload casa-v0.1.0 app/build/presente.apk --clobber`.
 
 ### Josuep · Telegram
 
@@ -82,7 +82,8 @@ webhook y el vigilante están hechos y verificados.
 
 ### Todo el equipo · el pitch
 
-- [x] **El nombre del producto: «En casa»**, y su asistente de voz, **«Lucero»** (sábado 24).
+- [x] **El nombre del producto: «Presente»** (domingo 25; el sábado era «En casa»), y su asistente
+      de voz, **«Lucero»**.
       Está en la web ([`web/src/lib/app.ts`](../web/src/lib/app.ts)), la app, el README y el
       `platanus-hack-project.jsonc`.
 - [ ] **El guion del demo** en [plan.md](plan.md#demo), con lo que se decidió el sábado.
