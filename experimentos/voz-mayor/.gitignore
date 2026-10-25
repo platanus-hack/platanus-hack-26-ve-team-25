@@ -1,0 +1,6 @@
+audio/
+modelos/
+.venv/
+__pycache__/
+guion.txt
+resultados-guion.md

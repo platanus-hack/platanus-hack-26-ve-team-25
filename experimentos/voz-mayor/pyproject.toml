@@ -1,0 +1,9 @@
+[project]
+name = "voz-mayor"
+version = "0.1.0"
+description = "Mide si Vosk entiende los pedidos de ayuda y las órdenes de la casa dichos por voces de personas mayores"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "numpy",
+    "vosk==0.3.44",
+]
