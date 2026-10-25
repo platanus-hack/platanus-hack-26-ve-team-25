@@ -115,7 +115,7 @@ export default function LaFamilia({ activa = false }: Props) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1.6fr",
+          gridTemplateColumns: "1.2fr 1.3fr",
           gap: "4cqw",
           flex: 1,
           minHeight: 0,
@@ -127,13 +127,14 @@ export default function LaFamilia({ activa = false }: Props) {
           <div
             className="telefono"
             style={{
-              width: "30cqh",
-              height: "64cqh",
-              borderRadius: "3cqh",
+              // El teléfono va de lado, como en la mesa: el ancho manda y el alto sale solo.
+              width: "100%",
+              aspectRatio: "19 / 9",
+              borderRadius: "2.6cqh",
               border: "1px solid var(--borde)",
               background: "var(--superficie)",
               // En vivo manda el video a sangre; si no, el mockup con su respiración.
-              padding: vivo || porAdb ? "0" : "2.5cqh 2cqw",
+              padding: vivo || porAdb ? "0" : "2.2cqh 1.6cqw",
               justifyContent: vivo || porAdb ? "center" : "space-between",
               gap: "0",
               overflow: "hidden",
@@ -157,38 +158,42 @@ export default function LaFamilia({ activa = false }: Props) {
               </>
             ) : (
               <>
-                <div className="telefono-reloj">16:24</div>
-                <div className="telefono-pregunta" style={{ fontSize: "3.2cqh", whiteSpace: "nowrap" }}>
-                  ¿Está bien?
-                </div>
-                <svg
-                  viewBox="0 0 100 100"
-                  aria-hidden="true"
-                  style={{ width: "14cqh", height: "14cqh", flex: "0 0 auto" }}
-                >
-                  <circle cx={50} cy={50} r={RADIO} fill="none" stroke="var(--borde)" strokeWidth={4} />
-                  <circle
-                    cx={50}
-                    cy={50}
-                    r={RADIO}
-                    fill="none"
-                    stroke="var(--verde)"
-                    strokeWidth={4}
-                    strokeLinecap="round"
-                    strokeDasharray={`${DASH} ${CIRC - DASH}`}
-                    transform="rotate(-90 50 50)"
-                  />
-                  <text
-                    x={50}
-                    y={56}
-                    fontSize={18}
-                    fontWeight={700}
-                    textAnchor="middle"
-                    fill="var(--tinta)"
+                <div className="telefono-fila">
+                  <div className="telefono-dicho">
+                    <div className="telefono-reloj">16:24</div>
+                    <div className="telefono-pregunta" style={{ whiteSpace: "nowrap" }}>
+                      ¿Está bien?
+                    </div>
+                  </div>
+                  <svg
+                    viewBox="0 0 100 100"
+                    aria-hidden="true"
+                    style={{ width: "11cqh", height: "11cqh", flex: "0 0 auto" }}
                   >
-                    48 s
-                  </text>
-                </svg>
+                    <circle cx={50} cy={50} r={RADIO} fill="none" stroke="var(--borde)" strokeWidth={4} />
+                    <circle
+                      cx={50}
+                      cy={50}
+                      r={RADIO}
+                      fill="none"
+                      stroke="var(--verde)"
+                      strokeWidth={4}
+                      strokeLinecap="round"
+                      strokeDasharray={`${DASH} ${CIRC - DASH}`}
+                      transform="rotate(-90 50 50)"
+                    />
+                    <text
+                      x={50}
+                      y={56}
+                      fontSize={18}
+                      fontWeight={700}
+                      textAnchor="middle"
+                      fill="var(--tinta)"
+                    >
+                      48 s
+                    </text>
+                  </svg>
+                </div>
                 <div className="telefono-boton" style={{ paddingLeft: "calc(3.5cqw + 1cqw)" }}>
                   <div className="telefono-riel" aria-hidden="true" />
                   <span
@@ -222,7 +227,7 @@ export default function LaFamilia({ activa = false }: Props) {
         </div>
 
         {/* Marco del navegador centrado verticalmente en el mismo eje */}
-        <div style={{ height: "64cqh", display: "flex", alignItems: "center" }}>
+        <div style={{ height: "40cqh", display: "flex", alignItems: "center" }}>
           <Marco url="platanus-hack-26-ve-team-25.vercel.app/f/carmen">
             <div
               style={{

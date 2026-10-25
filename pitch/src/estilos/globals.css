@@ -448,8 +448,28 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+.telefono-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqh;
+  width: 100%;
+  /* Ocupa el alto libre y centra su contenido: si no, la pregunta y el anillo se
+     pegan al borde de arriba y queda un desierto en el medio. */
+  flex: 1;
+  min-height: 0;
+}
+
+.telefono-dicho {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8cqh;
+  min-width: 0;
+}
+
 .telefono-pregunta {
-  font-size: 5cqh;
+  font-size: 4.6cqh;
   font-weight: 700;
   color: var(--tinta);
   text-align: center;
@@ -496,7 +516,9 @@ button {
 .telefono-vivo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* `contain` y no `cover`: si el teléfono está en vertical o la proporción no coincide,
+     preferimos franjas negras a cortar la pantalla. */
+  object-fit: contain;
   display: block;
   background: #000;
 }
