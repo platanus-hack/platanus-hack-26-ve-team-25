@@ -11,12 +11,33 @@
 | **Infinix** (Android 16) | De mesa: la app de la casa ([`app/`](../app/README.md)) | Es la casa de Carmen. Oye, pregunta «¿Está bien?», recuerda la pastilla y llama |
 | **Samsung** | Familia: Josuep, el hijo | La web de la familia instalada (`/f/demo`) y el aviso por Telegram. Recibe la llamada de WhatsApp de la casa |
 | **iPhone** | «El 911» | Recibe la llamada de «Lucero, llama a emergencias», en vez del 911 de verdad |
-| **Honor** | Por definir | La vista personal del abuelo, si se construye (Abrahan lo está pensando); si no, el vecino Pedro, que recibe «Lucero, llama al vecino» |
+| **Honor** | Por definir (por defecto, el vecino) | El vecino Pedro, que recibe «Lucero, llama al vecino». Si se confirma la vista personal del abuelo, se cambia el papel |
 
 **Cómo se conectan:** ninguno habla con otro directamente. La casa escribe en Supabase
 (eventos, alertas, latido y tomas) y la familia lee de ahí cada 5 s; el vigilante de la base
 escala lo vencido y manda el Telegram. Las llamadas salen del Infinix por la red de teléfono o
 por WhatsApp. Es la misma conexión que ya funcionó entre el Infinix y `/f/demo`.
+
+## Cómo se identifican en la mesa
+
+En el pitch no va ninguna lámina que explique qué papel tiene cada teléfono. Cada teléfono lleva una
+tarjeta o etiqueta visible con su rol, y esa etiqueta es lo que sustituye a la explicación en
+pantalla.
+
+| Teléfono | Texto de la etiqueta |
+|---|---|
+| **Infinix** | `LA CASA` |
+| **Samsung** | `EL HIJO · EN OTRO PAÍS` |
+| **iPhone** | `EL 911` |
+| **Honor** | `EL VECINO` (depende de que se confirme ese papel; ver el punto 4) |
+
+**Por qué:** durante los 60 s del escalamiento el jurado tiene que poder seguir la cadena con la
+mirada en la mesa —la casa llama al hijo, el hijo no contesta, la casa llama al 911— sin que nadie
+tenga que explicar nada en pantalla.
+
+**Montaje:** la etiqueta no puede tapar la pantalla. Va en la parte de atrás del teléfono o en un pie
+de tarjeta al lado. La del Infinix tiene que dejar ver la línea de diagnóstico con los dB y las
+clases que pide el punto 1.
 
 ## 1. El Infinix: la casa
 
@@ -57,6 +78,8 @@ Los números van en `app/config/local.json`, que no se sube al repo:
 - [ ] Esperar la decisión: vista personal o vecino.
 
 ## 5. La prueba de punta a punta, en el orden del demo
+
+- [ ] Las cuatro etiquetas puestas y visibles desde la mesa del jurado.
 
 | # | Qué se hace en el Infinix | Qué tiene que pasar |
 |---|---|---|
