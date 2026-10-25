@@ -1,13 +1,13 @@
 /**
  * Lámina 1 · Portada
- * Wordmark "En Casa" arriba a la izquierda, la pregunta como único titular
+ * Wordmark "Presente" arriba a la izquierda, la pregunta como único titular
  * y pie con el equipo abajo. Sin bajada: la pregunta se explica sola.
  */
 export default function Portada() {
   return (
     <div className="portada">
       <div className="portada-arriba">
-        <div className="portada-wordmark">En Casa</div>
+        <div className="portada-wordmark">Presente</div>
       </div>
       <div className="portada-medio">
         <h1 className="titular" style={{ fontSize: "10cqh", textAlign: "center" }}>

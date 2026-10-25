@@ -8,7 +8,7 @@ export default function QrTelegram() {
       <div className="qr-tarjeta">
         <img
           src="/qr-telegram.svg"
-          alt="Código QR para unirse al bot de avisos de En Casa en Telegram (@CasaAvisoBot)"
+          alt="Código QR para unirse al bot de avisos de Presente en Telegram (@CasaAvisoBot)"
           width={160}
           height={160}
         />

@@ -119,7 +119,7 @@ export default function App() {
       className="escenario"
       onClick={handleClick}
       role="region"
-      aria-label="Presentación En Casa"
+      aria-label="Presentación Presente"
     >
       {laminas.map((lamina, i) => (
         <section

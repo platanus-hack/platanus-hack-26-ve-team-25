@@ -1,4 +1,4 @@
-# En Casa — Pitch
+# Presente — Pitch
 
 Presentación del equipo 25 para Platanus Hack 26 (Caracas, 23–25 de octubre de 2026), track Emergencias.
 

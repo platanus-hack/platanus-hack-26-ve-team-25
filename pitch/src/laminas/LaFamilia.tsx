@@ -175,7 +175,7 @@ export default function LaFamilia() {
       </div>
 
       <div className="fuente" style={{ textAlign: "center" }}>
-        Sin instalar nada. Sin cuenta. El enlace es la llave.
+        Sin cuenta. Sin app que descargar. El enlace es la llave.
       </div>
     </div>
   );
