@@ -406,6 +406,19 @@ void main() {
       await _cerrar(tester, c);
     });
 
+    testWidgets('un «¡auxilio!» gritado también despierta al reconocedor', (
+      tester,
+    ) async {
+      final frases = await abrir(tester, ['auxilio']);
+      oido.add(oye({'Shout': 0.6}));
+      await tester.pump();
+      await tester.pump(Controlador.finDeFrase);
+      await tester.pump();
+      expect(frases.audios, isNotEmpty);
+      expect(find.text('¿Está bien, Carmen?'), findsOneWidget);
+      await _cerrar(tester, c);
+    });
+
     testWidgets('la voz de la TV no despierta al reconocedor', (tester) async {
       final frases = await abrir(tester, ['ayuda']);
       oido.add(oye({'Speech': 0.7, 'Television': 0.4}));

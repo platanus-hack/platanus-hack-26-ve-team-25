@@ -48,7 +48,6 @@ const bancoDePedidos = <TipoEvento, List<String>>{
     'no puedo levantarme',
     'no puedo pararme',
     'me mareo',
-    'me mareé',
     'estoy mareada',
     'estoy mareado',
     'me voy a desmayar',

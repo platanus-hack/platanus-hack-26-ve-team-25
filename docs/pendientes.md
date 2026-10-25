@@ -82,7 +82,7 @@ webhook y el vigilante están hechos y verificados.
 Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en el teléfono desde los
 últimos cambios.
 
-**App de la casa ([`app/`](../app/README.md)), 120 pruebas:**
+**App de la casa ([`app/`](../app/README.md)), 121 pruebas:**
 
 - [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
       en chico y «Leer récipe».
@@ -114,6 +114,11 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
       la bajan más de 30 dB y a la voz menos de 1 ([`filtro.dart`](../app/lib/oido/filtro.dart)).
       La sirena ahora se arma con sus armónicos, sin frecuencias fantasma que el filtro no podría
       quitar. Falta probarlo en el teléfono.
+- [x] El oído ya no se queda sordo después de una llamada (sábado 20:00, visto en el Infinix): el
+      paquete `record` pausaba la grabación cuando otro tomaba el audio y no la retomaba. Ahora
+      sigue grabando, y un vigilante reabre el micrófono si dejan de llegar bloques por 5 s.
+      Vosk también escucha gritos y quejidos, no solo habla tranquila, y el umbral de confianza
+      bajó a 0,5. De ~100 palabras del banco, el modelo solo no conocía «mareé».
 - [x] La rutina: cuenta lo de siempre que suena por franja del día y lo manda como «Su día»; si
       de día no suena nada en 3 horas, avisa una vez como «día distinto»
       ([`rutina.dart`](../app/lib/dominio/rutina.dart)).

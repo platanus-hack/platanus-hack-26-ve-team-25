@@ -91,7 +91,7 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 |---|---|---|
 | Web: estado de la familia, audio, inventario, factura y el tope de lecturas | 56 | `cd web && bun test` |
 | Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
-| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 120 | `make test` |
+| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 121 | `make test` |
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
 | Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
 | Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |

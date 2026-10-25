@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:record/record.dart';
 import 'package:tflite_flutter/tflite_flutter.dart'
@@ -63,6 +64,9 @@ class Oido implements Microfono {
   List<String> _etiquetas = const [];
   StreamSubscription<Uint8List>? _audio;
   Timer? _tic;
+  Timer? _vigilante;
+  int _ultimoBloque = 0;
+  int? _pausadoDesde;
   bool _clasificando = false;
   double _db = -100;
   bool _abierta = false;
@@ -83,7 +87,34 @@ class Oido implements Microfono {
     _isolate = await IsolateInterpreter.create(address: _modelo!.address);
 
     await _grabar();
+    _vigilante = Timer.periodic(const Duration(seconds: 5), (_) => _vigilar());
     return true;
+  }
+
+  /// Si dejó de llegar audio sin que nadie lo pausara (una llamada que se quedó con el micrófono,
+  /// un error de Android), o si una pausa duró demasiado, vuelve a abrir el micrófono. Sin esto,
+  /// la casa podía quedarse sorda en silencio después de una llamada.
+  Future<void> _vigilar() async {
+    final ahora = _reloj.elapsedMilliseconds;
+    final pausado = _pausadoDesde;
+    if (_audio == null) {
+      if (pausado != null && ahora - pausado > 30000) {
+        debugPrint('casa.oido: la pausa duró más de 30 s; se vuelve a oír');
+        await reanudar();
+      }
+      return;
+    }
+    if (ahora - _ultimoBloque < 5000) return;
+    debugPrint(
+      'casa.oido: no llega audio hace ${(ahora - _ultimoBloque) ~/ 1000} s; se reabre',
+    );
+    _tic?.cancel();
+    await _audio?.cancel();
+    _audio = null;
+    try {
+      await _recorder.stop();
+    } on Object catch (_) {}
+    await _grabar();
   }
 
   /// Suelta el micrófono un momento, para que otro lo use: por ejemplo, el reconocimiento de voz
@@ -91,6 +122,7 @@ class Oido implements Microfono {
   @override
   Future<void> pausar() async {
     if (_audio == null) return;
+    _pausadoDesde = _reloj.elapsedMilliseconds;
     _tic?.cancel();
     await _audio?.cancel();
     _audio = null;
@@ -105,6 +137,7 @@ class Oido implements Microfono {
   @override
   Future<void> reanudar() async {
     if (_audio != null || _isolate == null) return;
+    _pausadoDesde = null;
     await _grabar();
   }
 
@@ -117,17 +150,22 @@ class Oido implements Microfono {
         autoGain: false,
         echoCancel: false,
         noiseSuppress: false,
+        // Por defecto, el paquete pausa la grabación cuando otro toma el audio (una llamada, la voz
+        // de la alarma) y no la retoma sola: la casa quedaba sorda después de llamar. Así sigue.
+        audioInterruption: AudioInterruptionMode.none,
         androidConfig: AndroidRecordConfig(
           audioSource: AndroidAudioSource.unprocessed,
         ),
       ),
     );
+    _ultimoBloque = _reloj.elapsedMilliseconds;
     _audio = audio.listen(_alLlegarAudio);
     _tic = Timer.periodic(_cada, (_) => _clasificar());
   }
 
   // Lo barato corre con cada bloque de audio.
   void _alLlegarAudio(Uint8List bytes) {
+    _ultimoBloque = _reloj.elapsedMilliseconds;
     final bloque = _pcm.leer(bytes);
     _anillo.escribir(bloque);
     _db = rmsDb(bloque);
@@ -167,6 +205,7 @@ class Oido implements Microfono {
   }
 
   Future<void> detener() async {
+    _vigilante?.cancel();
     _tic?.cancel();
     await _audio?.cancel();
     await _recorder.stop();

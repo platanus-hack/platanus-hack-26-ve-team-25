@@ -16,8 +16,10 @@ abstract interface class Frases {
 
 /// Una palabra que Vosk reconoció con menos confianza que esto no cuenta. Con la gramática
 /// cerrada, Vosk tiende a forzar una frase del banco sobre cualquier voz: la confianza es lo que
-/// separa «ayuda» de una conversación que se le parece. Ajustar con voces mayores reales.
-const confianzaMinima = 0.6;
+/// separa «ayuda» de una conversación que se le parece. Bajó de 0,6 a 0,5 el sábado: a 3 m del
+/// teléfono se perdían pedidos de ayuda, y un pedido igual pasa por «¿Está bien?». La confianza de
+/// cada palabra se ve en `make logs` (casa.vosk) para seguir ajustándola.
+const confianzaMinima = 0.5;
 
 /// Lee el resultado de Vosk y deja solo el texto de las palabras con confianza suficiente. Vosk
 /// devuelve `{"result": [{"word": "ayuda", "conf": 0.93}, …], "text": "ayuda"}`.

@@ -347,7 +347,17 @@ class Controlador extends ChangeNotifier {
     double puntaje(String clase) =>
         e.top.where((c) => c.nombre == clase).firstOrNull?.puntaje ?? 0;
     final tv = puntaje('Television') + puntaje('Radio');
-    return puntaje('Speech') >= 0.4 && tv < 0.2;
+    // No solo el habla tranquila: un «¡auxilio!» gritado o un quejido YAMNet lo llama grito o
+    // llanto, y ahí también hay que escuchar qué dice.
+    final voz = [
+      'Speech',
+      'Shout',
+      'Yell',
+      'Screaming',
+      'Crying, sobbing',
+      'Wail, moan',
+    ].map(puntaje).fold(0.0, (a, b) => a + b);
+    return voz >= 0.4 && tv < 0.2;
   }
 
   /// Busca en los últimos segundos que oyó la casa una orden (comandos.dart) o un pedido de
