@@ -47,19 +47,21 @@ guarda lo que está en el récipe. Falta encenderla:
       app de la casa se ha probado en el teléfono desde que se agregaron la voz, la sirena, las
       órdenes con «Lucero», la toma que descuenta y el servicio en primer plano.
 - [ ] **Llave propia para firmar el App Bundle**, de madrugada, cuando todo funcione.
-- [ ] **La versión de la tarima, con la cuenta de 15 s** (decidido el sábado 22:30, solo para la
-      presentación: el producto sigue con 60, y se dice en voz alta). Es `--dart-define=DEMO=true`;
-      la base usa la misma espera porque la casa le manda `p_espera_s`. Va en release e instalada
-      antes de subir, porque `make run-demo` corre en debug. Ojo: con 15 s, «voy a llamar a
-      Josuep» (sale cuando faltan 20 s, `avisoFinal`) suena encima del «¿Está bien?». Cuando esté,
-      corregir [plan.md](plan.md#demo) y [riesgos.md](riesgos.md#cómo-contar-la-verdad), que dicen
-      que nada se acelera.
+- [x] **La versión de la tarima, con la cuenta de 15 s** (decidido el sábado 22:30, solo para la
+      presentación: el producto sigue con 60, y se dice en voz alta). Se instala con
+      **`make release-demo`** (release, con `local.json` y `DEMO=true`); la base usa la misma
+      espera porque la casa le manda `p_espera_s`. Arreglado el sábado 23:30: con 15 s el aviso
+      final reemplazaba la pregunta y nunca se oía «¿Está bien?». Ahora suena un ciclo de tono
+      (4 s), pregunta, abre la ventana callada de 4 s, y el aviso final solo va con 60 s; la
+      pantalla igual dice a quién llama. Prueba: `flutter test --dart-define=DEMO=true
+      test/sirena_test.dart`. plan.md y riesgos.md ya lo cuentan. Falta probarlo en el Infinix.
 - [ ] **En el Infinix, el número del iPhone guardado como «911»**: es el segundo número al que
       llama la casa en el demo.
 - [ ] **El APK, descargable**, como Release del repo y con su enlace en el README. Va con 60 s, y
-      se compila con `flutter build apk --release` a secas: `make build-apk` mete
-      `config/local.json` si existe, y con él se publicarían los números del equipo y la clave de la
-      casa de demo.
+      se compila con **`make apk-publico`** (`app/build/en-casa.apk`), sin `config/local.json`: con
+      él se publicarían los números del equipo y la clave de la casa de demo. Revisado el sábado
+      23:35: ningún valor de `local.json` aparece dentro del APK. Falta publicarlo
+      (`casa-v0.1.0`) y poner el enlace.
 
 ### Josuep · Telegram
 
