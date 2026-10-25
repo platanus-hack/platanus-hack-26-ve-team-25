@@ -247,6 +247,10 @@ button {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Sin alto propio, el hijo con height:100% (el iframe) se resuelve contra cero y
+     la página real no se ve. El alto lo pone el contenedor de la lámina. */
+  width: 100%;
+  height: 100%;
 }
 
 .marco-barra {
@@ -282,6 +286,7 @@ button {
 
 .marco-contenido {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -510,6 +515,15 @@ button {
 .telefono-pie {
   font-size: 1.1cqh;
   color: var(--gris);
+}
+
+/* La página real de la familia dentro del marco del navegador */
+.marco-pagina {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: var(--papel);
 }
 
 /* La ventana de scrcpy enchufada dentro del marco del teléfono */

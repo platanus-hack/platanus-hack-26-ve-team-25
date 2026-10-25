@@ -10,6 +10,12 @@ import Marco from "../componentes/Marco";
  * El anillo de progreso SVG usa stroke-dasharray. Para un círculo de radio R,
  * la circunferencia es 2πR. Un 20 % de progreso deja 80 % vacío.
  */
+/**
+ * La página real de la familia, en estado de alerta. Se muestra dentro del marco para que la
+ * lámina enseñe el producto y no un dibujo. Si en la tarima no hay internet, W vuelve al mockup.
+ */
+const URL_PAGINA = "https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta";
+
 const RADIO = 44;
 const CIRC = 2 * Math.PI * RADIO;
 const PROGRESO = 0.2; // 20 % congelado
@@ -29,6 +35,9 @@ export default function LaFamilia({ activa = false }: Props) {
   // Modo adb: un proceso local (npm run vivo) sirve la pantalla del teléfono por HTTP.
   const [porAdb, setPorAdb] = useState(false);
   const [tick, setTick] = useState(0);
+
+  // La página de la familia, de verdad, dentro del marco. Se puede apagar con W.
+  const [paginaReal, setPaginaReal] = useState(true);
 
   /** Suelta la ventana capturada y vuelve al mockup. */
   const soltar = useCallback(() => {
@@ -88,6 +97,9 @@ export default function LaFamilia({ activa = false }: Props) {
         } else {
           void tomar();
         }
+      } else if (tecla === "w") {
+        e.preventDefault();
+        setPaginaReal((antes) => !antes);
       } else if (tecla === "a") {
         e.preventDefault();
         // Los dos modos son excluyentes: si había ventana capturada, se suelta.
@@ -108,22 +120,22 @@ export default function LaFamilia({ activa = false }: Props) {
         className="portada-logo"
         width={918}
         height={180}
-        style={{ alignSelf: "flex-start" }}
+        style={{ alignSelf: "flex-start", height: "7cqh" }}
       />
 
       {/* Los dos paneles: teléfono (izq) y navegador (der), alineados al mismo centro vertical */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 1.3fr",
+          gridTemplateColumns: "1fr 1fr",
           gap: "4cqw",
           flex: 1,
           minHeight: 0,
-          alignItems: "center",
+          alignItems: "stretch",
         }}
       >
         {/* Teléfono de la casa: proporción 9:19, vertical, centrado en su celda */}
-        <div style={{ display: "grid", justifyItems: "center", gap: "1.4cqh" }}>
+        <div style={{ display: "grid", justifyItems: "center", alignContent: "center", gap: "1.4cqh" }}>
           <div
             className="telefono"
             style={{
@@ -221,14 +233,28 @@ export default function LaFamilia({ activa = false }: Props) {
                   ? "A para soltar el teléfono"
                   : vivo
                     ? "V para soltar la ventana"
-                    : "V ventana · A teléfono por adb")}
+                    : "V ventana · A teléfono · W página")}
             </div>
           )}
         </div>
 
         {/* Marco del navegador centrado verticalmente en el mismo eje */}
-        <div style={{ height: "40cqh", display: "flex", alignItems: "center" }}>
-          <Marco url="platanus-hack-26-ve-team-25.vercel.app/f/carmen">
+        <div style={{ height: "100%", display: "flex" }}>
+          <Marco
+            url={
+              paginaReal
+                ? "platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta"
+                : "platanus-hack-26-ve-team-25.vercel.app/f/carmen"
+            }
+          >
+            {paginaReal ? (
+              <iframe
+                src={URL_PAGINA}
+                title="Página de la familia de la casa de Carmen, en estado de alerta"
+                className="marco-pagina"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
             <div
               style={{
                 padding: "2cqh 2cqw",
@@ -251,6 +277,7 @@ export default function LaFamilia({ activa = false }: Props) {
                 <span>Visto hace 4 s</span>
               </div>
             </div>
+            )}
           </Marco>
         </div>
       </div>
