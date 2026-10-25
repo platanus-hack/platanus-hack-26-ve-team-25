@@ -14,12 +14,19 @@ import 'voz_falsa.dart';
 class SirenaFalsa implements Sirena {
   final pasos = <String>[];
   final _ventanas = StreamController<bool>.broadcast(sync: true);
+  final _hablando = StreamController<bool>.broadcast(sync: true);
 
   /// Simula que la sirena se calla para escuchar (true) o vuelve (false).
   void ventana(bool abierta) => _ventanas.add(abierta);
 
+  /// Simula que la voz del teléfono empieza (true) o termina (false) la frase.
+  void hablar(bool hablando) => _hablando.add(hablando);
+
   @override
   Stream<bool> get ventanas => _ventanas.stream;
+
+  @override
+  Stream<bool> get hablando => _hablando.stream;
 
   @override
   Future<void> sonar(String frase) async => pasos.add('sonar: $frase');
@@ -47,6 +54,14 @@ void main() {
       TipoSonido.alarma,
       Clase('Smoke detector, smoke alarm', 0.9),
     ),
+  );
+
+  // Alguien habla, como lo vería YAMNet.
+  const voz = Escucha(
+    db: -30,
+    fondo: -50,
+    compuerta: true,
+    top: [Clase('Speech', 0.8)],
   );
 
   setUp(() {
@@ -160,6 +175,41 @@ void main() {
       expect(frases.audios, [32000 * 4]);
       expect(c.alerta, isNull);
       expect(sirena.pasos.last, 'callar');
+      c.dispose();
+    },
+  );
+
+  testWidgets(
+    'no se oye a sí mismo: la frase «Lucero, estoy bien» del teléfono no calla la alarma',
+    (tester) async {
+      final frases = FrasesFalsas(['lucero estoy bien el botón']);
+      final c = Controlador(
+        casa: casaSimulada,
+        reloj: () => ahora,
+        escuchas: oido.stream,
+        sirena: sirena,
+        frases: frases,
+        microfono: MicrofonoFalso(),
+      );
+      c.oirEvento(TipoEvento.golpe);
+
+      // El teléfono dice la frase, YAMNet la oye como voz y despierta a Vosk: no le pasa audio.
+      sirena.hablar(true);
+      oido.add(voz);
+      await tester.pump(Controlador.finDeFrase);
+      await tester.pump();
+      expect(frases.audios, isEmpty);
+      expect(c.alerta?.estado, EstadoAlerta.pendiente);
+
+      // Termina la frase y se abre la ventana. Al cerrarse, Vosk oye solo lo de después de la voz.
+      sirena.hablar(false);
+      sirena.ventana(true);
+      ahora = ahora.add(const Duration(seconds: 4));
+      sirena.ventana(false);
+      await tester.pump();
+      expect(frases.audios, [
+        32000 * 3,
+      ]); // 4 s menos la cola de la voz, en segundos enteros
       c.dispose();
     },
   );

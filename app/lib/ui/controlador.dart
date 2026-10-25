@@ -43,6 +43,7 @@ class Controlador extends ChangeNotifier {
     _finDeWhatsApp = telefono?.finDeWhatsApp.listen(_alTerminarWhatsApp);
     _finDeTelefono = telefono?.finDeTelefono.listen(_alTerminarTelefono);
     _ventanas = sirena?.ventanas.listen(_alAbrirseLaVentana);
+    _hablando = sirena?.hablando.listen(_alHablarElTelefono);
   }
 
   /// El mismo sonido no vuelve a preguntar «¿Está bien?» antes de este tiempo.
@@ -71,6 +72,10 @@ class Controlador extends ChangeNotifier {
 
   /// Cuánto se ignoran los sonidos después de callar la alarma: el anillo es de 5 s.
   static const sordoTrasLaAlarma = Duration(seconds: 5);
+
+  /// Lo que se descarta del audio justo después de que el teléfono termina de hablar: lo que
+  /// todavía suena del parlante y lo que el anillo recibe con retraso.
+  static const colaDeLaVozPropia = Duration(milliseconds: 600);
 
   /// Cuánto se espera antes de una llamada pedida en voz alta, para decir «no».
   static const esperaLlamada = Duration(seconds: 5);
@@ -126,6 +131,7 @@ class Controlador extends ChangeNotifier {
   final rutina = Rutina();
 
   StreamSubscription<bool>? _ventanas;
+  StreamSubscription<bool>? _hablando;
 
   /// True mientras la sirena se calla para que la persona conteste: la pantalla dice «Le
   /// escucho…».
@@ -388,7 +394,9 @@ class Controlador extends ChangeNotifier {
         final desde = ahora.difference(llamada.desde);
         if (desde < cuanto) cuanto = desde;
       }
-      _actuar(await frases.reconocer(_paraVosk(microfono.ultimoAudio(cuanto))));
+      final limpio = _sinLaVozPropia(cuanto);
+      if (limpio == null) return;
+      _actuar(await frases.reconocer(_paraVosk(microfono.ultimoAudio(limpio))));
     } finally {
       _reconociendo = false;
       notifyListeners();
@@ -412,14 +420,37 @@ class Controlador extends ChangeNotifier {
           _alerta?.estado == EstadoAlerta.pendiente) {
         var cuanto = ahora.difference(desde);
         if (cuanto > audioDelPedido) cuanto = audioDelPedido;
-        unawaited(
-          frases
-              .reconocer(_paraVosk(microfono.ultimoAudio(cuanto)))
-              .then(_actuar, onError: (_) {}),
-        );
+        final limpio = _sinLaVozPropia(cuanto);
+        if (limpio != null) {
+          unawaited(
+            frases
+                .reconocer(_paraVosk(microfono.ultimoAudio(limpio)))
+                .then(_actuar, onError: (_) {}),
+          );
+        }
       }
     }
     notifyListeners();
+  }
+
+  bool _telefonoHablando = false;
+  DateTime? _calloElTelefono;
+
+  void _alHablarElTelefono(bool hablando) {
+    _telefonoHablando = hablando;
+    if (!hablando) _calloElTelefono = ahora;
+  }
+
+  /// Cuánto de los últimos [cuanto] puede oír Vosk sin oír al propio teléfono, o null si no queda
+  /// nada. La frase de la alarma dice «Lucero, estoy bien»: oída por Vosk, la alarma se callaba
+  /// sola a los 10 s (Samsung, sábado 23:55).
+  Duration? _sinLaVozPropia(Duration cuanto) {
+    if (_telefonoHablando) return null;
+    final callo = _calloElTelefono;
+    if (callo == null) return cuanto;
+    final desde = ahora.difference(callo) - colaDeLaVozPropia;
+    if (desde <= Duration.zero) return null;
+    return desde < cuanto ? desde : cuanto;
   }
 
   /// Mientras suena la sirena, Vosk recibe el audio sin ella (filtro.dart). YAMNet sigue oyendo
@@ -628,6 +659,7 @@ class Controlador extends ChangeNotifier {
     _finDeWhatsApp?.cancel();
     _finDeTelefono?.cancel();
     _ventanas?.cancel();
+    _hablando?.cancel();
     super.dispose();
   }
 }

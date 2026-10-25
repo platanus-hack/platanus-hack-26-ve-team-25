@@ -75,9 +75,10 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
             v.setAudioAttributes(atributos())
             v.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(id: String?) {}
-                override fun onDone(id: String?) { reloj.post { abrirVentana() } }
+                override fun onDone(id: String?) { reloj.post { calloLaVoz(); abrirVentana() } }
                 @Deprecated("Deprecated in Java")
-                override fun onError(id: String?) { reloj.post { abrirVentana() } }
+                override fun onError(id: String?) { reloj.post { calloLaVoz(); abrirVentana() } }
+                override fun onStop(id: String?, interrumpida: Boolean) { reloj.post { calloLaVoz() } }
             })
             vozLista = true
         }
@@ -94,7 +95,14 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         }
         p.pause()
         vibrador().cancel()
+        // Dart deja de pasarle audio a Vosk mientras el teléfono habla: la frase dice «Lucero,
+        // estoy bien», y si Vosk la oyera, la alarma se callaría sola.
+        canal.invokeMethod("hablando", true)
         v.speak(frase, TextToSpeech.QUEUE_FLUSH, null, "frase")
+    }
+
+    private fun calloLaVoz() {
+        canal.invokeMethod("hablando", false)
     }
 
     // Después de la frase, silencio: sin tono ni vibración, para que «Lucero, estoy bien» se oiga

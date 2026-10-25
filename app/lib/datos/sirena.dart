@@ -18,20 +18,33 @@ abstract interface class Sirena {
   /// True cuando, después de la frase, la sirena se calla unos segundos para que la persona
   /// conteste; false cuando vuelve el tono.
   Stream<bool> get ventanas;
+
+  /// True cuando la voz del teléfono empieza a decir la frase; false cuando termina o se corta.
+  Stream<bool> get hablando;
 }
 
 class SirenaAndroid implements Sirena {
   SirenaAndroid() {
     _canal.setMethodCallHandler((llamada) async {
-      if (llamada.method == 'ventana') _ventanas.add(llamada.arguments as bool);
+      final si = llamada.arguments as bool;
+      switch (llamada.method) {
+        case 'ventana':
+          _ventanas.add(si);
+        case 'hablando':
+          _hablando.add(si);
+      }
     });
   }
 
   static const _canal = MethodChannel('casa/sirena');
   final _ventanas = StreamController<bool>.broadcast();
+  final _hablando = StreamController<bool>.broadcast();
 
   @override
   Stream<bool> get ventanas => _ventanas.stream;
+
+  @override
+  Stream<bool> get hablando => _hablando.stream;
 
   @override
   Future<void> sonar(String frase) => _canal.invokeMethod<void>('sonar', {
