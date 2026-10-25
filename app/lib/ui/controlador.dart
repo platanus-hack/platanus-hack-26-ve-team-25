@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../datos/frases.dart';
 import '../datos/llamadas.dart';
 import '../datos/nube.dart';
+import '../datos/camara.dart';
 import '../datos/sirena.dart';
 import '../datos/voz.dart';
 import '../dominio/alerta.dart';
@@ -30,6 +31,8 @@ class Controlador extends ChangeNotifier {
     this.microfono,
     this.frases,
     this.nube,
+    this.camara,
+    this.fotos,
     this.numeroEmergencias = '',
     this.sirena,
     List<Pastilla> pastillas = const [],
@@ -77,6 +80,10 @@ class Controlador extends ChangeNotifier {
   /// todavía suena del parlante y lo que el anillo recibe con retraso.
   static const colaDeLaVozPropia = Duration(milliseconds: 600);
 
+  /// Lo más que una llamada de emergencia espera a la foto. Si la cámara tarda más o falla, se
+  /// llama igual: la foto nunca puede retrasar una emergencia.
+  static const esperaFoto = Duration(seconds: 4);
+
   /// Cuánto se espera antes de una llamada pedida en voz alta, para decir «no».
   static const esperaLlamada = Duration(seconds: 5);
 
@@ -105,6 +112,11 @@ class Controlador extends ChangeNotifier {
 
   /// Supabase, para que la familia vea lo que pasa. Null sin configurar (y en la web).
   final Nube? nube;
+
+  /// La cámara de adelante y la subida de su foto a la web de la familia. Solo se usan justo
+  /// antes de llamar por una emergencia. Null sin configurar (y en la web).
+  final Camara? camara;
+  final Fotos? fotos;
 
   /// True mientras el reconocimiento de voz escucha la respuesta.
   bool escuchandoVoz = false;
@@ -218,6 +230,9 @@ class Controlador extends ChangeNotifier {
     final numero = primerContacto.telefono;
     if (t == null || numero.isEmpty) return;
     _preguntaHasta = null;
+    await _fotoAntesDeLlamar(
+      '${_alerta?.motivo.frase ?? 'Pidió ayuda'}: llamando a ${primerContacto.nombre}',
+    );
     final via = await llamarPrimeroPorWhatsApp(numero, t);
     _esperandoWhatsApp = via == ViaLlamada.whatsapp;
     notifyListeners();
@@ -246,6 +261,9 @@ class Controlador extends ChangeNotifier {
     if (t == null || numeroEmergencias.isEmpty) return notifyListeners();
     llamandoAEmergencias = true;
     notifyListeners();
+    await _fotoAntesDeLlamar(
+      '${primerContacto.nombre} no contestó: llamando a emergencias',
+    );
     if (!await t.llamarEnAltavoz(numeroEmergencias)) {
       await t.llamar(numeroEmergencias);
     }
@@ -562,11 +580,35 @@ class Controlador extends ChangeNotifier {
       // La familia también se entera, como un pedido de ayuda ya escalado. No se cambia la
       // alerta de la casa: si no, la casa llamaría además al primer contacto encima del 911.
       nube?.nuevaAlerta(Alerta.urgente(TipoEvento.panico, ahora));
+      await _fotoAntesDeLlamar('Pidió en voz alta: llamando a emergencias');
     }
     if (l.porWhatsApp) {
       await llamarPrimeroPorWhatsApp(l.numero, t);
     } else if (!await t.llamarEnAltavoz(l.numero)) {
       await t.llamar(l.numero);
+    }
+  }
+
+  /// Una foto de la sala para la familia, justo antes de una llamada de emergencia: con la llamada
+  /// abierta, la app queda atrás y Android ya no presta la cámara. Se espera la foto [esperaFoto]
+  /// como mucho y se sube sin esperar; si algo falla, se llama igual.
+  Future<void> _fotoAntesDeLlamar(String motivo) async {
+    final camara = this.camara;
+    final fotos = this.fotos;
+    if (camara == null || fotos == null) return;
+    try {
+      final jpg = await camara.foto().timeout(esperaFoto);
+      if (jpg == null) return;
+      unawaited(
+        fotos
+            .subir(jpg, motivo)
+            .then(
+              (ok) => debugPrint('casa.foto: ${ok ? 'subida' : 'no se subió'}'),
+              onError: (Object e) => debugPrint('casa.foto: $e'),
+            ),
+      );
+    } on Object catch (e) {
+      debugPrint('casa.foto: sin foto ($e)');
     }
   }
 

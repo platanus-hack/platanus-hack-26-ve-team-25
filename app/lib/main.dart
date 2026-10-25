@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'datos/camara.dart';
 import 'datos/frases.dart';
 import 'datos/llamadas.dart';
 import 'datos/nube.dart';
@@ -38,6 +39,8 @@ Future<void> main() async {
     numeroEmergencias: numeroEmergencias,
     sirena: kIsWeb ? null : SirenaAndroid(),
     nube: nube,
+    camara: nube == null ? null : CamaraAndroid(),
+    fotos: _fotos(),
   );
   runApp(AppCasa(controlador: controlador));
 
@@ -51,6 +54,7 @@ Future<void> main() async {
     Permission.phone,
     Permission.contacts,
     Permission.notification,
+    Permission.camera,
   ].request();
   // «Mostrar sobre otras apps»: para volver sola al frente cuando termina el WhatsApp. Android lo
   // pide en una pantalla de ajustes aparte; se activa una vez al configurar la casa.
@@ -88,6 +92,18 @@ Nube? _nube() {
       );
     },
   );
+}
+
+/// A dónde va la foto de la sala antes de una llamada de emergencia: la web de la familia, con la
+/// misma clave de la casa. Sin clave (la web de la casa, o sin local.json) no hay foto.
+Fotos? _fotos() {
+  const clave = String.fromEnvironment('CASA_CLAVE');
+  const urlWeb = String.fromEnvironment(
+    'URL_WEB',
+    defaultValue: 'https://platanus-hack-26-ve-team-25.vercel.app',
+  );
+  if (kIsWeb || clave.isEmpty) return null;
+  return Fotos(urlWeb: urlWeb, clave: clave);
 }
 
 class AppCasa extends StatelessWidget {

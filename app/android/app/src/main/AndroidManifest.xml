@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- El oído: el audio se procesa en el teléfono y nunca sale de él -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- La foto de la sala justo antes de llamar por una emergencia (lib/datos/camara.dart). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <!-- Supabase: eventos, alertas y latido. Debug lo trae solo; sin esto, release no tiene red -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- La llamada de emergencia directa al primer contacto -->
