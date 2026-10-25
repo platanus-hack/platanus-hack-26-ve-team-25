@@ -111,9 +111,9 @@ export default function App() {
     <Cierre key="4" />,
   ];
 
-  // Sin QR fijo en la lámina 3 (la familia), a pedido. En las demás siempre está, incluido
-  // el cierre, que ya no lleva uno grande adentro.
-  const mostrarQrFijo = actual !== 3;
+  // El QR fijo solo va en las dos primeras láminas: la 3 (la familia) y la 4 (el cierre,
+  // que es una sola pregunta) van limpias, a pedido.
+  const mostrarQrFijo = actual === 1 || actual === 2;
 
   return (
     <div
