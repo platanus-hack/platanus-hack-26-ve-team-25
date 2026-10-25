@@ -1,9 +1,9 @@
 // Nombre y colores de la web instalable, en un solo lugar.
-// El producto se llama «En casa» (sábado 24); su asistente de voz, «Lucero». Si cambia, se cambia
+// El producto se llama «Presente» (domingo 25; antes, «En casa»); su asistente de voz, «Lucero». Si cambia, se cambia
 // aquí y en los íconos de public/ (icono-192.png, icono-512.png, icono-maskable-512.png) y app/apple-icon.png.
 export const APP = {
-  nombre: "En casa · familia",
-  nombreCorto: "En casa",
+  nombre: "Presente · familia",
+  nombreCorto: "Presente",
   descripcion: "Saber cada día que tu familiar está bien, y enterarte en segundos si algo pasa.",
   colorFondo: "#ffffff",
   colorTema: "#14532d",

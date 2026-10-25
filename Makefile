@@ -12,7 +12,7 @@ EN_EL_TELEFONO = -d $(TELEFONO)
 BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
 .DEFAULT_GOAL := ayuda
-.PHONY: ayuda devices deps telefono logs run run-demo demo debug profile release test test-integracion analyze format \
+.PHONY: ayuda devices deps telefono logs run run-demo release-demo apk-publico demo debug profile release test test-integracion analyze format \
 	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
 	web-deps web-dev web-test web-lint web-build \
 	pitch pitch-deploy
@@ -63,6 +63,10 @@ profile: telefono deps ## Corre la app en modo profile, para medir rendimiento e
 release: telefono deps ## Corre la app en modo release, como la vería el usuario
 	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG) --release
 
+# La versión que se sube a la tarima: release, con local.json y 15 s en vez de 60.
+release-demo: telefono deps ## Corre en release con la espera de 15 s de la tarima
+	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG) --release --dart-define=DEMO=true
+
 test: deps ## Corre las pruebas de la app
 	cd $(APP) && flutter test
 
@@ -80,6 +84,11 @@ build-apk-debug: deps ## Arma el APK de debug
 
 build-apk: deps ## Arma el APK de release, para instalar a mano
 	cd $(APP) && flutter build apk $(CONFIG) --release
+
+# El APK que se publica en el repo: sin $(CONFIG), porque local.json trae los números del equipo y
+# la clave de la casa de demo. Oye y pregunta, pero sin números no llama ni escribe en la base.
+apk-publico: deps ## Arma el APK para el Release de GitHub, sin local.json (app/build/presente.apk)
+	cd $(APP) && flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/presente.apk
 
 build-appbundle: deps ## Arma el App Bundle (.aab) de release, para Google Play
 	cd $(APP) && flutter build appbundle $(CONFIG) --release

@@ -6,6 +6,10 @@ const esperaConfirmacion = bool.fromEnvironment('DEMO')
     ? Duration(seconds: 15)
     : Duration(seconds: 60);
 
+/// Cuántos ciclos de 4 s del tono suenan antes de que la voz pregunte. Con 60 s son dos; con los
+/// 15 s de la tarima, uno: así la pregunta y su ventana callada (4 s) caben antes de avisar.
+const ciclosAntesDeLaPregunta = bool.fromEnvironment('DEMO') ? 1 : 2;
+
 /// Los estados de una alerta, con las únicas transiciones válidas:
 ///
 ///     pendiente ──► cancelada            la persona tocó «Estoy bien»

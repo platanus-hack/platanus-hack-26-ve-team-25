@@ -34,6 +34,9 @@ export function Portada() {
       >
         Ver la casa de ejemplo
       </Link>
+      <Link href="/privacidad" className="self-center text-[14px] text-gris underline underline-offset-2">
+        Política de privacidad
+      </Link>
     </main>
   );
 }

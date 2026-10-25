@@ -73,7 +73,7 @@ Todo esto ya está escrito. Falta probarlo en el teléfono y conectarlo:
 | 3 | El ciclo casa → Supabase → `/f/demo` abierta en 5 a 10 teléfonos a la vez | Rogelio | 17:00 | Es lo que vive el público |
 | 4 | Avisos: ~~el vigilante cada 5 s~~ (16:21, en pg_cron), ~~el `setWebhook` de Telegram~~, y el webhook de Kapso apuntando a `/api/kapso/webhook` | Josuep | 17:00 | Es la integración real que ven los jueces. Falta probarla de punta a punta con el teléfono |
 | 5 | Pastillas: migración, `ANTHROPIC_API_KEY` en Vercel y `casa_tomar` desde la app | Abrahan y Rogelio | 20:00 | La web está hecha, falta conectarla |
-| 6 | ~~Nombre del producto~~ («En casa», con «Lucero» de asistente), README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
+| 6 | ~~Nombre del producto~~ («Presente», con «Lucero» de asistente; el sábado era «En casa»), README con arquitectura, ensayo y video de respaldo | Todos | 24:00 | Es lo que leen el agente y el jurado |
 
 **Se cortó y va como proyección:** la vibración del piso, el apagón con el perfil de
 salud, la ficha de emergencia, el teléfono personal de la persona con la pregunta del ánimo, el
@@ -88,10 +88,12 @@ por foto.
    web de la familia se ve cuántos días de losartán le quedan.
 3. **La falsa alarma.** Un golpe fuerte junto al teléfono. Sale «¿Está bien?», «Carmen» dice que
    está bien y no escala. Es el filtro: despreocupar, no angustiar.
-4. **La alerta.** Otro golpe y nadie responde. Mientras corren los 60 s se cuenta el problema, con
-   las cifras. Al vencer, se pone roja la web de todos los que escanearon, a cada uno le llega el
-   Telegram y la casa llama por WhatsApp al hijo. Los tiempos son los del producto:
-   nada se acelera.
+4. **La alerta.** Otro golpe y nadie responde. En la tarima la espera es de 15 s y no de 60
+   (decidido el sábado 22:30, por los 3 minutos del pitch), y se dice en voz alta: «En la casa
+   son 60 segundos; aquí, 15». Al vencer, se pone roja la web de todos los que escanearon, a cada
+   uno le llega el Telegram y la casa llama por WhatsApp a Josuep. La base escala con la misma
+   espera, porque la casa se la manda con la alerta. Es el APK compilado con
+   `--dart-define=DEMO=true`; el que se descarga del repo usa 60 s.
 
 Si algo falla en vivo, `/f/demo?escenario=alerta` muestra lo mismo con datos simulados, y queda el
 video de respaldo.

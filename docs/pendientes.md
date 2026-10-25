@@ -39,6 +39,14 @@ guarda lo que está en el récipe. Falta encenderla:
       más alta y con letra de 27, y el borde de los botones a 3,8:1 de contraste. Captura sin
       teléfono: `flutter test --run-skipped --update-goldens -t captura` →
       [`app/test/capturas/reposo.png`](../app/test/capturas/reposo.png).
+- [x] **Probado en el Samsung (domingo 00:00–00:10), y dos arreglos:** la alarma se callaba sola a
+      los 10 s porque Vosk oía la frase del propio teléfono («Diga "Lucero, estoy bien"…»), y
+      toda versión release se cerraba al abrir porque R8 renombraba las clases de JNA que usa Vosk
+      (ahora hay `proguard-rules.pro`). El Release `casa-v0.1.0` ya tiene el APK arreglado.
+- [x] **Sin «Leer récipe» en el teléfono de mesa** (sábado 24, 23:55): el botón solo decía que no
+      estaba listo. «Pedir ayuda» ocupa ahora toda la columna derecha. Leer una foto se hace desde la
+      web de la familia, desplegada en Vercel: la factura en
+      [`/f/demo/pastillas/factura`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo/pastillas/factura).
 - [ ] **Las demás vistas del teléfono de mesa,** con las indicaciones que va a dar Abrahan.
 - [ ] **Armar el demo** con los cuatro teléfonos ([armar-demo.md](armar-demo.md)): Infinix de
       mesa, Samsung de la familia, iPhone como «el 911» y el Honor por definir.
@@ -47,19 +55,22 @@ guarda lo que está en el récipe. Falta encenderla:
       app de la casa se ha probado en el teléfono desde que se agregaron la voz, la sirena, las
       órdenes con «Lucero», la toma que descuenta y el servicio en primer plano.
 - [ ] **Llave propia para firmar el App Bundle**, de madrugada, cuando todo funcione.
-- [ ] **La versión de la tarima, con la cuenta de 15 s** (decidido el sábado 22:30, solo para la
-      presentación: el producto sigue con 60, y se dice en voz alta). Es `--dart-define=DEMO=true`;
-      la base usa la misma espera porque la casa le manda `p_espera_s`. Va en release e instalada
-      antes de subir, porque `make run-demo` corre en debug. Ojo: con 15 s, «voy a llamar a
-      Josuep» (sale cuando faltan 20 s, `avisoFinal`) suena encima del «¿Está bien?». Cuando esté,
-      corregir [plan.md](plan.md#demo) y [riesgos.md](riesgos.md#cómo-contar-la-verdad), que dicen
-      que nada se acelera.
+- [x] **La versión de la tarima, con la cuenta de 15 s** (decidido el sábado 22:30, solo para la
+      presentación: el producto sigue con 60, y se dice en voz alta). Se instala con
+      **`make release-demo`** (release, con `local.json` y `DEMO=true`); la base usa la misma
+      espera porque la casa le manda `p_espera_s`. Arreglado el sábado 23:30: con 15 s el aviso
+      final reemplazaba la pregunta y nunca se oía «¿Está bien?». Ahora suena un ciclo de tono
+      (4 s), pregunta, abre la ventana callada de 4 s, y el aviso final solo va con 60 s; la
+      pantalla igual dice a quién llama. Prueba: `flutter test --dart-define=DEMO=true
+      test/sirena_test.dart`. plan.md y riesgos.md ya lo cuentan. Falta probarlo en el Infinix.
 - [ ] **En el Infinix, el número del iPhone guardado como «911»**: es el segundo número al que
       llama la casa en el demo.
-- [ ] **El APK, descargable**, como Release del repo y con su enlace en el README. Va con 60 s, y
-      se compila con `flutter build apk --release` a secas: `make build-apk` mete
-      `config/local.json` si existe, y con él se publicarían los números del equipo y la clave de la
-      casa de demo.
+- [x] **El APK, descargable** (sábado 23:45): Release
+      [`casa-v0.1.0`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/tag/casa-v0.1.0),
+      enlazado en el README. Va con 60 s y se compila con **`make apk-publico`**, sin
+      `config/local.json`: con él se publicarían los números del equipo y la clave de la casa de
+      demo. Ningún valor de `local.json` aparece dentro del APK. Si cambia la app antes del gong,
+      se vuelve a subir con `gh release upload casa-v0.1.0 app/build/presente.apk --clobber`.
 
 ### Josuep · Telegram
 
@@ -71,7 +82,8 @@ webhook y el vigilante están hechos y verificados.
 
 ### Todo el equipo · el pitch
 
-- [x] **El nombre del producto: «En casa»**, y su asistente de voz, **«Lucero»** (sábado 24).
+- [x] **El nombre del producto: «Presente»** (domingo 25; el sábado era «En casa»), y su asistente
+      de voz, **«Lucero»**.
       Está en la web ([`web/src/lib/app.ts`](../web/src/lib/app.ts)), la app, el README y el
       `platanus-hack-project.jsonc`.
 - [ ] **El guion del demo** en [plan.md](plan.md#demo), con lo que se decidió el sábado.
@@ -105,8 +117,8 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
 
 **App de la casa ([`app/`](../app/README.md)), 121 pruebas:**
 
-- [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
-      en chico y «Leer récipe».
+- [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho y la
+      pastilla en chico.
 - [x] El oído: micrófono crudo → compuerta de dB → YAMNet en el teléfono. Arreglado el sábado: el
       audio llegaba en bloques que empezaban en un byte impar y el oído estaba sordo.
 - [x] «¿Está bien?» con 60 s, deslizar para «estoy bien» y tocar para «necesito ayuda». Suena a

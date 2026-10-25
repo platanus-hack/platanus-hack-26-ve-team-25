@@ -1,4 +1,4 @@
-# En casa · Equipo 25 · Platanus Hack 26: Caracas ft. Yummy
+# Presente · Equipo 25 · Platanus Hack 26: Caracas ft. Yummy
 
 <img src="./project-logo.png" alt="Logo del proyecto" width="200" />
 
@@ -6,7 +6,8 @@
 mayor que vive solo, lo acompaña en el día a día (la pastilla, llamar a su hijo con un toque) y oye
 lo que pasa en la casa: una alarma de humo, un vidrio roto, un golpe, un grito o un «¡ayuda!» dicho
 en voz alta. Antes de avisar, pregunta «¿Está bien?». Si nadie responde en 60 s, avisa a la
-familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp. **El audio se
+familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp; si nadie
+contesta, la casa llama a emergencias, y sin internet llama igual por la línea. **El audio se
 procesa en el teléfono y nunca sale de él.** Su asistente de voz se llama **Lucero**: «Lucero,
 estoy bien» calla la alarma y «Lucero, llama a mi hijo» llama.
 
@@ -21,6 +22,13 @@ Track: 🚨 Emergencias
 - **Una alerta simulada**, sin esperar a que pase algo: [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta).
 - **El teléfono de la casa en el navegador**, sin oído ni llamadas: https://platanus-hack-26-ve-team-25-casa.vercel.app.
   El oído de verdad corre en la app Android ([`app/`](app/README.md)).
+- **La app Android, desde Play Store:** [prueba interna](https://play.google.com/apps/internaltest/4701205547603054693)
+  (solo para las cuentas de Google que están en la lista de prueba).
+- **La app Android, para instalar a mano:** [`presente.apk`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/latest/download/presente.apk)
+  (105 MB, Android 7 o posterior, [Release `casa-v0.1.0`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/tag/casa-v0.1.0)).
+  Oye, entiende «Lucero» y pregunta «¿Está bien?» con 60 s de espera, sin internet. Va sin los
+  números ni la clave de la casa de demo, así que no llama ni escribe en la base: para eso se
+  compila con su propio `app/config/local.json`.
 
 ## Cómo funciona
 
@@ -35,6 +43,7 @@ TELÉFONO DE LA CASA · Flutter en Android
      ├─ «Estoy bien», deslizando o con la voz ─► casa_responder('cancelar')      │
      ├─ «ayuda», «me caí» o «no» ─► escala sin esperar los 60 s                  │
      └─ vence sin respuesta ─► llama al hijo por WhatsApp; si no, por teléfono   │
+                               si tampoco contesta, llama a emergencias          │
   latido cada 90 s, con enchufado y batería ─► casa_latido                       │
                                                                                  ▼
 SUPABASE · Postgres

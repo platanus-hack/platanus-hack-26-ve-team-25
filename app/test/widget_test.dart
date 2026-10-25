@@ -5,6 +5,7 @@ import 'package:casa/dominio/tipos.dart';
 import 'package:casa/main.dart';
 import 'package:casa/oido/oido.dart';
 import 'package:casa/oido/sonidos.dart';
+import 'package:casa/ui/componentes/boton_grande.dart';
 import 'package:casa/ui/controlador.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -621,20 +622,24 @@ void main() {
     });
   });
 
-  testWidgets('«Leer récipe» dice que todavía no está lista y vuelve', (
-    tester,
-  ) async {
-    comoRelojDeMesa(tester);
-    final c = Controlador(casa: casaSimulada, reloj: temprano);
-    await tester.pumpWidget(AppCasa(controlador: c));
-    await tester.tap(find.text('Leer récipe'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Todavía no está lista'), findsOneWidget);
-    await tester.tap(find.text('Volver'));
-    await tester.pumpAndSettle();
-    expect(find.text('Cuidando la casa'), findsOneWidget);
-    await _cerrar(tester, c);
-  });
+  testWidgets(
+    'en reposo no hay «Leer récipe»: «Pedir ayuda» ocupa todo el alto',
+    (tester) async {
+      comoRelojDeMesa(tester);
+      final c = Controlador(casa: casaSimulada, reloj: temprano);
+      await tester.pumpWidget(AppCasa(controlador: c));
+      expect(find.text('Leer récipe'), findsNothing);
+      final pantalla = tester.getSize(find.byType(AppCasa));
+      final rojo = tester.getRect(
+        find.ancestor(
+          of: find.text(c.textoDelBotonRojo),
+          matching: find.byType(BotonGrande),
+        ),
+      );
+      expect(rojo.height, greaterThan(pantalla.height * 0.8));
+      await _cerrar(tester, c);
+    },
+  );
 }
 
 /// Desmonta la app antes de apagar el reloj del controlador, para que la prueba no termine

@@ -9,7 +9,8 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
 - **La alerta:** una máquina de estados en Dart puro. «Estoy bien» se desliza para no apagarla por
   reflejo; «Necesito ayuda» es un toque.
 - **El reposo:** el reloj grande y, a la derecha, «Pedir ayuda» de arriba abajo. Abajo, en chico,
-  la pastilla que le toca o la próxima, y «Leer récipe», que todavía solo dice que no está lista.
+  la pastilla que le toca o la próxima. Las fotos no se leen aquí: la factura de la farmacia se le
+  toma desde la web de la familia, en Vercel ([`/f/demo/pastillas/factura`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo/pastillas/factura)).
 - **Pedir en voz alta:** cuando YAMNet oye hablar a alguien (y no es la TV), Vosk lee los últimos
   5 s del mismo anillo de audio y busca un banco de unas 70 frases
   ([`pedidos.dart`](lib/dominio/pedidos.dart)): «huele a gas», «me siento malita», «no me puedo
@@ -61,7 +62,7 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   `SUPABASE_PUBLISHABLE_KEY` y `CASA_CLAVE` en `config/local.json`; sin eso no escribe.
 
 Falta el aviso por WhatsApp a la familia, el tono de 520 Hz, la vibración y cargar las pastillas desde
-la foto del récipe: ver [docs/pantallas.md](../docs/pantallas.md).
+la foto del récipe (la de la factura ya funciona, desde la web de la familia): ver [docs/pantallas.md](../docs/pantallas.md).
 
 ## Correrla en un Android
 

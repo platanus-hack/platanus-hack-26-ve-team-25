@@ -5,7 +5,7 @@
 # Una copia queda en app/build/logs/, para revisarla después. Uso: make logs
 set -uo pipefail
 
-PAQUETE=ve.equipo25.casa
+PAQUETE=com.abrahan.presente
 DISPOSITIVO=${1:?falta el teléfono}
 ADB=(adb -s "$DISPOSITIVO")
 CARPETA="$(cd "$(dirname "$0")/.." && pwd)/build/logs"
