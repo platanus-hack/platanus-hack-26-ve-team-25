@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// La llave de subida a Google Play vive en android/key.properties, que no va al repo.
+// Sin ese archivo, el release se firma con la llave de debug: sirve para instalar a mano,
+// pero Play lo rechaza.
+val llave = Properties().apply {
+    val archivo = rootProject.file("key.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
 }
 
 android {
@@ -38,11 +48,20 @@ android {
         }
     }
 
+    signingConfigs {
+        if (llave.isNotEmpty()) {
+            create("subida") {
+                keyAlias = llave.getProperty("keyAlias")
+                keyPassword = llave.getProperty("keyPassword")
+                storeFile = rootProject.file(llave.getProperty("storeFile"))
+                storePassword = llave.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("subida") ?: signingConfigs.getByName("debug")
             // Vosk usa JNA, que no aguanta que R8 le cambie los nombres (proguard-rules.pro).
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
