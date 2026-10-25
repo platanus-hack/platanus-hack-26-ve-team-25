@@ -1,22 +1,24 @@
 /**
  * Lámina 4 · Cierre
  *
- * Una sola cosa: una pregunta dirigida a quien mira, no al producto.
+ * Una sola cosa: una pregunta dirigida a quien mira, no al producto, y debajo el QR para
+ * instalarse la app.
  *
  * El pitch abre acusando («¿Por qué esperar a que ocurra una emergencia?») y cierra preguntando
  * cuánto tarda él en enterarse. Eso es lo que compra el cliente: no un aparato ni un modelo de
  * audio, tiempo. Los 47 minutos, los 60 segundos y el Telegram que llega caben en esa pregunta.
- * Todo lo demás —columnas, QR grande, gracias— se quitó a propósito.
  *
- * El QR de Telegram sigue apareciendo en la esquina superior derecha, porque ese es fijo en
- * todas las láminas (lo pinta App.tsx, no esta).
+ * `QR_descarga_app.jpeg` lleva a la prueba interna de Play Store (`com.abrahan.presente`).
  */
 export default function Cierre() {
   return (
     <div
       style={{
-        display: "grid",
-        placeItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "5cqh",
         height: "100%",
         textAlign: "center",
       }}
@@ -27,14 +29,22 @@ export default function Cierre() {
           fontWeight: 700,
           lineHeight: 1.05,
           letterSpacing: "-0.04em",
-          maxWidth: "92%",
           color: "var(--tinta)",
-          textWrap: "balance",
+          maxWidth: "92%",
         }}
       >
         ¿Cuánto tardarías
         <br />
         en enterarte?
+      </div>
+
+      <div className="qr-descarga">
+        <img
+          src="/QR_descarga_app.jpeg"
+          alt="Código QR para instalar la app de Presente en el teléfono"
+          width={300}
+          height={300}
+        />
       </div>
     </div>
   );

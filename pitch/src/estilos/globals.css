@@ -520,6 +520,21 @@ button {
   color: var(--gris);
 }
 
+/* QR de descarga de la app, al pie del cierre */
+.qr-descarga {
+  background: #fff;
+  border-radius: 1.6cqh;
+  padding: 1.4cqh;
+  display: flex;
+  line-height: 0;
+}
+
+.qr-descarga img {
+  width: 19cqh;
+  height: 19cqh;
+  display: block;
+}
+
 /* La página real de la familia dentro del marco del navegador */
 .marco-pagina {
   width: 100%;
