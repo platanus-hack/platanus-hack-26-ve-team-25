@@ -30,7 +30,7 @@
 
   /* Tamaño del QR de Telegram que va fijo en todas las láminas.
      Sube o baja este número y cambia en todas a la vez. */
-  --qr-tamano: 11cqh;
+  --qr-tamano: 13.5cqh;
 }
 
 * {
