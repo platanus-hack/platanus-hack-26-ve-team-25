@@ -133,7 +133,8 @@ export default function App() {
         </section>
       ))}
 
-      {mostrarQrFijo && <QrTelegram />}
+      {/* En la lámina 2 el QR va algo más grande: ahí la lámina está llena y necesita más presencia. */}
+      {mostrarQrFijo && <QrTelegram tamano={actual === 2 ? "13.5cqh" : undefined} />}
 
       <BarraProgreso actual={actual} total={TOTAL_LAMINAS} />
       <div className="contador">
