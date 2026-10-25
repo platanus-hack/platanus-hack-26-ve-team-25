@@ -40,6 +40,11 @@ const DATOS: { dato: string; para: string; sale: string }[] = [
     sale: "Sí: el nombre de la pastilla, cuántas hay y la hora en que se tomó.",
   },
   {
+    dato: "Una foto de la sala, solo en una emergencia",
+    para: "Que la familia vea qué pasa cuando la casa va a llamar porque nadie respondió o se pidió emergencias. Claude la describe en una frase para el aviso.",
+    sale: "Sí: va a un almacenamiento privado de la casa y, por Telegram, a los familiares suscritos. La web la muestra durante 24 horas, y la borramos cuando el teléfono sube la siguiente o cuando pides borrar los datos. La copia de Telegram queda en el chat de cada familiar.",
+  },
+  {
     dato: "Nombre de la persona y las condiciones de salud que anote la familia (por ejemplo, hipertensión o marcapasos)",
     para: "Que quien recibe una alerta sepa a quién va a ayudar y qué tener en cuenta.",
     sale: "Sí: se guardan con la casa.",
@@ -66,6 +71,7 @@ const PERMISOS: [string, string][] = [
     "Micrófono",
     ", también con la pantalla apagada, con un servicio en primer plano que muestra una notificación permanente: para oír la casa.",
   ],
+  ["Cámara", ": para la foto de la sala justo antes de llamar por una emergencia. Se prende, toma una foto y se apaga."],
   ["Llamadas telefónicas", ": para llamar al familiar o al número de emergencias."],
   ["Contactos", ": para hacer la llamada por WhatsApp."],
   ["Mostrar sobre otras apps", ": para que «¿Está bien?» aparezca aunque haya otra app abierta."],
@@ -76,16 +82,19 @@ const PERMISOS: [string, string][] = [
 ];
 
 const SERVICIOS: [string, string][] = [
-  ["Supabase", ": la base de datos donde se guardan las etiquetas, las alertas, la batería y las pastillas."],
+  [
+    "Supabase",
+    ": la base de datos donde se guardan las etiquetas, las alertas, la batería y las pastillas, y el almacenamiento privado de las fotos de emergencia.",
+  ],
   [
     "Vercel",
     ": aloja la web de la familia. Como todo servidor web, registra datos técnicos de las visitas, como la dirección IP.",
   ],
-  ["Telegram", ": entrega el aviso a los familiares que se suscribieron."],
+  ["Telegram", ": entrega el aviso, y la foto de emergencia, a los familiares que se suscribieron."],
   ["WhatsApp y la compañía telefónica", ": cursan las llamadas que hace el teléfono."],
   [
     "Anthropic (Claude)",
-    ": solo si la familia toma en su web una foto de la factura de la farmacia, para leer las pastillas compradas. La foto no se guarda; se guarda solo lo que la familia confirma.",
+    ": describe en una frase la foto de emergencia, y lee la foto de la factura de la farmacia si la familia la toma en su web. La foto de la factura no se guarda; se guarda solo lo que la familia confirma.",
   ],
 ];
 
@@ -135,8 +144,9 @@ export default function Page() {
         </p>
         <p>
           <strong className="text-tinta">El audio nunca sale del teléfono.</strong> Se procesa en el
-          aparato y no se graba ni se envía a ningún servidor. No hay anuncios, no vendemos datos y no
-          usamos herramientas de analítica ni de publicidad.
+          aparato y no se graba ni se envía a ningún servidor. Lo único que sale además de etiquetas
+          de texto es una foto de la sala, y solo justo antes de llamar por una emergencia. No hay
+          anuncios, no vendemos datos y no usamos herramientas de analítica ni de publicidad.
         </p>
       </div>
 
@@ -161,7 +171,7 @@ export default function Page() {
         </dl>
         <p>
           No recogemos la ubicación, mensajes, el historial de navegación ni identificadores de
-          publicidad, y no guardamos fotos. La web de la familia recuerda en tu navegador cuál fue la
+          publicidad, y la cámara solo se usa en una emergencia. La web de la familia recuerda en tu navegador cuál fue la
           última casa que abriste, para llevarte directo a ella, y no usa cookies de seguimiento.
         </p>
       </Seccion>
@@ -189,7 +199,8 @@ export default function Page() {
           Los datos se guardan mientras la casa esté activa. Puedes pedir que borremos todos los datos
           de una casa <Contacto>escribiéndonos aquí</Contacto>, sin poner datos de la casa en el
           mensaje: te respondemos para confirmar que es tuya. Lo hacemos en un plazo de 30 días, y se
-          borran también las alertas, los eventos, las pastillas y las suscripciones de esa casa. Al
+          borran también las alertas, los eventos, las fotos, las pastillas y las suscripciones de esa
+          casa. Al
           desinstalar la app, el teléfono deja de enviar datos.
         </p>
       </Seccion>
