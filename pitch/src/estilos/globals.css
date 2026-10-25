@@ -30,7 +30,7 @@
 
   /* Tamaño del QR de Telegram que va fijo en todas las láminas.
      Sube o baja este número y cambia en todas a la vez. */
-  --qr-tamano: 13.5cqh;
+  --qr-tamano: 16cqh;
 }
 
 * {
@@ -231,6 +231,8 @@ button {
 .qr-etiqueta {
   font-size: 1.2cqh;
   color: var(--gris);
+  /* Sobre la foto de la lámina 2 el gris se pierde: le damos sombra para que se lea */
+  text-shadow: 0 0.1cqh 0.5cqh rgba(0, 0, 0, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 500;
