@@ -120,7 +120,7 @@ export default function LaFamilia({ activa = false }: Props) {
         className="portada-logo"
         width={918}
         height={180}
-        style={{ position: "absolute", top: 0, left: 0, height: "6.5cqh", zIndex: 2 }}
+        style={{ position: "absolute", top: 0, left: 0, height: "5cqh", zIndex: 2 }}
       />
 
       {/* Los dos paneles: teléfono (izq) y navegador (der), alineados al mismo centro vertical */}
