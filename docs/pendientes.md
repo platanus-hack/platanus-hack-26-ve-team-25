@@ -57,11 +57,12 @@ guarda lo que está en el récipe. Falta encenderla:
       test/sirena_test.dart`. plan.md y riesgos.md ya lo cuentan. Falta probarlo en el Infinix.
 - [ ] **En el Infinix, el número del iPhone guardado como «911»**: es el segundo número al que
       llama la casa en el demo.
-- [ ] **El APK, descargable**, como Release del repo y con su enlace en el README. Va con 60 s, y
-      se compila con **`make apk-publico`** (`app/build/en-casa.apk`), sin `config/local.json`: con
-      él se publicarían los números del equipo y la clave de la casa de demo. Revisado el sábado
-      23:35: ningún valor de `local.json` aparece dentro del APK. Falta publicarlo
-      (`casa-v0.1.0`) y poner el enlace.
+- [x] **El APK, descargable** (sábado 23:45): Release
+      [`casa-v0.1.0`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/tag/casa-v0.1.0),
+      enlazado en el README. Va con 60 s y se compila con **`make apk-publico`**, sin
+      `config/local.json`: con él se publicarían los números del equipo y la clave de la casa de
+      demo. Ningún valor de `local.json` aparece dentro del APK. Si cambia la app antes del gong,
+      se vuelve a subir con `gh release upload casa-v0.1.0 app/build/en-casa.apk --clobber`.
 
 ### Josuep · Telegram
 

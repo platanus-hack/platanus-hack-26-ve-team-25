@@ -21,6 +21,11 @@ Track: 🚨 Emergencias
 - **Una alerta simulada**, sin esperar a que pase algo: [`/f/demo?escenario=alerta`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta).
 - **El teléfono de la casa en el navegador**, sin oído ni llamadas: https://platanus-hack-26-ve-team-25-casa.vercel.app.
   El oído de verdad corre en la app Android ([`app/`](app/README.md)).
+- **La app Android, para instalar:** [`en-casa.apk`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/latest/download/en-casa.apk)
+  (105 MB, Android 7 o posterior, [Release `casa-v0.1.0`](https://github.com/platanus-hack/platanus-hack-26-ve-team-25/releases/tag/casa-v0.1.0)).
+  Oye, entiende «Lucero» y pregunta «¿Está bien?» con 60 s de espera, sin internet. Va sin los
+  números ni la clave de la casa de demo, así que no llama ni escribe en la base: para eso se
+  compila con su propio `app/config/local.json`.
 
 ## Cómo funciona
 
