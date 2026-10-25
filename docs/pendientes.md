@@ -52,6 +52,17 @@ guarda lo que está en el récipe. Falta encenderla:
       hackatón.
 - [ ] **Actualizar la sección de seguridad de los datos en Play Console:** ahora la app recoge
       fotos (solo en emergencias, se borran a las 24 h).
+- [ ] **Que las fotos se borren a las 24 h de verdad:** hoy las vencidas se borran cuando la casa
+      sube la siguiente ([`api/casa/foto`](../web/src/app/api/casa/foto/route.ts)); la web deja de
+      mostrarlas a las 24 h. Lo justo sería que el vigilante las borre. La
+      [política](https://platanus-hack-26-ve-team-25.vercel.app/privacidad) ya lo cuenta así.
+- [ ] **Después del demo, no antes:** que «la tomé» cuente mientras suena el recordatorio. Dicha,
+      «Ya me la tomé» falla con 5 de 6 voces de prueba porque Vosk oye «llame la tomé»
+      ([voz-mayor](../experimentos/voz-mayor/README.md)). En la tarima, Carmen toca el botón.
+- [ ] **Revisar una línea de AGENTS.md:** dice que un «no» durante la cuenta llama sin esperar,
+      pero en [`pedidos.dart`](../app/lib/dominio/pedidos.dart) no hay un «no» suelto y en
+      [`comandos.dart`](../app/lib/dominio/comandos.dart) el «no» solo cancela en los 5 s antes de
+      una llamada.
 - [x] **Probado en el Samsung (domingo 00:00–00:10), y dos arreglos:** la alarma se callaba sola a
       los 10 s porque Vosk oía la frase del propio teléfono («Diga "Lucero, estoy bien"…»), y
       toda versión release se cerraba al abrir porque R8 renombraba las clases de JNA que usa Vosk
@@ -110,6 +121,9 @@ webhook y el vigilante están hechos y verificados.
 - [ ] **Logo propio e identidad gráfica** (Rogelio): `project-logo.png` todavía es el de Platanus,
       y sale en el Market y en la página de votación.
 - [ ] **Ensayar las limitaciones en voz alta** ([riesgos.md](riesgos.md#cómo-contar-la-verdad)).
+- [ ] **Un correo de contacto para la [política de privacidad](../web/src/app/privacidad/page.tsx)**
+      (`CONTACTO`): hoy lleva a los issues del repo. Lo natural es el correo de desarrollador de
+      Play Console, que ya es público en la ficha.
 - [ ] **En el pitch se dice «golpe», no «caída».** El oído reconoce un golpe y por eso pregunta.
 - [ ] Video de respaldo.
 

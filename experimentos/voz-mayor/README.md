@@ -98,4 +98,5 @@ uv run evaluar.py              # escribe resultados.md y resultados.csv
 ```
 
 `generar.py` toma `ELEVENLABS_API_KEY` del entorno o de `web/.env.local`. Los audios quedan en
-`audio/` y no van al repo.
+`audio/` y no van al repo. Con varios procesos, Vosk no da exactamente lo mismo en cada corrida:
+puede cambiar una frase, un punto en alguna celda.
