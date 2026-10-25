@@ -11,10 +11,15 @@ import Marco from "../componentes/Marco";
  * la circunferencia es 2πR. Un 20 % de progreso deja 80 % vacío.
  */
 /**
- * La página real de la familia, en estado de alerta. Se muestra dentro del marco para que la
- * lámina enseñe el producto y no un dibujo. Si en la tarima no hay internet, W vuelve al mockup.
+ * La página real de la familia, en vivo. Se muestra dentro del marco para que la lámina enseñe el
+ * producto y no un dibujo.
+ *
+ * Ojo con agregarle `?escenario=alerta`: ese parámetro carga los datos SIMULADOS de
+ * `web/src/lib/familia/simulado.ts`, que están congelados. Sin parámetro la página lee de Supabase
+ * cada 5 s y se actualiza sola, que es lo que hace falta en la tarima: la lámina se pone roja
+ * cuando la casa de verdad alerta, sin tocar nada.
  */
-const URL_PAGINA = "https://platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta";
+const URL_PAGINA = "https://platanus-hack-26-ve-team-25.vercel.app/f/demo";
 
 const RADIO = 44;
 const CIRC = 2 * Math.PI * RADIO;
@@ -38,6 +43,8 @@ export default function LaFamilia({ activa = false }: Props) {
 
   // La página de la familia, de verdad, dentro del marco. Se puede apagar con W.
   const [paginaReal, setPaginaReal] = useState(true);
+  // Cambiar la versión remonta el iframe: recarga la página sin tocar el video del teléfono.
+  const [version, setVersion] = useState(0);
 
   /** Suelta la ventana capturada y vuelve al mockup. */
   const soltar = useCallback(() => {
@@ -97,6 +104,9 @@ export default function LaFamilia({ activa = false }: Props) {
         } else {
           void tomar();
         }
+      } else if (tecla === "r") {
+        e.preventDefault();
+        setVersion((v) => v + 1);
       } else if (tecla === "w") {
         e.preventDefault();
         setPaginaReal((antes) => !antes);
@@ -233,7 +243,7 @@ export default function LaFamilia({ activa = false }: Props) {
                   ? "A para soltar el teléfono"
                   : vivo
                     ? "V para soltar la ventana"
-                    : "V ventana · A teléfono · W página")}
+                    : "V ventana · A teléfono · W página · R recargar")}
             </div>
           )}
         </div>
@@ -243,14 +253,15 @@ export default function LaFamilia({ activa = false }: Props) {
           <Marco
             url={
               paginaReal
-                ? "platanus-hack-26-ve-team-25.vercel.app/f/demo?escenario=alerta"
+                ? "platanus-hack-26-ve-team-25.vercel.app/f/demo"
                 : "platanus-hack-26-ve-team-25.vercel.app/f/carmen"
             }
           >
             {paginaReal ? (
               <iframe
+                key={version}
                 src={URL_PAGINA}
-                title="Página de la familia de la casa de Carmen, en estado de alerta"
+                title="Página de la familia de la casa de Carmen, en vivo"
                 className="marco-pagina"
                 referrerPolicy="no-referrer"
               />
