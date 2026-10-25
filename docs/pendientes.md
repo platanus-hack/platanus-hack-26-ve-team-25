@@ -45,9 +45,11 @@ guarda lo que está en el récipe. Falta encenderla:
       AGENTS.md.
 - [ ] **Probar la foto en el Samsung** con una alerta de verdad: «Pedir ayuda» llama a Josuep y
       tiene que llegar la foto por Telegram. Necesita `ANTHROPIC_API_KEY` en Vercel para la
-      descripción; sin ella la foto llega igual, sin «Lo que se ve». Probar también con la
-      pantalla apagada: lo más probable es que Android no preste la cámara y la llamada salga sin
-      foto, y hay que decirlo así en el pitch.
+      descripción; sin ella la foto llega igual, sin «Lo que se ve». Con el teléfono bloqueado
+      llama sin foto (Android no presta la cámara a una app que está atrás): se dejó así y se
+      dice en el pitch ([riesgos.md](riesgos.md#cómo-contar-la-verdad)). Arreglarlo es que la
+      alerta prenda la pantalla y salga sobre el bloqueo (`setShowWhenLocked`), después del
+      hackatón.
 - [ ] **Actualizar la sección de seguridad de los datos en Play Console:** ahora la app recoge
       fotos (solo en emergencias, se borran a las 24 h).
 - [x] **Probado en el Samsung (domingo 00:00–00:10), y dos arreglos:** la alarma se callaba sola a

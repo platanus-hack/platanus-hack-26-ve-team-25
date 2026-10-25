@@ -223,6 +223,9 @@ más que una limitación que contemos nosotros.
 3. **Separar el demo de la realidad, en voz alta:**
     - «En la casa, la alarma espera 60 s antes de avisar; aquí la acortamos a 15 para que
       quepa en el pitch. Todo lo demás es igual». Es lo único que se acelera.
+    - «Antes de llamar por una emergencia, la casa toma una foto de la sala para la familia. Con
+      el teléfono bloqueado llama igual, pero sin foto: Android no le presta la cámara a una app
+      que está atrás». Decidido el domingo 02:20: no se cambia para el demo.
     - «El morral que cae representa una caída. Una caída silenciosa la detectamos por la
       rutina, no por el golpe».
     - Si se usa el botón oculto de «modo demo» porque la sala no deja oír, se dice: «La sala está
