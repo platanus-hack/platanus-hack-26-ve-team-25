@@ -26,7 +26,8 @@ Abre http://localhost:4173 en el navegador.
 - **End**: ir a la última lámina
 - **f**: pantalla completa (Escape para salir)
 - **Clic** en la mitad izquierda o derecha de la pantalla: navegar
-- **v** (solo en la lámina 3): enchufar o soltar la ventana de scrcpy dentro del teléfono
+- **v** (solo en la lámina 3): enchufar o soltar una ventana capturada por el navegador
+- **a** (solo en la lámina 3): enchufar o soltar la pantalla del teléfono vía `adb`
 
 También puedes ir directamente a una lámina con el hash: `#1`, `#2`, `#3`, `#4`.
 
@@ -44,6 +45,25 @@ el permiso, se queda el mockup y el deck sigue funcionando igual.
 
 Funciona en `localhost` y en la URL desplegada (las dos son contexto seguro). El video no sale del
 navegador: se reproduce en memoria y no se graba ni se envía a ningún sitio.
+
+### Si el selector solo ofrece pestañas
+
+En Linux, Chrome depende del portal de PipeWire (`xdg-desktop-portal`) para compartir ventanas. Sin
+él, el selector solo lista **pestañas del navegador** y la ventana de scrcpy no aparece. No es un
+problema del deck: es el navegador recortando lo que puede compartir.
+
+Para eso está el modo `adb`, que no le pide permiso a nadie:
+
+```bash
+npm run vivo                      # cada 800 ms
+npm run vivo -- --cada 500        # más refresco, más CPU
+```
+
+Deja ese proceso corriendo y, en la lámina 3, pulsa **a**. El deck pide el último cuadro a
+`http://localhost:8765/telefono.png` y lo pinta dentro del marco. Otra **a** lo suelta. En
+`/estado` se ve cuántos cuadros lleva y el último error.
+
+El servidor escucha **solo en 127.0.0.1**: la pantalla del teléfono no se publica en la red local.
 
 ## Cómo desplegar
 

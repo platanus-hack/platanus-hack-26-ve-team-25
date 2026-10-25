@@ -26,6 +26,10 @@ export default function LaFamilia({ activa = false }: Props) {
   const [vivo, setVivo] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
+  // Modo adb: un proceso local (npm run vivo) sirve la pantalla del teléfono por HTTP.
+  const [porAdb, setPorAdb] = useState(false);
+  const [tick, setTick] = useState(0);
+
   /** Suelta la ventana capturada y vuelve al mockup. */
   const soltar = useCallback(() => {
     flujoRef.current?.getTracks().forEach((pista) => pista.stop());
@@ -55,6 +59,13 @@ export default function LaFamilia({ activa = false }: Props) {
     }
   }, [soltar]);
 
+  // Refresco de la imagen de adb: cambia el ?t= para que el navegador no use la caché.
+  useEffect(() => {
+    if (!porAdb) return;
+    const id = setInterval(() => setTick((t) => t + 1), 800);
+    return () => clearInterval(id);
+  }, [porAdb]);
+
   // El <video> no existe hasta que `vivo` es true: el flujo se enchufa justo después.
   useEffect(() => {
     if (!vivo || !videoRef.current || !flujoRef.current) return;
@@ -68,12 +79,21 @@ export default function LaFamilia({ activa = false }: Props) {
   useEffect(() => {
     if (!activa) return;
     const alPulsar = (e: KeyboardEvent) => {
-      if (e.key !== "v" && e.key !== "V") return;
-      e.preventDefault();
-      if (vivo) {
-        soltar();
-      } else {
-        void tomar();
+      const tecla = e.key.toLowerCase();
+      if (tecla === "v") {
+        e.preventDefault();
+        setPorAdb(false);
+        if (vivo) {
+          soltar();
+        } else {
+          void tomar();
+        }
+      } else if (tecla === "a") {
+        e.preventDefault();
+        // Los dos modos son excluyentes: si había ventana capturada, se suelta.
+        if (vivo) soltar();
+        setAviso(null);
+        setPorAdb((antes) => !antes);
       }
     };
     window.addEventListener("keydown", alPulsar);
@@ -113,14 +133,24 @@ export default function LaFamilia({ activa = false }: Props) {
               border: "1px solid var(--borde)",
               background: "var(--superficie)",
               // En vivo manda el video a sangre; si no, el mockup con su respiración.
-              padding: vivo ? "0" : "2.5cqh 2cqw",
-              justifyContent: vivo ? "center" : "space-between",
+              padding: vivo || porAdb ? "0" : "2.5cqh 2cqw",
+              justifyContent: vivo || porAdb ? "center" : "space-between",
               gap: "0",
               overflow: "hidden",
               position: "relative",
             }}
           >
-            {vivo ? (
+            {porAdb ? (
+              <>
+                <img
+                  src={`http://localhost:8765/telefono.png?t=${tick}`}
+                  alt="Pantalla del teléfono de la casa, en vivo"
+                  className="telefono-vivo"
+                  onError={() => setAviso("No responde localhost:8765. ¿Está corriendo `npm run vivo`?")}
+                />
+                <span className="telefono-en-vivo">EN VIVO</span>
+              </>
+            ) : vivo ? (
               <>
                 <video ref={videoRef} muted playsInline autoPlay className="telefono-vivo" />
                 <span className="telefono-en-vivo">EN VIVO</span>
@@ -181,7 +211,12 @@ export default function LaFamilia({ activa = false }: Props) {
           {/* Pista solo para quien presenta: no aparece si la lámina no está en pantalla */}
           {activa && (
             <div className="pista-vivo">
-              {aviso ?? (vivo ? "V para soltar la ventana" : "V para ver el teléfono en vivo")}
+              {aviso ??
+                (porAdb
+                  ? "A para soltar el teléfono"
+                  : vivo
+                    ? "V para soltar la ventana"
+                    : "V ventana · A teléfono por adb")}
             </div>
           )}
         </div>
