@@ -18,11 +18,11 @@ export const cifrasContexto: readonly Cifra[] = [
     etiqueta: "de venezolanos en el exterior",
   },
   {
-    valor: "400 000+",
+    valor: ">400 k",
     etiqueta: "adultos mayores viven solos",
   },
   {
-    valor: "31 M+",
+    valor: ">31 M",
     etiqueta: "de adultos mayores están solos en el mundo",
     tinta: true,
   },
