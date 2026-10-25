@@ -12,7 +12,7 @@ EN_EL_TELEFONO = -d $(TELEFONO)
 BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 
 .DEFAULT_GOAL := ayuda
-.PHONY: ayuda devices deps telefono logs run run-demo release-demo apk-publico demo debug profile release test test-integracion analyze format \
+.PHONY: ayuda devices deps telefono logs run run-demo release-demo apk-publico apk-demo demo debug profile release test test-integracion analyze format \
 	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
 	web-deps web-dev web-test web-lint web-build \
 	pitch pitch-deploy
@@ -44,7 +44,7 @@ deps: ## Baja las dependencias de la app y el modelo de Vosk
 run: telefono deps ## Corre la app en el teléfono conectado (r recarga, q sale)
 	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG)
 
-run-demo: telefono deps ## Corre la app con la cuenta regresiva de 15 s del demo
+run-demo: telefono deps ## Corre la app con la cuenta regresiva de 10 s del demo
 	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG) --dart-define=DEMO=true
 
 # Para ensayar el demo: la web de la familia en la laptop y la app en el teléfono, conectadas por
@@ -63,8 +63,8 @@ profile: telefono deps ## Corre la app en modo profile, para medir rendimiento e
 release: telefono deps ## Corre la app en modo release, como la vería el usuario
 	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG) --release
 
-# La versión que se sube a la tarima: release, con local.json y 15 s en vez de 60.
-release-demo: telefono deps ## Corre en release con la espera de 15 s de la tarima
+# La versión que se sube a la tarima: release, con local.json y 10 s en vez de 60.
+release-demo: telefono deps ## Corre en release con la espera de 10 s de la tarima
 	cd $(APP) && flutter run $(EN_EL_TELEFONO) $(CONFIG) --release --dart-define=DEMO=true
 
 test: deps ## Corre las pruebas de la app
@@ -89,6 +89,12 @@ build-apk: deps ## Arma el APK de release, para instalar a mano
 # la clave de la casa de demo. Oye y pregunta, pero sin números no llama ni escribe en la base.
 apk-publico: deps ## Arma el APK para el Release de GitHub, sin local.json (app/build/presente.apk)
 	cd $(APP) && flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/presente.apk
+
+# El APK de la tarima, para instalar en un teléfono que no está conectado a la laptop: lleva
+# local.json (números y clave de la casa) y 10 s. No se sube a ningún Release: el repo es público.
+apk-demo: deps ## Arma el APK de la tarima, con local.json y 10 s (app/build/presente-demo.apk)
+	@test -f $(APP)/config/local.json || { echo "Falta app/config/local.json"; exit 1; }
+	cd $(APP) && flutter build apk $(CONFIG) --release --dart-define=DEMO=true && cp build/app/outputs/flutter-apk/app-release.apk build/presente-demo.apk
 
 build-appbundle: deps ## Arma el App Bundle (.aab) de release, para Google Play
 	cd $(APP) && flutter build appbundle $(CONFIG) --release

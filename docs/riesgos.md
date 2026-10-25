@@ -221,7 +221,7 @@ más que una limitación que contemos nosotros.
 2. **Mostrar los números, también los malos.** Por ejemplo: «Reconoce la tos y el vidrio. Le
    cuesta el quejido débil: 6 de 10». Un número malo explicado da confianza.
 3. **Separar el demo de la realidad, en voz alta:**
-    - «En la casa, la alarma espera 60 s antes de avisar; aquí la acortamos a 15 para que
+    - «En la casa, la alarma espera 60 s antes de avisar; aquí la acortamos a 10 para que
       quepa en el pitch. Todo lo demás es igual». Es lo único que se acelera.
     - «Antes de llamar por una emergencia, la casa toma una foto de la sala para la familia. Con
       el teléfono bloqueado llama igual, pero sin foto: Android no le presta la cámara a una app
