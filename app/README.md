@@ -25,11 +25,11 @@ mayor. Las pantallas son las de los mockups horizontales aprobados. Hoy tiene:
   al vecino y a emergencias, por llamada normal en altavoz y con el volumen al máximo. Sin
   «Lucero» no llama: puede ser la TV. Los números van en `config/local.json`
   (`TELEFONO_VECINO`, `NUMERO_EMERGENCIAS`); para probar, nunca el 911 de verdad.
-- **La alarma de «¿Está bien?»:** primero Lucero, con la voz del teléfono y sin tono: dice de una
-  vez «Carmen, ¿está bien?», se calla 4 s para oír la respuesta y vuelve a preguntar, y a 20 s del
-  final dice a quién va a llamar. En los últimos 3 s entran un tono de 520 Hz en onda cuadrada,
-  que las personas mayores oyen mejor que un pitido agudo, con el ritmo de las alarmas de humo, y
-  la vibración. Suena por el canal de alarma, aunque el teléfono esté en silencio.
+- **La alarma de «¿Está bien?»:** un tono de 520 Hz en onda cuadrada, que las personas mayores
+  oyen mejor que un pitido agudo, con el ritmo de las alarmas de humo, y vibración. Cada dos
+  ciclos la voz del teléfono dice «Carmen, ¿está bien? Si está bien, deslice el botón», y a 20 s
+  del final, a quién va a llamar. Suena por el canal de alarma, aunque el teléfono esté en
+  silencio.
 - **La rutina:** cuenta lo de siempre que suena por franja del día (cocina, agua, puerta, baño,
   TV, voces) y lo manda como «Su día» a la familia, una vez por hábito y franja. Si de día no suena
   nada en 3 horas, avisa una vez como «día distinto» ([`rutina.dart`](lib/dominio/rutina.dart)).
@@ -96,8 +96,8 @@ flutter run
 lo pasa solo; con `flutter run` directo hay que agregar `--dart-define-from-file=config/local.json`.
 Sin número, la app no llama y lo dice en pantalla.
 
-Para el demo, con la cuenta regresiva de 10 s en vez de 60 s (como siempre, Lucero pregunta de
-entrada y el tono entra en los últimos 3 s):
+Para el demo, con la cuenta regresiva de 10 s en vez de 60 s (la voz pregunta de entrada, sin
+tono antes):
 
 ```bash
 flutter run --dart-define=DEMO=true

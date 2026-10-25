@@ -6,9 +6,10 @@ const esperaConfirmacion = bool.fromEnvironment('DEMO')
     ? Duration(seconds: 10)
     : Duration(seconds: 60);
 
-/// Primero pregunta la voz, de una vez y sin tono; el tono de 520 Hz y la vibración entran solo
-/// cuando falta esto para avisar, para quien no oyó la pregunta.
-const sirenaAlFinal = Duration(seconds: 3);
+/// Cuántos ciclos de 4 s del tono suenan antes de que la voz pregunte. Con 60 s son dos; con los
+/// 10 s de la tarima, ninguno: la voz pregunta de entrada, y así la pregunta y su ventana callada
+/// (4 s) caben antes de avisar. El tono suena después de la ventana.
+const ciclosAntesDeLaPregunta = bool.fromEnvironment('DEMO') ? 0 : 2;
 
 /// Los estados de una alerta, con las únicas transiciones válidas:
 ///

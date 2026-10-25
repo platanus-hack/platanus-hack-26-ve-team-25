@@ -19,10 +19,9 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.Locale
 
 /**
- * La alarma de «¿Está bien?»: primero la voz del teléfono, de una vez y sin tono («Carmen, ¿está
- * bien?»), que se calla 4 s para oír la respuesta y vuelve a preguntar; en los últimos segundos,
- * un tono de 520 Hz en onda cuadrada y vibración, en bucle (lo pide Dart con tono()). Frases
- * fijas y no una IA que responda: en la alarma la voz tiene que ser predecible y funcionar sin internet
+ * La alarma de «¿Está bien?»: un tono de 520 Hz en onda cuadrada y vibración, en bucle, y cada dos
+ * ciclos una frase fija con la voz del teléfono («Carmen, ¿está bien?…»). Frases fijas y no una IA
+ * que responda: en la alarma la voz tiene que ser predecible y funcionar sin internet
  * (docs/por-planificar.md, punto 9). La voz es grave y lenta, como pide la investigación de audio.
  *
  * 520 Hz y no un pitido agudo porque con la edad se oyen peor los agudos: en las pruebas de la
@@ -41,17 +40,11 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     private var voz: TextToSpeech? = null
     private var vozLista = false
 
-    /** Lo primero que dice, apenas nace la alerta: corto, «Carmen, ¿está bien?». */
-    private var primera: String? = null
-
-    /** Lo que dice en los turnos siguientes. Dart lo cambia cerca del final. */
+    /** Lo que dice en el próximo turno de voz. Dart lo cambia cerca del final. */
     private var frase = ""
 
-    /** True desde que Dart pide el tono, en los últimos segundos: ya no habla, suena y vibra. */
-    private var conTono = false
-
-    /** True mientras la sirena calla para oír la respuesta. */
-    private var ventanaAbierta = false
+    /** Cuántos ciclos de tono van antes de la primera frase: 0 en la versión de tarima (DEMO). */
+    private var ciclosAntesDeLaFrase = CICLOS_ENTRE_FRASES
 
     private val canal = MethodChannel(mensajero, "casa/sirena")
 
@@ -60,11 +53,10 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
             when (call.method) {
                 "sonar" -> {
                     frase = call.argument<String>("frase").orEmpty()
-                    primera = call.argument<String>("primera")
+                    ciclosAntesDeLaFrase = call.argument<Int>("ciclosAntes") ?: CICLOS_ENTRE_FRASES
                     sonar()
                     result.success(null)
                 }
-                "tono" -> { tono(); result.success(null) }
                 "decir" -> { frase = call.argument<String>("frase").orEmpty(); result.success(null) }
                 "callar" -> { callar(); result.success(null) }
                 else -> result.notImplemented()
@@ -92,21 +84,21 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         }
     }
 
-    // Primero la voz, sin tono: Lucero pregunta apenas nace la alerta, se calla 4 s para oír la
-    // respuesta y vuelve a preguntar. El tono y la vibración entran solo al final (tono()).
+    // Dos ciclos del tono (8 s), la frase, 4 s callados para que la persona conteste, y otra vez el
+    // tono.
     private val turnoDeVoz: Runnable = Runnable {
-        if (pista == null || conTono) return@Runnable
+        val p = pista ?: return@Runnable
         val v = voz
-        val texto = primera ?: frase
-        if (!vozLista || v == null || texto.isEmpty()) {
-            programarVoz(REINTENTO_VOZ_MS)
+        if (!vozLista || v == null || frase.isEmpty()) {
+            programarVoz()
             return@Runnable
         }
-        primera = null
+        p.pause()
+        vibrador().cancel()
         // Dart deja de pasarle audio a Vosk mientras el teléfono habla: la frase dice «Lucero,
         // estoy bien», y si Vosk la oyera, la alarma se callaría sola.
         canal.invokeMethod("hablando", true)
-        v.speak(texto, TextToSpeech.QUEUE_FLUSH, null, "frase")
+        v.speak(frase, TextToSpeech.QUEUE_FLUSH, null, "frase")
     }
 
     private fun calloLaVoz() {
@@ -116,35 +108,24 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     // Después de la frase, silencio: sin tono ni vibración, para que «Lucero, estoy bien» se oiga
     // limpio. Dart muestra «Le escucho…» y, al cerrarse, reconoce lo que se dijo en ese rato.
     private fun abrirVentana() {
-        if (pista == null || conTono) return
-        ventanaAbierta = true
+        if (pista == null) return
         canal.invokeMethod("ventana", true)
         reloj.postDelayed(cerrarVentana, VENTANA_MS)
     }
 
     private val cerrarVentana: Runnable = Runnable {
-        ventanaAbierta = false
         canal.invokeMethod("ventana", false)
-        if (!conTono) programarVoz(PAUSA_ENTRE_FRASES_MS)
+        volverAlTono()
     }
 
-    private fun programarVoz(ms: Long): Boolean = reloj.postDelayed(turnoDeVoz, ms)
+    private fun programarVoz(ciclos: Int = CICLOS_ENTRE_FRASES): Boolean =
+        reloj.postDelayed(turnoDeVoz, ciclos * 4000L)
 
-    // Los últimos segundos antes de llamar: se corta la voz y suenan el tono de 520 Hz y la
-    // vibración, para quien no oyó la pregunta.
-    private fun tono() {
+    private fun volverAlTono() {
         val p = pista ?: return
-        if (conTono) return
-        conTono = true
-        reloj.removeCallbacks(turnoDeVoz)
-        if (ventanaAbierta) {
-            ventanaAbierta = false
-            reloj.removeCallbacks(cerrarVentana)
-            canal.invokeMethod("ventana", false)
-        }
-        voz?.stop()
         p.play()
         vibrar()
+        programarVoz()
     }
 
     private fun sonar() {
@@ -168,10 +149,10 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
             .apply {
                 write(muestras, 0, muestras.size)
                 setLoopPoints(0, muestras.size, -1)
+                play()
             }
-        conTono = false
-        // La voz pregunta de una vez; el tono espera a tono().
-        reloj.post(turnoDeVoz)
+        vibrar()
+        programarVoz(ciclosAntesDeLaFrase)
     }
 
     // El mismo ritmo en la vibración: espera, pulso, pausa… y se repite desde el principio.
@@ -187,9 +168,6 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     }
 
     private fun callar() {
-        conTono = false
-        ventanaAbierta = false
-        primera = null
         reloj.removeCallbacks(turnoDeVoz)
         reloj.removeCallbacks(cerrarVentana)
         voz?.stop()
@@ -244,10 +222,7 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         const val FRECUENCIA = 520.0
         // No a tope: una cuadrada al máximo satura el parlante de un teléfono viejo y suena rota.
         const val AMPLITUD = 26000
+        const val CICLOS_ENTRE_FRASES = 2
         const val VENTANA_MS = 4000L
-        // Entre el fin de la ventana y la próxima pregunta.
-        const val PAUSA_ENTRE_FRASES_MS = 1500L
-        // Si la voz del teléfono todavía no está lista, cuánto esperar para intentar de nuevo.
-        const val REINTENTO_VOZ_MS = 500L
     }
 }
