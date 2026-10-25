@@ -29,6 +29,8 @@ Track: 🚨 Emergencias
   Oye, entiende «Lucero» y pregunta «¿Está bien?» con 60 s de espera, sin internet. Va sin los
   números ni la clave de la casa de demo, así que no llama ni escribe en la base: para eso se
   compila con su propio `app/config/local.json`.
+- **Qué datos usa y con quién se comparten:** la [política de privacidad](https://platanus-hack-26-ve-team-25.vercel.app/privacidad)
+  ([`web/src/app/privacidad/`](web/src/app/privacidad/page.tsx)). El audio no sale del teléfono.
 
 ## Cómo funciona
 

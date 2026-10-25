@@ -50,7 +50,7 @@ El proyecto ya tiene `vercel.json` configurado con framework `vite`, buildComman
 ```
 pitch/
   index.html                  entry point, lang="es"
-  package.json                name "en-casa-pitch", scripts: dev, build, preview, qr
+  package.json                name "presente-pitch", scripts: dev, build, preview, qr
   tsconfig.json               TypeScript estricto, incluye src y vite.config.ts
   tsconfig.node.json          configuración alternativa para vite.config.ts (no usada en build)
   vite.config.ts              Vite con plugin de React, sin CDN ni dependencias externas
