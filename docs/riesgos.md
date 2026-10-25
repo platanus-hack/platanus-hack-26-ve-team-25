@@ -221,8 +221,8 @@ más que una limitación que contemos nosotros.
 2. **Mostrar los números, también los malos.** Por ejemplo: «Reconoce la tos y el vidrio. Le
    cuesta el quejido débil: 6 de 10». Un número malo explicado da confianza.
 3. **Separar el demo de la realidad, en voz alta:**
-    - «El demo usa los tiempos del producto: 60 s de alarma y el escalamiento después. No hay
-      cuenta regresiva acelerada».
+    - «En la casa, la alarma espera 60 s antes de avisar; aquí la acortamos a 15 para que
+      quepa en el pitch. Todo lo demás es igual». Es lo único que se acelera.
     - «El morral que cae representa una caída. Una caída silenciosa la detectamos por la
       rutina, no por el golpe».
     - Si se usa el botón oculto de «modo demo» porque la sala no deja oír, se dice: «La sala está

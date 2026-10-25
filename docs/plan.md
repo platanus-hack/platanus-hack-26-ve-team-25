@@ -88,10 +88,12 @@ por foto.
    web de la familia se ve cuántos días de losartán le quedan.
 3. **La falsa alarma.** Un golpe fuerte junto al teléfono. Sale «¿Está bien?», «Carmen» dice que
    está bien y no escala. Es el filtro: despreocupar, no angustiar.
-4. **La alerta.** Otro golpe y nadie responde. Mientras corren los 60 s se cuenta el problema, con
-   las cifras. Al vencer, se pone roja la web de todos los que escanearon, a cada uno le llega el
-   Telegram y la casa llama por WhatsApp al hijo. Los tiempos son los del producto:
-   nada se acelera.
+4. **La alerta.** Otro golpe y nadie responde. En la tarima la espera es de 15 s y no de 60
+   (decidido el sábado 22:30, por los 3 minutos del pitch), y se dice en voz alta: «En la casa
+   son 60 segundos; aquí, 15». Al vencer, se pone roja la web de todos los que escanearon, a cada
+   uno le llega el Telegram y la casa llama por WhatsApp a Josuep. La base escala con la misma
+   espera, porque la casa se la manda con la alerta. Es el APK compilado con
+   `--dart-define=DEMO=true`; el que se descarga del repo usa 60 s.
 
 Si algo falla en vivo, `/f/demo?escenario=alerta` muestra lo mismo con datos simulados, y queda el
 video de respaldo.
