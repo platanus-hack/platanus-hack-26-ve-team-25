@@ -85,6 +85,12 @@ export default async function Page(props: PageProps<"/f/[token]/bienvenida">) {
           Ver cómo está ahora
         </Link>
       </div>
+      <Link
+        href="/privacidad"
+        className="mt-auto self-center pt-4 text-[14px] text-gris underline underline-offset-2"
+      >
+        Política de privacidad
+      </Link>
     </main>
   );
 }
