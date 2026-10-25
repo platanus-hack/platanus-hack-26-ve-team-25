@@ -277,6 +277,9 @@ button {
 
 .marco-url {
   font-size: 1.6cqh;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--gris);
   background: var(--superficie-alta);
   border-radius: 0.4cqh;
@@ -448,7 +451,7 @@ button {
 }
 
 .telefono-reloj {
-  font-size: 2.6cqh;
+  font-size: 3.3cqh;
   color: var(--tinta);
   font-variant-numeric: tabular-nums;
 }
@@ -474,7 +477,7 @@ button {
 }
 
 .telefono-pregunta {
-  font-size: 4.6cqh;
+  font-size: 5.8cqh;
   font-weight: 700;
   color: var(--tinta);
   text-align: center;
@@ -487,7 +490,7 @@ button {
 
 .telefono-boton {
   width: 100%;
-  height: 5cqh;
+  height: 6.4cqh;
   background: var(--verde-claro);
   border-radius: 1.2cqh;
   display: flex;
@@ -499,9 +502,9 @@ button {
 
 .telefono-riel {
   position: absolute;
-  left: 0.4cqw;
-  width: 3.5cqw;
-  height: 4.2cqh;
+  left: 0.5cqw;
+  width: 4.4cqw;
+  height: 5.4cqh;
   background: var(--verde);
   border-radius: 1cqh;
 }
@@ -539,9 +542,9 @@ button {
 
 .telefono-en-vivo {
   position: absolute;
-  top: 1.4cqh;
-  left: 1.4cqh;
-  font-size: 1.1cqh;
+  top: 1.8cqh;
+  left: 1.6cqw;
+  font-size: 1.3cqh;
   font-weight: 700;
   letter-spacing: 0.14em;
   color: #fff;

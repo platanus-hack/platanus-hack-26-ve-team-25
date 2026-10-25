@@ -127,8 +127,8 @@ export default function LaFamilia({ activa = false }: Props) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "4cqw",
+          gridTemplateColumns: "1.25fr 0.75fr",
+          gap: "3cqw",
           flex: 1,
           minHeight: 0,
           alignItems: "stretch",
@@ -146,7 +146,7 @@ export default function LaFamilia({ activa = false }: Props) {
               border: "1px solid var(--borde)",
               background: "var(--superficie)",
               // En vivo manda el video a sangre; si no, el mockup con su respiración.
-              padding: vivo || porAdb ? "0" : "2.2cqh 1.6cqw",
+              padding: vivo || porAdb ? "0" : "2.8cqh 2cqw",
               justifyContent: vivo || porAdb ? "center" : "space-between",
               gap: "0",
               overflow: "hidden",
@@ -180,7 +180,7 @@ export default function LaFamilia({ activa = false }: Props) {
                   <svg
                     viewBox="0 0 100 100"
                     aria-hidden="true"
-                    style={{ width: "11cqh", height: "11cqh", flex: "0 0 auto" }}
+                    style={{ width: "14cqh", height: "14cqh", flex: "0 0 auto" }}
                   >
                     <circle cx={50} cy={50} r={RADIO} fill="none" stroke="var(--borde)" strokeWidth={4} />
                     <circle
@@ -206,14 +206,14 @@ export default function LaFamilia({ activa = false }: Props) {
                     </text>
                   </svg>
                 </div>
-                <div className="telefono-boton" style={{ paddingLeft: "calc(3.5cqw + 1cqw)" }}>
+                <div className="telefono-boton" style={{ paddingLeft: "calc(4.4cqw + 1.2cqw)" }}>
                   <div className="telefono-riel" aria-hidden="true" />
                   <span
                     className="telefono-desliza"
                     style={{
                       position: "relative",
                       zIndex: 1,
-                      fontSize: "1.45cqh",
+                      fontSize: "1.7cqh",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                     }}
