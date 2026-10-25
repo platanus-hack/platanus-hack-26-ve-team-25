@@ -39,6 +39,10 @@ guarda lo que está en el récipe. Falta encenderla:
       más alta y con letra de 27, y el borde de los botones a 3,8:1 de contraste. Captura sin
       teléfono: `flutter test --run-skipped --update-goldens -t captura` →
       [`app/test/capturas/reposo.png`](../app/test/capturas/reposo.png).
+- [x] **Probado en el Samsung (domingo 00:00–00:10), y dos arreglos:** la alarma se callaba sola a
+      los 10 s porque Vosk oía la frase del propio teléfono («Diga "Lucero, estoy bien"…»), y
+      toda versión release se cerraba al abrir porque R8 renombraba las clases de JNA que usa Vosk
+      (ahora hay `proguard-rules.pro`). El Release `casa-v0.1.0` ya tiene el APK arreglado.
 - [x] **Sin «Leer récipe» en el teléfono de mesa** (sábado 24, 23:55): el botón solo decía que no
       estaba listo. «Pedir ayuda» ocupa ahora toda la columna derecha. Leer una foto se hace desde la
       web de la familia, desplegada en Vercel: la factura en
