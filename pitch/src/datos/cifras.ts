@@ -39,18 +39,5 @@ export const cifrasContexto: readonly Cifra[] = [
   },
 ] as const;
 
-/** Serie de la migración venezolana 2015–2024 (en millones). Fuente: ACNUR/R4V, 2024 */
-export const migracion: readonly { ano: number; millones: number }[] = [
-  { ano: 2015, millones: 0.695 },
-  { ano: 2016, millones: 1.0 },
-  { ano: 2017, millones: 1.6 },
-  { ano: 2018, millones: 2.6 },
-  { ano: 2019, millones: 3.93 },
-  { ano: 2020, millones: 5.4 },
-  { ano: 2021, millones: 6.0 },
-  { ano: 2022, millones: 7.1 },
-  { ano: 2023, millones: 7.7 },
-  { ano: 2024, millones: 7.89 },
-] as const;
-
-/* Las series de tiemposAviso y accidentes se eliminaron: ya no se usan en el deck. */
+/* La serie de la migración (2015–2024) se quitó junto con la gráfica de la lámina 2;
+   si vuelve a hacer falta, está en el historial de git. */

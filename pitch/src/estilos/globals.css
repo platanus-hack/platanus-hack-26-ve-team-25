@@ -325,14 +325,20 @@ button {
 .kpi-lista {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Dos filas iguales que se reparten todo el alto libre de la columna: los bloques
+     respiran hacia abajo en vez de amontonarse bajo el titular. */
+  grid-template-rows: 1fr 1fr;
   gap: 2cqh 4cqw;
   padding: 2cqh 0;
+  flex: 1;
+  min-height: 0;
 }
 
 .kpi {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   gap: 0.3cqh;
 }

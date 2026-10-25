@@ -1,10 +1,9 @@
-import GraficaArea from "../componentes/GraficaArea";
 import { cifrasContexto } from "../datos/cifras";
 
 /**
  * Lámina 2 · El que se queda (fusionada con Los números)
  * Columna derecha: foto a sangre con fundido.
- * Columna izquierda: titular, 4 KPIs en grid 2×2, gráfica de migración.
+ * Columna izquierda: titular y los 4 KPIs en grid 2×2, repartidos en todo el alto libre.
  */
 export default function ElQueSeQueda() {
   return (
@@ -56,19 +55,6 @@ export default function ElQueSeQueda() {
           ))}
         </div>
 
-        {/* Gráfica de migración: se queda con todo el alto que sobre, sin desbordar */}
-        <div className="grafica" style={{ flex: 1, minHeight: 0 }}>
-          <GraficaArea />
-          <div
-            style={{
-              fontSize: "1.1cqh",
-              color: "var(--gris)",
-              textAlign: "center",
-            }}
-          >
-            ACNUR/R4V, 2024
-          </div>
-        </div>
       </div>
     </>
   );
