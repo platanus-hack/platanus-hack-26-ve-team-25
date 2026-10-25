@@ -69,7 +69,7 @@ class Controlador extends ChangeNotifier {
   /// Cuando falta esto para avisar, la voz de la alarma dice a quién va a llamar.
   static const avisoFinal = Duration(seconds: 20);
 
-  /// Con los 15 s de la tarima no hay un segundo turno de voz: si el aviso final reemplazara la
+  /// Con los 10 s de la tarima no hay un segundo turno de voz: si el aviso final reemplazara la
   /// frase, nunca se oiría «¿Está bien?». Ahí solo pregunta, y la pantalla dice a quién llama.
   static final diceElFinal = esperaConfirmacion > avisoFinal;
 
@@ -612,7 +612,10 @@ class Controlador extends ChangeNotifier {
     }
   }
 
-  /// Lo que dice la voz del teléfono entre los tonos de «¿Está bien?».
+  /// Lo primero que dice Lucero apenas nace la alerta: corto, para oír la respuesta de una vez.
+  String get preguntaCorta => '${casa.nombre}, ¿está bien?';
+
+  /// Lo que dice en los turnos siguientes de «¿Está bien?».
   String get fraseDeLaAlarma =>
       '${casa.nombre}, ¿está bien? Diga «$nombreDeLaCasa, estoy bien», o deslice el botón.';
 
@@ -622,6 +625,7 @@ class Controlador extends ChangeNotifier {
       : '${casa.nombre}, si no responde, voy a avisar a su familia.';
 
   bool _dijoElFinal = false;
+  bool _sonoElTono = false;
 
   // Una línea por minuto en el log (make logs), para saber qué se trabó si algo se traba: si deja
   // de aparecer, se trabó la app; si el oído da 0, se cayó el micrófono; si la cola crece, no hay
@@ -651,6 +655,13 @@ class Controlador extends ChangeNotifier {
       _dijoElFinal = true;
       unawaited(sirena?.decir(fraseDelFinal));
     }
+    // Los últimos segundos antes de llamar, el tono y la vibración, para quien no oyó la voz.
+    if (!_sonoElTono &&
+        pendiente?.estado == EstadoAlerta.pendiente &&
+        pendiente!.restante(ahora) <= sirenaAlFinal) {
+      _sonoElTono = true;
+      unawaited(sirena?.tono());
+    }
     final llamada = porLlamar;
     if (llamada != null && porLlamarRestante == Duration.zero) {
       unawaited(_llamarYa(llamada));
@@ -667,7 +678,8 @@ class Controlador extends ChangeNotifier {
     final ahoraPendiente = nueva?.estado == EstadoAlerta.pendiente;
     if (ahoraPendiente && (naciendo || antes != EstadoAlerta.pendiente)) {
       _dijoElFinal = false;
-      unawaited(sirena?.sonar(fraseDeLaAlarma));
+      _sonoElTono = false;
+      unawaited(sirena?.sonar(fraseDeLaAlarma, primera: preguntaCorta));
     } else if (!ahoraPendiente && antes == EstadoAlerta.pendiente) {
       unawaited(sirena?.callar());
       _sordoHasta = ahora.add(sordoTrasLaAlarma);

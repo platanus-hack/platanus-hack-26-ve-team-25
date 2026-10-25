@@ -1,14 +1,14 @@
 import 'tipos.dart';
 
 /// Cuánto espera la casa a que la persona responda antes de avisar a la familia.
-/// En el demo se corre con `--dart-define=DEMO=true` para que sean 15 s.
+/// En el demo se corre con `--dart-define=DEMO=true` para que sean 10 s.
 const esperaConfirmacion = bool.fromEnvironment('DEMO')
-    ? Duration(seconds: 15)
+    ? Duration(seconds: 10)
     : Duration(seconds: 60);
 
-/// Cuántos ciclos de 4 s del tono suenan antes de que la voz pregunte. Con 60 s son dos; con los
-/// 15 s de la tarima, uno: así la pregunta y su ventana callada (4 s) caben antes de avisar.
-const ciclosAntesDeLaPregunta = bool.fromEnvironment('DEMO') ? 1 : 2;
+/// Primero pregunta la voz, de una vez y sin tono; el tono de 520 Hz y la vibración entran solo
+/// cuando falta esto para avisar, para quien no oyó la pregunta.
+const sirenaAlFinal = Duration(seconds: 3);
 
 /// Los estados de una alerta, con las únicas transiciones válidas:
 ///

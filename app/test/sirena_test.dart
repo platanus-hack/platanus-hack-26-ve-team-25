@@ -29,7 +29,11 @@ class SirenaFalsa implements Sirena {
   Stream<bool> get hablando => _hablando.stream;
 
   @override
-  Future<void> sonar(String frase) async => pasos.add('sonar: $frase');
+  Future<void> sonar(String frase, {String? primera}) async =>
+      pasos.add('sonar: $primera → $frase');
+
+  @override
+  Future<void> tono() async => pasos.add('tono');
 
   @override
   Future<void> decir(String frase) async => pasos.add('decir: $frase');
@@ -77,13 +81,36 @@ void main() {
   });
   tearDown(() => c.dispose());
 
-  test('«¿Está bien?» suena mientras espera y se calla con «Estoy bien»', () {
+  test('Lucero pregunta de una vez, corto, y se calla con «Estoy bien»', () {
     c.oirEvento(TipoEvento.alarma);
     expect(sirena.pasos, [
-      'sonar: Carmen, ¿está bien? Diga «Lucero, estoy bien», o deslice el botón.',
+      'sonar: Carmen, ¿está bien? → '
+          'Carmen, ¿está bien? Diga «Lucero, estoy bien», o deslice el botón.',
     ]);
     c.estoyBien();
     expect(sirena.pasos.last, 'callar');
+  });
+
+  testWidgets('el tono entra recién en los últimos 3 s, una sola vez', (
+    tester,
+  ) async {
+    final c = Controlador(
+      casa: casaSimulada,
+      reloj: () => ahora,
+      sirena: sirena,
+    );
+    c.oirEvento(TipoEvento.golpe);
+    ahora = ahora.add(
+      esperaConfirmacion - sirenaAlFinal - const Duration(seconds: 1),
+    );
+    await tester.pump(const Duration(seconds: 1));
+    expect(sirena.pasos, isNot(contains('tono')));
+    ahora = ahora.add(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    ahora = ahora.add(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(sirena.pasos.where((p) => p == 'tono'), hasLength(1));
+    c.dispose();
   });
 
   test('se calla al escalar: ya no pregunta, avisa', () {
@@ -129,7 +156,7 @@ void main() {
 
   // Con DEMO=true: flutter test --dart-define=DEMO=true test/sirena_test.dart
   testWidgets(
-    'en la tarima (15 s) no cambia la frase: siempre pregunta «¿Está bien?»',
+    'en la tarima (10 s) no cambia la frase: siempre pregunta «¿Está bien?»',
     (tester) async {
       final c = Controlador(
         casa: casaSimulada,
@@ -142,11 +169,11 @@ void main() {
         await tester.pump(const Duration(seconds: 1));
       }
       expect(sirena.pasos.where((p) => p.startsWith('decir')), isEmpty);
-      // La primera pregunta (unos 5 s de voz lenta) y su ventana callada de 4 s caben antes de
-      // avisar.
+      // La pregunta corta (unos 2 s de voz lenta) y su ventana callada de 4 s caben antes de
+      // que entre el tono.
       expect(
-        ciclosAntesDeLaPregunta * 4 + 5 + 4,
-        lessThanOrEqualTo(esperaConfirmacion.inSeconds),
+        const Duration(seconds: 2 + 4),
+        lessThanOrEqualTo(esperaConfirmacion - sirenaAlFinal),
       );
       c.dispose();
     },

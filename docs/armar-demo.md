@@ -85,7 +85,7 @@ Los números van en `app/config/local.json`, que no se sube al repo:
 |---|---|---|
 | 0 | En el Samsung, `/f/demo/pastillas/factura`: foto de la factura impresa y confirmar | Sube el losartán y cambian los días que alcanzan; lo que no está en el récipe no se guarda |
 | 1 | Mantener presionado «Pastillas de hoy» y decir «ya me la tomé» | Se quita el recordatorio; en `/f/demo/pastillas` del Samsung el losartán baja uno |
-| 2 | Un golpe fuerte cerca y decir «Lucero, estoy bien» | Suena el tono de 520 Hz, habla la voz, y se calla sin avisar a nadie |
+| 2 | Un golpe fuerte cerca y decir «Lucero, estoy bien» | Lucero pregunta «Carmen, ¿está bien?» de una vez, y se calla sin avisar a nadie |
 | 3 | Otro golpe y no responder | A los 40 s la voz dice que va a llamar a Josuep; a los 60 s el Samsung se pone rojo, le llega el Telegram y suena el WhatsApp |
 | 3b | En el Samsung, no contestar el WhatsApp ni la llamada | Al terminar la llamada, el Infinix pregunta «¿Pudo hablar con Josuep?»; a los 15 s llama al iPhone («el 911») en altavoz |
 | 4 | Decir «Lucero, llama a emergencias» | Pantalla roja con 5 s; el iPhone recibe una llamada normal, con el Infinix en altavoz |
@@ -117,7 +117,7 @@ de `local.json`, nunca el 911 de verdad.
 | # | Decir | Tiene que pasar |
 |---|---|---|
 | V8 | «Lucero, estoy bien» en los 4 s de «Le escucho» | Se calla y no avisa |
-| V9 | «Lucero, estoy bien» encima del tono | Se calla (prueba el filtro de la sirena) |
+| V9 | «Lucero, estoy bien» encima del tono, en los últimos 3 s | Se calla (prueba el filtro de la sirena) |
 | V10 | «Estoy bien», sin «Lucero» | No se calla |
 | V11 | «Ayuda» · «me caí» · «no» | Llama a Josuep de una vez |
 
