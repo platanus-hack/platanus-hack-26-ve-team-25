@@ -117,10 +117,13 @@ export function AlertaUrgente({
   casa,
   vista,
   onAtendida,
+  foto,
 }: {
   casa: Casa;
   vista: Extract<Vista, { tipo: "alerta" }>;
   onAtendida: () => void;
+  /** La foto que tomó la casa antes de llamar (foto-casa.tsx), si la hay. */
+  foto?: ReactNode;
 }) {
   const vecino = segundoContacto(casa);
   const condiciones = mayuscula(casa.condiciones.map((c) => CONDICION[c] ?? c).join(" · "));
@@ -143,6 +146,7 @@ export function AlertaUrgente({
             <span key={h}>{h}</span>
           ))}
         </div>
+        {foto}
         {condiciones && <div className="text-[15px] text-rojo-texto">{condiciones}</div>}
         <div className="mt-auto flex flex-col gap-2.5">
           <Boton href={tel(casa.telefono)} variante="blanco">

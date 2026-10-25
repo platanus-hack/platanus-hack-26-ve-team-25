@@ -6,6 +6,7 @@ import { atender, derivarVista } from "@/lib/familia/estado";
 import { resumenPastillas } from "@/lib/familia/inventario";
 import { atenderAlerta, leerCasa } from "@/lib/familia/supabase";
 import type { DatosCasa } from "@/lib/familia/tipos";
+import { FotoDeLaCasa } from "./foto-casa";
 import { AlertaUrgente, SinSenal, TodoBien } from "./pantallas";
 import { enlace } from "./pastillas";
 
@@ -90,7 +91,14 @@ export function VistaFamilia({
 
   switch (vista.tipo) {
     case "alerta":
-      return <AlertaUrgente casa={datos.casa} vista={vista} onAtendida={() => alAtender(vista.alerta.id)} />;
+      return (
+        <AlertaUrgente
+          casa={datos.casa}
+          vista={vista}
+          onAtendida={() => alAtender(vista.alerta.id)}
+          foto={origen === "supabase" ? <FotoDeLaCasa token={token} desde={vista.alerta.creada} /> : null}
+        />
+      );
     case "sin_senal":
       return <SinSenal casa={datos.casa} vista={vista} ahora={ahora} />;
     case "bien":

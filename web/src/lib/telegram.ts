@@ -61,3 +61,34 @@ export async function enviarTexto(
     return { ok: false, error: msg };
   }
 }
+
+/**
+ * Envía una foto JPEG con su pie de texto (sendPhoto, hasta 1024 caracteres). Mismo contrato que
+ * `enviarTexto`: no lanza. Timeout de 15 s, porque sube la imagen.
+ */
+export async function enviarFoto(
+  chatId: string,
+  jpg: Uint8Array<ArrayBuffer>,
+  pie: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return { ok: false, error: "sin TELEGRAM_BOT_TOKEN" };
+  const id = chatId.replace(/\D/g, "");
+  if (!id) return { ok: false, error: "chat_id vacío" };
+
+  const form = new FormData();
+  form.append("chat_id", id);
+  form.append("caption", pie.slice(0, 1024));
+  form.append("photo", new Blob([jpg], { type: "image/jpeg" }), "casa.jpg");
+  try {
+    const res = await fetch(`${URL_TELEGRAM_BASE}/bot${token}/sendPhoto`, {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return { ok: false, error: `Telegram ${res.status}: ${(await res.text()).slice(0, 200)}` };
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "error desconocido" };
+  }
+}
