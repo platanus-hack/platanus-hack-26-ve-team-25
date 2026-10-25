@@ -4,7 +4,6 @@ import Marco from "../componentes/Marco";
  * Lámina 4 · La familia
  * Izquierda: mockup del teléfono de la casa con la pregunta «¿Está bien?» y la cuenta de 60 s.
  * Derecha: página de la familia en estado de alerta (tarjeta roja con dos botones).
- * Entre ambos (como banda horizontal bajo el titular): flujo casa → Supabase → Telegram.
  *
  * El anillo de progreso SVG usa stroke-dasharray. Para un círculo de radio R,
  * la circunferencia es 2πR. Un 20 % de progreso deja 80 % vacío.
@@ -17,59 +16,14 @@ const DASH = CIRC * PROGRESO;
 export default function LaFamilia() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2cqh", height: "100%" }}>
-      <img src="/presente-logo.svg" alt="Presente" className="portada-logo" width={918} height={180} />
-
-      {/* Flujo horizontal: banda entre los dos paneles */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "2cqw",
-          fontSize: "2.1cqh",
-          color: "var(--texto)",
-          padding: "1cqh 0",
-        }}
-      >
-        <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
-          <span
-            style={{
-              width: "0.8cqh",
-              height: "0.8cqh",
-              borderRadius: "50%",
-              background: "var(--verde)",
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ whiteSpace: "nowrap" }}>casa</span>
-        </span>
-        <span style={{ color: "var(--gris)", fontSize: "2.3cqh" }}>→</span>
-        <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
-          <span
-            style={{
-              width: "0.8cqh",
-              height: "0.8cqh",
-              borderRadius: "50%",
-              background: "var(--verde)",
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ whiteSpace: "nowrap" }}>Supabase</span>
-        </span>
-        <span style={{ color: "var(--gris)", fontSize: "2.3cqh" }}>→</span>
-        <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
-          <span
-            style={{
-              width: "0.8cqh",
-              height: "0.8cqh",
-              borderRadius: "50%",
-              background: "var(--verde)",
-              flexShrink: 0,
-            }}
-          />
-          <span style={{ whiteSpace: "nowrap" }}>Telegram</span>
-        </span>
-      </div>
+      <img
+        src="/presente-logo.svg"
+        alt="Presente"
+        className="portada-logo"
+        width={918}
+        height={180}
+        style={{ alignSelf: "flex-start" }}
+      />
 
       {/* Los dos paneles: teléfono (izq) y navegador (der), alineados al mismo centro vertical */}
       <div
@@ -170,10 +124,6 @@ export default function LaFamilia() {
             </div>
           </Marco>
         </div>
-      </div>
-
-      <div className="fuente" style={{ textAlign: "center" }}>
-        Sin cuenta. Sin app que descargar. El enlace es la llave.
       </div>
     </div>
   );
