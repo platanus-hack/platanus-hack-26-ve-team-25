@@ -107,7 +107,7 @@ export default function App() {
   const laminas = [
     <Portada key="1" />,
     <ElQueSeQueda key="2" />,
-    <LaFamilia key="3" />,
+    <LaFamilia key="3" activa={actual === 3} />,
     <Cierre key="4" />,
   ];
 

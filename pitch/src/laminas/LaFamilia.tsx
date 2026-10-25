@@ -1,8 +1,10 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import Marco from "../componentes/Marco";
 
 /**
- * Lámina 4 · La familia
- * Izquierda: mockup del teléfono de la casa con la pregunta «¿Está bien?» y la cuenta de 60 s.
+ * Lámina 3 · La familia
+ * Izquierda: el teléfono de la casa. Por defecto es un mockup dibujado en CSS; con la tecla
+ * `V` se le enchufa la ventana de scrcpy y entonces muestra la app de verdad, en vivo.
  * Derecha: página de la familia en estado de alerta (tarjeta roja con dos botones).
  *
  * El anillo de progreso SVG usa stroke-dasharray. Para un círculo de radio R,
@@ -13,7 +15,71 @@ const CIRC = 2 * Math.PI * RADIO;
 const PROGRESO = 0.2; // 20 % congelado
 const DASH = CIRC * PROGRESO;
 
-export default function LaFamilia() {
+interface Props {
+  /** True cuando la lámina está en pantalla: solo entonces atiende la tecla V. */
+  activa?: boolean;
+}
+
+export default function LaFamilia({ activa = false }: Props) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const flujoRef = useRef<MediaStream | null>(null);
+  const [vivo, setVivo] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  /** Suelta la ventana capturada y vuelve al mockup. */
+  const soltar = useCallback(() => {
+    flujoRef.current?.getTracks().forEach((pista) => pista.stop());
+    flujoRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    setVivo(false);
+  }, []);
+
+  /** Pide al navegador que capture una ventana (la de scrcpy). */
+  const tomar = useCallback(async () => {
+    setAviso(null);
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      setAviso("Este navegador no deja capturar ventanas.");
+      return;
+    }
+    try {
+      const flujo = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: 30 },
+        audio: false,
+      });
+      flujo.getVideoTracks()[0]?.addEventListener("ended", soltar);
+      flujoRef.current = flujo;
+      setVivo(true);
+    } catch {
+      // Cancelar el selector también entra aquí: no es un error que haya que gritar.
+      setAviso("No se eligió ninguna ventana.");
+    }
+  }, [soltar]);
+
+  // El <video> no existe hasta que `vivo` es true: el flujo se enchufa justo después.
+  useEffect(() => {
+    if (!vivo || !videoRef.current || !flujoRef.current) return;
+    videoRef.current.srcObject = flujoRef.current;
+    videoRef.current.play().catch(() => setAviso("El navegador no dejó reproducir la ventana."));
+  }, [vivo]);
+
+  // Si la lámina se desmonta, no queda una captura de pantalla viva por ahí.
+  useEffect(() => () => soltar(), [soltar]);
+
+  useEffect(() => {
+    if (!activa) return;
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key !== "v" && e.key !== "V") return;
+      e.preventDefault();
+      if (vivo) {
+        soltar();
+      } else {
+        void tomar();
+      }
+    };
+    window.addEventListener("keydown", alPulsar);
+    return () => window.removeEventListener("keydown", alPulsar);
+  }, [activa, vivo, soltar, tomar]);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2cqh", height: "100%" }}>
       <img
@@ -37,78 +103,101 @@ export default function LaFamilia() {
         }}
       >
         {/* Teléfono de la casa: proporción 9:19, vertical, centrado en su celda */}
-        <div
-          className="telefono"
-          style={{
-            width: "30cqh",
-            height: "64cqh",
-            borderRadius: "3cqh",
-            border: "1px solid var(--borde)",
-            background: "var(--superficie)",
-            padding: "2.5cqh 2cqw",
-            margin: "0 auto",
-            justifyContent: "space-between",
-            gap: "0",
-          }}
-        >
-          <div className="telefono-reloj">16:24</div>
-          <div className="telefono-pregunta" style={{ fontSize: "3.2cqh", whiteSpace: "nowrap" }}>¿Está bien?</div>
-          <svg
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-            style={{ width: "14cqh", height: "14cqh", flex: "0 0 auto" }}
+        <div style={{ display: "grid", justifyItems: "center", gap: "1.4cqh" }}>
+          <div
+            className="telefono"
+            style={{
+              width: "30cqh",
+              height: "64cqh",
+              borderRadius: "3cqh",
+              border: "1px solid var(--borde)",
+              background: "var(--superficie)",
+              // En vivo manda el video a sangre; si no, el mockup con su respiración.
+              padding: vivo ? "0" : "2.5cqh 2cqw",
+              justifyContent: vivo ? "center" : "space-between",
+              gap: "0",
+              overflow: "hidden",
+              position: "relative",
+            }}
           >
-            <circle
-              cx={50}
-              cy={50}
-              r={RADIO}
-              fill="none"
-              stroke="var(--borde)"
-              strokeWidth={4}
-            />
-            <circle
-              cx={50}
-              cy={50}
-              r={RADIO}
-              fill="none"
-              stroke="var(--verde)"
-              strokeWidth={4}
-              strokeLinecap="round"
-              strokeDasharray={`${DASH} ${CIRC - DASH}`}
-              transform="rotate(-90 50 50)"
-            />
-            <text
-              x={50}
-              y={56}
-              fontSize={18}
-              fontWeight={700}
-              textAnchor="middle"
-              fill="var(--tinta)"
-            >
-              48 s
-            </text>
-          </svg>
-          <div className="telefono-boton" style={{ paddingLeft: "calc(3.5cqw + 1cqw)" }}>
-            <div className="telefono-riel" aria-hidden="true" />
-            <span
-              className="telefono-desliza"
-              style={{
-                position: "relative",
-                zIndex: 1,
-                fontSize: "1.45cqh",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-              }}
-            >
-              Desliza si estás bien
-            </span>
+            {vivo ? (
+              <>
+                <video ref={videoRef} muted playsInline autoPlay className="telefono-vivo" />
+                <span className="telefono-en-vivo">EN VIVO</span>
+              </>
+            ) : (
+              <>
+                <div className="telefono-reloj">16:24</div>
+                <div className="telefono-pregunta" style={{ fontSize: "3.2cqh", whiteSpace: "nowrap" }}>
+                  ¿Está bien?
+                </div>
+                <svg
+                  viewBox="0 0 100 100"
+                  aria-hidden="true"
+                  style={{ width: "14cqh", height: "14cqh", flex: "0 0 auto" }}
+                >
+                  <circle cx={50} cy={50} r={RADIO} fill="none" stroke="var(--borde)" strokeWidth={4} />
+                  <circle
+                    cx={50}
+                    cy={50}
+                    r={RADIO}
+                    fill="none"
+                    stroke="var(--verde)"
+                    strokeWidth={4}
+                    strokeLinecap="round"
+                    strokeDasharray={`${DASH} ${CIRC - DASH}`}
+                    transform="rotate(-90 50 50)"
+                  />
+                  <text
+                    x={50}
+                    y={56}
+                    fontSize={18}
+                    fontWeight={700}
+                    textAnchor="middle"
+                    fill="var(--tinta)"
+                  >
+                    48 s
+                  </text>
+                </svg>
+                <div className="telefono-boton" style={{ paddingLeft: "calc(3.5cqw + 1cqw)" }}>
+                  <div className="telefono-riel" aria-hidden="true" />
+                  <span
+                    className="telefono-desliza"
+                    style={{
+                      position: "relative",
+                      zIndex: 1,
+                      fontSize: "1.45cqh",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                    }}
+                  >
+                    Desliza si estás bien
+                  </span>
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Pista solo para quien presenta: no aparece si la lámina no está en pantalla */}
+          {activa && (
+            <div className="pista-vivo">
+              {aviso ?? (vivo ? "V para soltar la ventana" : "V para ver el teléfono en vivo")}
+            </div>
+          )}
         </div>
 
         {/* Marco del navegador centrado verticalmente en el mismo eje */}
         <div style={{ height: "64cqh", display: "flex", alignItems: "center" }}>
           <Marco url="platanus-hack-26-ve-team-25.vercel.app/f/carmen">
-            <div style={{ padding: "2cqh 2cqw", display: "flex", flexDirection: "column", gap: "1.5cqh", height: "100%" }}>
+            <div
+              style={{
+                padding: "2cqh 2cqw",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.5cqh",
+                height: "100%",
+              }}
+            >
               <div className="alerta">
                 <div className="alerta-titulo">Carmen no responde</div>
                 <div className="alerta-tiempo">1 min 12 s</div>

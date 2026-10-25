@@ -492,6 +492,36 @@ button {
   color: var(--gris);
 }
 
+/* La ventana de scrcpy enchufada dentro del marco del teléfono */
+.telefono-vivo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.telefono-en-vivo {
+  position: absolute;
+  top: 1.4cqh;
+  left: 1.4cqh;
+  font-size: 1.1cqh;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #fff;
+  background: var(--rojo);
+  border-radius: 0.6cqh;
+  padding: 0.5cqh 1cqh;
+}
+
+/* Pista de teclado, solo visible con la lámina en pantalla */
+.pista-vivo {
+  font-size: 1.2cqh;
+  color: var(--gris);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
 /* Tarjeta de alerta (página de la familia) */
 .alerta {
   background: var(--rojo-tarjeta);

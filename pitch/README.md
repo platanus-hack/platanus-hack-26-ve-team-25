@@ -26,8 +26,24 @@ Abre http://localhost:4173 en el navegador.
 - **End**: ir a la última lámina
 - **f**: pantalla completa (Escape para salir)
 - **Clic** en la mitad izquierda o derecha de la pantalla: navegar
+- **v** (solo en la lámina 3): enchufar o soltar la ventana de scrcpy dentro del teléfono
 
-También puedes ir directamente a una lámina con el hash: `#1`, `#2`, `#3`, `#4`, `#5`.
+También puedes ir directamente a una lámina con el hash: `#1`, `#2`, `#3`, `#4`.
+
+## El teléfono en vivo (scrcpy)
+
+La lámina 3 dibuja el teléfono de la casa con CSS, pero puede mostrar el teléfono **de verdad**:
+
+1. Antes de subir a tarima, con el teléfono conectado: `scrcpy`.
+2. En el navegador, abre la lámina 3 y pulsa **v**. Se abre el selector de ventanas del navegador.
+3. Elige la ventana de scrcpy. La app aparece en vivo dentro del marco del teléfono.
+
+Otra **v** la suelta y vuelve el mockup. El selector es un diálogo del sistema, así que hay que
+elegir la ventana **antes** del pitch: en mitad de la presentación no queda bien. Si no se concede
+el permiso, se queda el mockup y el deck sigue funcionando igual.
+
+Funciona en `localhost` y en la URL desplegada (las dos son contexto seguro). El video no sale del
+navegador: se reproduce en memoria y no se graba ni se envía a ningún sitio.
 
 ## Cómo desplegar
 
