@@ -1,0 +1,668 @@
+/* ==========================================================================
+   En Casa — Pitch
+   Sistema visual del producto. Las variables son los colores oficiales.
+   Todo escala con cqw/cqh dentro del escenario (container-type: size).
+   No hay fuentes externas: system-ui, y punto.
+   ========================================================================== */
+
+:root {
+  --papel: #131312;
+  --superficie: #1b1b19;
+  --superficie-alta: #232320;
+  --tinta: #f5f5f2;
+  --texto: #b9b9b2;
+  --gris: #85857c;
+  --borde: #2a2a27;
+  --linea: #232320;
+
+  --verde: #7ee2a8;
+  --verde-profundo: #14532d;
+  --verde-claro: #1e2b22;
+  --ok: #4ade80;
+
+  --rojo: #c8352a;
+  --rojo-tarjeta: #8f1d16;
+  --rojo-texto: #fde8e7;
+  --rojo-borde: #5c2a26;
+
+  /* Tipografía */
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Tamaño del QR de Telegram que va fijo en todas las láminas.
+     Sube o baja este número y cambia en todas a la vez. */
+  --qr-tamano: 11cqh;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#raiz {
+  height: 100%;
+  width: 100%;
+  background: var(--papel);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Números tabulares para las cifras (peso 700 siempre) */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Escenario — el "proyector"
+   Mantiene 16:9 centrado, con container queries para el escalado.
+   ========================================================================== */
+
+.escenario {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  background: var(--papel);
+  overflow: hidden;
+  container-type: size;
+  container-name: escenario;
+}
+
+/* Cada lámina ocupa todo el escenario */
+.lamina {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 5cqh 6cqw;
+}
+
+.lamina[aria-hidden="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Tipografía
+   ========================================================================== */
+
+.titular {
+  font-size: 8cqh;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--tinta);
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+
+.titular-grande {
+  font-size: 11cqh;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tinta);
+  text-wrap: balance;
+  letter-spacing: -0.03em;
+}
+
+.subtitulo {
+  font-size: 3cqh;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--texto);
+  text-wrap: balance;
+}
+
+.etiqueta {
+  font-size: 1.6cqh;
+  font-weight: 500;
+  color: var(--texto);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.fuente {
+  font-size: 1.2cqh;
+  color: var(--gris);
+}
+
+.gris {
+  color: var(--gris);
+}
+
+.verde {
+  color: var(--verde);
+}
+
+/* ==========================================================================
+   Barra de progreso (segmentos, no puntos)
+   ========================================================================== */
+
+.barra-progreso {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0.35cqh;
+  display: flex;
+  gap: 0.2cqw;
+  padding: 0 2cqw;
+  z-index: 10;
+}
+
+.barra-segmento {
+  flex: 1;
+  background: var(--borde);
+  border-radius: 0.2cqh;
+  transition: background 120ms ease;
+}
+
+.barra-segmento.activo {
+  background: var(--verde);
+}
+
+.barra-segmento.pasado {
+  background: var(--gris);
+  opacity: 0.35;
+}
+
+.contador {
+  position: absolute;
+  bottom: 1.2cqh;
+  right: 2cqw;
+  font-size: 1.4cqh;
+  color: var(--gris);
+  font-variant-numeric: tabular-nums;
+  z-index: 10;
+}
+
+/* ==========================================================================
+   QR fijo (todas las láminas excepto Cierre)
+   ========================================================================== */
+
+.qr-fijo {
+  position: absolute;
+  top: 3.5cqh;
+  right: 3cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqh;
+  z-index: 20;
+}
+
+.qr-tarjeta {
+  background: #fff;
+  border: 0.15cqh solid var(--borde);
+  border-radius: 1cqh;
+  padding: 0.8cqh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-tarjeta img {
+  /* Un solo número manda sobre el QR de todas las láminas. Se sube o se baja aquí. */
+  width: var(--qr-tamano);
+  height: var(--qr-tamano);
+  display: block;
+}
+
+.qr-etiqueta {
+  font-size: 1.2cqh;
+  color: var(--gris);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Marco de navegador (lámina 4)
+   ========================================================================== */
+
+.marco {
+  background: var(--superficie);
+  border: 0.15cqh solid var(--borde);
+  border-radius: 1cqh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.marco-barra {
+  height: 3cqh;
+  background: var(--superficie-alta);
+  display: flex;
+  align-items: center;
+  padding: 0 1.2cqw;
+  gap: 0.8cqw;
+  border-bottom: 0.1cqh solid var(--borde);
+}
+
+.marco-puntos {
+  display: flex;
+  gap: 0.4cqw;
+}
+
+.marco-punto {
+  width: 1cqh;
+  height: 1cqh;
+  border-radius: 50%;
+  background: rgba(245, 245, 242, 0.15);
+}
+
+.marco-url {
+  font-size: 1.1cqh;
+  color: var(--gris);
+  background: var(--superficie-alta);
+  border-radius: 0.4cqh;
+  padding: 0.3cqh 0.8cqw;
+  flex: 1;
+}
+
+.marco-contenido {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Foto del señor (lámina 2)
+   La foto es vertical 1920x2743 (ratio ~0.70). La damos de alto 100% y
+   el ancho sale del ratio. Fundida hacia el papel con máscara.
+   ========================================================================== */
+
+.foto-sangre {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  aspect-ratio: 0.7015;
+  object-fit: cover;
+  /* Máscara lineal: fundido corto (~10% del ancho) para preservar la penumbra */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 3%,
+    rgba(0, 0, 0, 0.6) 7%,
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 3%,
+    rgba(0, 0, 0, 0.6) 7%,
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  filter: brightness(1.18) contrast(1.05);
+}
+
+/* ==========================================================================
+   KPIs (lámina 2 fusionada)
+   ========================================================================== */
+
+.kpi-lista {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2cqh 4cqw;
+  padding: 2cqh 0;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3cqh;
+}
+
+/* Solo la fila superior tiene separador */
+.kpi:nth-child(-n+2) {
+  padding-bottom: 2cqh;
+  border-bottom: 1px solid var(--linea);
+}
+
+.kpi-numero {
+  font-size: 6.5cqh;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--verde);
+}
+
+.kpi-numero.tinta {
+  color: var(--tinta);
+}
+
+.kpi-etiqueta {
+  font-size: 1.5cqh;
+  font-weight: 500;
+  color: var(--texto);
+  line-height: 1.3;
+}
+
+.kpi-fuente {
+  font-size: 1.1cqh;
+  color: var(--gris);
+}
+
+/* ==========================================================================
+   Gráficas (gráfica de área en lámina 2 fusionada)
+   ========================================================================== */
+
+.grafica {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2cqh;
+}
+
+.grafica-titulo {
+  font-size: 2.4cqh;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.grafica svg {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.grafica svg text {
+  font-family: var(--fuente);
+}
+
+/* ==========================================================================
+   Lámina 4 — familia
+   ========================================================================== */
+
+.familia-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2cqw;
+  flex: 1;
+  align-items: center;
+  min-height: 0;
+}
+
+.flujo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqh;
+  color: var(--gris);
+  font-size: 1.2cqh;
+}
+
+.flujo-paso {
+  white-space: nowrap;
+}
+
+.flujo-flecha {
+  width: 0.15cqw;
+  height: 2cqh;
+  background: var(--borde);
+  border-radius: 0.1cqw;
+}
+
+/* Mockup del teléfono de la casa */
+.telefono {
+  background: var(--superficie);
+  border: 0.25cqh solid var(--borde);
+  border-radius: 2cqh;
+  padding: 3cqh 2.5cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqh;
+  height: 100%;
+  position: relative;
+}
+
+.telefono-reloj {
+  font-size: 2cqh;
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;
+}
+
+.telefono-pregunta {
+  font-size: 5cqh;
+  font-weight: 700;
+  color: var(--tinta);
+  text-align: center;
+}
+
+.telefono-anillo {
+  width: 10cqh;
+  height: 10cqh;
+}
+
+.telefono-boton {
+  width: 100%;
+  height: 5cqh;
+  background: var(--verde-claro);
+  border-radius: 1.2cqh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.telefono-riel {
+  position: absolute;
+  left: 0.4cqw;
+  width: 5cqw;
+  height: 4.2cqh;
+  background: var(--verde);
+  border-radius: 1cqh;
+}
+
+.telefono-desliza {
+  font-size: 1.6cqh;
+  color: var(--verde);
+  font-weight: 500;
+}
+
+.telefono-pie {
+  font-size: 1.1cqh;
+  color: var(--gris);
+}
+
+/* Tarjeta de alerta (página de la familia) */
+.alerta {
+  background: var(--rojo-tarjeta);
+  color: var(--rojo-texto);
+  border-radius: 1cqh;
+  padding: 3cqh 2.5cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5cqh;
+}
+
+.alerta-titulo {
+  font-size: 3cqh;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.alerta-tiempo {
+  font-size: 5cqh;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.alerta-botones {
+  display: flex;
+  gap: 1.5cqw;
+  margin-top: 1cqh;
+}
+
+.alerta-boton {
+  flex: 1;
+  height: 4.5cqh;
+  border-radius: 0.8cqh;
+  font-size: 1.5cqh;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.alerta-boton.solido {
+  background: #fff;
+  color: var(--rojo-tarjeta);
+}
+
+.alerta-boton.borde {
+  border: 0.15cqh solid var(--rojo-borde);
+  color: var(--rojo-texto);
+}
+
+.alerta-estado {
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  font-size: 1.4cqh;
+  color: var(--texto);
+  margin-top: 1cqh;
+}
+
+.alerta-punto {
+  width: 0.8cqh;
+  height: 0.8cqh;
+  border-radius: 50%;
+  background: var(--ok);
+}
+
+/* ==========================================================================
+   Lámina 5 — Cierre
+   ========================================================================== */
+
+.cierre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 3cqh;
+}
+
+.cierre-frase {
+  font-size: 11cqh;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--tinta);
+  letter-spacing: -0.03em;
+}
+
+.cierre-columnas {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 5cqw;
+  font-size: 1.8cqh;
+  color: var(--texto);
+}
+
+.cierre-columna {
+  padding-top: 1cqh;
+  border-top: 0.2cqh solid var(--verde);
+}
+
+.cierre-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqh;
+}
+
+.cierre-qr img {
+  width: 10cqh;
+  height: 10cqh;
+  display: block;
+}
+
+.cierre-qr-texto {
+  font-size: 1.6cqh;
+  color: var(--texto);
+}
+
+.cierre-gracias {
+  font-size: 2cqh;
+  color: var(--gris);
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   Lámina 1 — Portada
+   Wordmark arriba a la izquierda, pregunta centrada, pie abajo.
+   ========================================================================== */
+
+.portada {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.portada-arriba {
+  display: flex;
+  align-items: flex-start;
+}
+
+.portada-wordmark {
+  font-size: 4cqh;
+  font-weight: 700;
+  color: var(--verde);
+  letter-spacing: -0.01em;
+}
+
+.portada-medio {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.5cqh;
+}
+
+.portada-abajo {
+  display: flex;
+  align-items: flex-end;
+}
+
+.portada-pie {
+  font-size: 1.6cqh;
+  color: var(--gris);
+}
+
+/* ==========================================================================
+   Responsive: con prefers-reduced-motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-segmento {
+    transition: none;
+  }
+}
