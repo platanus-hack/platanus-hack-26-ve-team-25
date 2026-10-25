@@ -69,12 +69,18 @@ descartan las palabras con confianza menor a 0,5 ([`frases.dart`](../app/lib/dat
 
 ### ¿Funciona con la voz de una persona mayor?
 
-❌ No medido, y no se va a medir en el hackatón: el equipo no tiene personas mayores cerca para
-grabar. Las voces mayores son más débiles, aireadas y temblorosas, y el reconocimiento de voz se
-equivoca más con ellas ([investigacion-audio.md §1.1](investigacion-audio.md)). Por eso el diseño
-no depende solo de la voz: la compuerta de dB se mide contra el fondo de la casa (un «ayuda» bajo
-pasa igual al modelo), YAMNet busca también quejidos («Wail, moan»), y siempre quedan la pantalla y
-la alarma que escala sola. No afirmamos que funcione con voces mayores.
+⚠️ Medido con voces **sintéticas** de personas mayores, no con voces reales
+([experimentos/voz-mayor](../experimentos/voz-mayor/README.md)). Con 6 voces de ElevenLabs y el
+mismo Vosk de la app, la casa entiende el 94 % de los pedidos y órdenes sin ruido, el 77 % con una
+TV de fondo a 10 dB y el 45 % a 5 dB. Lo más frágil son las órdenes con ruido: «Lucero, llama a mi
+hijo» pasa de 5 de 6 voces a 1 de 6 con la TV prendida. «Lucero, estoy bien» aguanta: 6 de 6 sin
+ruido, con TV a 10 dB y con la calle.
+
+Una voz real de 80 años es más débil, aireada y temblorosa, y el reconocimiento se equivoca más con
+ella ([investigacion-audio.md §1.1](investigacion-audio.md)): estos números son un techo, no una
+promesa. Por eso el diseño no depende solo de la voz: la compuerta de dB se mide contra el fondo de
+la casa (un «ayuda» bajo pasa igual al modelo), YAMNet busca también quejidos («Wail, moan»), y
+siempre quedan la pantalla y la alarma que escala sola.
 
 ## Las falsas alarmas
 

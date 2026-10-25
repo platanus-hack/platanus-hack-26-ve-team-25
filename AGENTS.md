@@ -34,6 +34,7 @@ nunca sale de él. La arquitectura y las decisiones, con su evidencia, están en
 | Prueba de carga del pitch | 50 teléfonos durante 2 min y 150 durante 1 min contra producción, sin una falla | [`web/scripts/carga.ts`](web/scripts/carga.ts), [resultados](docs/pendientes.md#para-el-pitch-y-el-jurado) |
 | Oído en el navegador (`/escucha`) | La prueba de viabilidad: micrófono → compuerta de dB → YAMNet → 6 tipos de evento, con 12 pruebas | [`web/src/app/escucha/`](web/src/app/escucha/), [`web/src/lib/escucha/`](web/src/lib/escucha/) |
 | Comparación de 9 modelos de audio en 640 sonidos de casa | Hecha y reproducible. YAMNet acierta el 82% en el top-5 con 4,1 MB | [`experimentos/modelos-audio/`](experimentos/modelos-audio/README.md) |
+| Voz de personas mayores, con voces sintéticas | Hecha el domingo con 6 voces de ElevenLabs y el mismo Vosk de la app: 94 % sin ruido, 77 % con TV a 10 dB, 45 % a 5 dB. «Lucero, estoy bien» aguanta el ruido; «Ya me la tomé» falla con 5 de 6 voces (Vosk oye «llame la tomé»). Los arreglos propuestos no se aplicaron | [`experimentos/voz-mayor/`](experimentos/voz-mayor/README.md) |
 | Vibración del piso, apagón según el perfil de salud, ficha de emergencia, cámara, rutina | Fuera del alcance del hackatón: van como proyección | [`docs/futuro.md`](docs/futuro.md#hacia-dónde-va) |
 
 La raíz lleva a la última casa abierta en el teléfono. Cada push a `main` despliega la web en
@@ -61,6 +62,7 @@ web/                              Next.js: la web de la familia, el vigilante, l
 web/scripts/                      la prueba de carga y la carga de la casa de demo
 supabase/migrations/              el esquema, las funciones, quién puede llamar qué y el vigilante
 experimentos/modelos-audio/       Python con uv: exportación a ONNX y comparación de modelos
+experimentos/voz-mayor/           Python con uv: voces sintéticas de ElevenLabs contra el Vosk de la app
 ```
 
 ## Decisiones técnicas clave

@@ -115,6 +115,7 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
 | Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
 | Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |
+| Voz de personas mayores (sintética): 138 frases × 6 voces, con y sin ruido | 94 % sin ruido, 77 % con TV a 10 dB ([resultados](experimentos/voz-mayor/README.md)) | `cd experimentos/voz-mayor && uv run evaluar.py` |
 
 La carga se midió el sábado 24-oct contra producción, desde una laptop en Caracas
 ([detalle](docs/pendientes.md#para-el-pitch-y-el-jurado)).
