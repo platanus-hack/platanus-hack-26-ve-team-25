@@ -113,21 +113,21 @@ export default function LaFamilia({ activa = false }: Props) {
   }, [activa, vivo, soltar, tomar]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2cqh", height: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", position: "relative" }}>
       <img
         src="/presente-logo.svg"
         alt="Presente"
         className="portada-logo"
         width={918}
         height={180}
-        style={{ alignSelf: "flex-start", height: "7cqh" }}
+        style={{ position: "absolute", top: 0, left: 0, height: "6.5cqh", zIndex: 2 }}
       />
 
       {/* Los dos paneles: teléfono (izq) y navegador (der), alineados al mismo centro vertical */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.25fr 0.75fr",
+          gridTemplateColumns: "1.12fr 0.88fr",
           gap: "3cqw",
           flex: 1,
           minHeight: 0,
