@@ -50,7 +50,6 @@ export default function ElQueSeQueda() {
             <div key={i} className="kpi">
               <div className={`kpi-numero ${c.tinta ? "tinta" : ""}`}>{c.valor}</div>
               <div className="kpi-etiqueta">{c.etiqueta}</div>
-              <div className="kpi-fuente">{c.fuente}</div>
             </div>
           ))}
         </div>

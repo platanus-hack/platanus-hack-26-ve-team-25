@@ -113,15 +113,30 @@ Respeta `prefers-reduced-motion`: sin animaciones de entrada si está activo.
 
 ## El QR de Telegram
 
-Fijo arriba a la derecha, fuera del flujo del contenido, ~`6cqh` de lado, sobre tarjeta blanca con borde `--borde` y esquinas redondeadas. Contenido: `https://t.me/CasaAvisoBot?start=demo`. Debajo, en `1.2cqh` gris mayúsculas con tracking: `@CasaAvisoBot`.
+Fijo arriba a la derecha, fuera del flujo del contenido, sobre tarjeta blanca con borde `--borde` y esquinas redondeadas. El tamaño lo manda una sola variable en `globals.css`: `--qr-tamano: 11cqh`. Contenido: `https://t.me/CasaAvisoBot?start=demo`. Debajo, en `1.2cqh` gris mayúsculas con tracking: `@CasaAvisoBot`.
 
 `scripts/qr.mjs` genera el SVG con el paquete `qrcode` y lo escribe en `public/qr-telegram.svg`. Idempotente: si ya existe y el contenido es el mismo, no lo reescribe. Se ejecuta automáticamente antes de `dev` y `build` (predev/prebuild).
 
-El QR se oculta en la lámina 5 (Cierre), donde se muestra uno grande dentro del contenido.
+El QR se oculta en la lámina 3 (la familia) y en la 4 (Cierre), que lleva uno grande dentro del contenido.
+
+## Fuentes de las cifras
+
+Las cuatro cifras de la lámina 2 no llevan la fuente en pantalla, para no cargar la diapositiva.
+Si el jurado pregunta, aquí están:
+
+| Cifra | Fuente |
+|---|---|
+| 7,89 M de venezolanos en el exterior | ACNUR/R4V, 2024 |
+| 400 000+ de adultos mayores viven solos | Convite AC/ENCOVI, 2023 |
+| 31 M+ de adultos mayores están solos en el mundo | Diásporas juveniles · HelpAge/OIM |
+| 1 de 3 sufre una caída cada año | OMS, 2022 |
 
 ## Crédito de la foto
 
-`public/foto-senor.jpg`: foto de un adulto mayor mirando por la ventana. Uso educativo para el pitch del hackatón.
+`public/foto-senor.jpg`: «Man sitting on a chair looking out the window», de **Harun Tan**, en
+[Pexels](https://www.pexels.com/photo/man-sitting-on-a-chair-looking-out-the-window-3979493/).
+Licencia de Pexels: uso comercial permitido, sin atribución obligatoria. Convertida a blanco y
+negro y recortada a 1920 px de ancho.
 
 ## Licencia
 
