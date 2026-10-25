@@ -14,7 +14,8 @@ BUN ?= $(shell command -v bun 2>/dev/null || echo "npx -y bun@1.3.14")
 .DEFAULT_GOAL := ayuda
 .PHONY: ayuda devices deps telefono logs run run-demo demo debug profile release test test-integracion analyze format \
 	build-apk build-apk-debug build-appbundle install clean casa-web casa-deploy \
-	web-deps web-dev web-test web-lint web-build
+	web-deps web-dev web-test web-lint web-build \
+	pitch pitch-deploy
 
 ayuda: ## Muestra estos comandos
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -115,3 +116,11 @@ web-lint: web-deps ## Revisa el código de la web
 
 web-build: web-deps ## Arma la web para producción
 	cd $(WEB) && $(BUN) run build
+
+# --- Pitch (Vite + React) -------------------------------------------------------------------
+
+pitch: ## Corre la presentación del pitch en http://localhost:4173
+	cd pitch && npm install && npm run dev
+
+pitch-deploy: ## Publica la presentación del pitch en Vercel
+	cd pitch && npm run build && npx vercel --prod
