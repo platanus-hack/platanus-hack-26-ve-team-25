@@ -26,7 +26,10 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "ve.equipo25.casa"
+        // El paquete que Play Store tiene registrado para Presente; no se puede cambiar después de
+        // la primera subida. El código Kotlin sigue en ve.equipo25.casa (namespace): no hace falta
+        // moverlo, porque Android solo mira el applicationId.
+        applicationId = "com.abrahan.presente"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
