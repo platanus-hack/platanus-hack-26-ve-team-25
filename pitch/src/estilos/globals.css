@@ -530,9 +530,16 @@ button {
 }
 
 .qr-descarga img {
-  width: 19cqh;
-  height: 19cqh;
+  width: 25cqh;
+  height: 25cqh;
   display: block;
+}
+
+.qr-descarga-texto {
+  font-size: 2.6cqh;
+  font-weight: 500;
+  color: var(--texto);
+  letter-spacing: 0.01em;
 }
 
 /* La página real de la familia dentro del marco del navegador */

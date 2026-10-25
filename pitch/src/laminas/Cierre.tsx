@@ -18,7 +18,7 @@ export default function Cierre() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "5cqh",
+        gap: "4cqh",
         height: "100%",
         textAlign: "center",
       }}
@@ -38,13 +38,23 @@ export default function Cierre() {
         en enterarte?
       </div>
 
-      <div className="qr-descarga">
-        <img
-          src="/QR_descarga_app.jpeg"
-          alt="Código QR para instalar la app de Presente en el teléfono"
-          width={300}
-          height={300}
-        />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1.8cqh",
+        }}
+      >
+        <div className="qr-descarga">
+          <img
+            src="/QR_descarga_app.jpeg"
+            alt="Código QR para instalar la app de Presente en el teléfono"
+            width={300}
+            height={300}
+          />
+        </div>
+        <div className="qr-descarga-texto">Descarga aquí</div>
       </div>
     </div>
   );
