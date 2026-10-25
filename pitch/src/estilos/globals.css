@@ -632,11 +632,10 @@ button {
   align-items: flex-start;
 }
 
-.portada-wordmark {
-  font-size: 4cqh;
-  font-weight: 700;
-  color: var(--verde);
-  letter-spacing: -0.01em;
+.portada-logo {
+  height: 6cqh;
+  width: auto;
+  display: block;
 }
 
 .portada-medio {

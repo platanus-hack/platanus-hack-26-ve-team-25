@@ -7,7 +7,13 @@ export default function Portada() {
   return (
     <div className="portada">
       <div className="portada-arriba">
-        <div className="portada-wordmark">Presente</div>
+        <img
+          src="/presente-logo.svg"
+          alt="Presente"
+          className="portada-logo"
+          width={918}
+          height={180}
+        />
       </div>
       <div className="portada-medio">
         <h1 className="titular" style={{ fontSize: "10cqh", textAlign: "center" }}>
