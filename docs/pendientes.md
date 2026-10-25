@@ -6,6 +6,12 @@ después del hackatón está en [futuro.md](futuro.md); las ideas que se van pen
 [por-planificar.md](por-planificar.md); y cómo se arma el demo con los cuatro teléfonos, en
 [armar-demo.md](armar-demo.md).
 
+> **Del taller de demo (sábado 20:20):** el gong suena a las **09:15** y desde ahí el repo no recibe
+> commits. La presentación se corta a las 3:01 y siguen 2 minutos de preguntas. El orden se anuncia
+> de a uno, así que desde las 10:00 estamos todos en la sala. Se proyecta compartiendo la pantalla
+> de la laptop a una página web (para Android recomiendan scrcpy). En una app móvil, deploy es un
+> APK que cualquiera pueda descargar e instalar.
+
 ## Lo que queda
 
 ### Rogelio · activar la lectura de la factura
@@ -41,6 +47,19 @@ guarda lo que está en el récipe. Falta encenderla:
       app de la casa se ha probado en el teléfono desde que se agregaron la voz, la sirena, las
       órdenes con «Lucero», la toma que descuenta y el servicio en primer plano.
 - [ ] **Llave propia para firmar el App Bundle**, de madrugada, cuando todo funcione.
+- [ ] **La versión de la tarima, con la cuenta de 15 s** (decidido el sábado 22:30, solo para la
+      presentación: el producto sigue con 60, y se dice en voz alta). Es `--dart-define=DEMO=true`;
+      la base usa la misma espera porque la casa le manda `p_espera_s`. Va en release e instalada
+      antes de subir, porque `make run-demo` corre en debug. Ojo: con 15 s, «voy a llamar a
+      Josuep» (sale cuando faltan 20 s, `avisoFinal`) suena encima del «¿Está bien?». Cuando esté,
+      corregir [plan.md](plan.md#demo) y [riesgos.md](riesgos.md#cómo-contar-la-verdad), que dicen
+      que nada se acelera.
+- [ ] **En el Infinix, el número del iPhone guardado como «911»**: es el segundo número al que
+      llama la casa en el demo.
+- [ ] **El APK, descargable**, como Release del repo y con su enlace en el README. Va con 60 s, y
+      se compila con `flutter build apk --release` a secas: `make build-apk` mete
+      `config/local.json` si existe, y con él se publicarían los números del equipo y la clave de la
+      casa de demo.
 
 ### Josuep · Telegram
 
@@ -56,13 +75,15 @@ webhook y el vigilante están hechos y verificados.
       Está en la web ([`web/src/lib/app.ts`](../web/src/lib/app.ts)), la app, el README y el
       `platanus-hack-project.jsonc`.
 - [ ] **El guion del demo** en [plan.md](plan.md#demo), con lo que se decidió el sábado.
-- [ ] **El hijo tiene dos nombres.** En el guion del pitch es Pedro, en Madrid; en el teléfono de
-      la casa es Josuep, y la voz lo dice en alto («Llamando a Josuep»). O se guarda el Samsung como
-      «Pedro» en el Infinix, o se cambia el guion. Pedro también es el vecino en
-      [armar-demo.md](armar-demo.md).
-- [ ] **La llamada a emergencias ya existe** (`257160e`: si el hijo no contesta, la casa llama a
-      emergencias), pero el guion todavía la cuenta como lo que sigue. Decidir entre todos si entra en
-      el demo y ajustar el guion.
+- [x] **El hijo es Josuep** (sábado 22:30): es lo que dice la voz y lo que muestra el botón rojo.
+      Se cambió el guion.
+- [x] **La llamada a emergencias entra en el demo** (sábado 22:30): es el segundo número al que
+      llama la casa, después de Josuep (`257160e`). La app no cambia. En voz alta: «Aquí, el 911 es
+      un teléfono del equipo».
+- [ ] **Ensayamos los cuatro**, y el domingo presenta el que esté más preparado y seguro. Se decide
+      a las 09:15.
+- [ ] **Logo propio e identidad gráfica** (Rogelio): `project-logo.png` todavía es el de Platanus,
+      y sale en el Market y en la página de votación.
 - [ ] **Ensayar las limitaciones en voz alta** ([riesgos.md](riesgos.md#cómo-contar-la-verdad)).
 - [ ] **En el pitch se dice «golpe», no «caída».** El oído reconoce un golpe y por eso pregunta.
 - [ ] Video de respaldo.
