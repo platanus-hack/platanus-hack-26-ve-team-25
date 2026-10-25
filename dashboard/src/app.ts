@@ -9,10 +9,8 @@ import {
 import {
   drawMigracion,
   drawPaises,
-  drawEdades,
   drawGlobalCharts,
   drawMayores,
-  drawAccidentes,
   drawRespuesta,
   drawEstados,
   drawGauge
@@ -68,9 +66,9 @@ export function buildFallsCards(): void {
   const c = document.getElementById("grid-caidas");
   if (!c) return;
   const cards: KPIItem[] = [
-    { icon: "💀", val: "842.000", label: "Muertes por caída al año", sub: "2ª causa de muerte por lesión · OMS", color: "#f87171" },
-    { icon: "🧓", val: "1 de 3", label: "Adultos 65+ cae cada año", sub: "30–40% de esta población · OMS/NIH", color: "#fbbf24" },
-    { icon: "⏳", val: "1 de 5", label: "Queda >1 hora solo", sub: "Riesgo de muerte se duplica · NIH", color: "#a78bfa" }
+    { icon: "💀", val: "842.000", label: "Muertes por caída al año", sub: "2ª causa de muerte por lesión · OMS · Global Health Estimates 2023", color: "#f87171" },
+    { icon: "🧓", val: "28-35 %", label: "Caen cada año (65+)", sub: "OMS · Global Report on Falls 2007", color: "#fbbf24" },
+    { icon: "⏳", val: "30 %", label: "Mayores de 90 que caen: >1 h en el suelo", sub: "Fleming & Brayne · BMJ 2008", color: "#a78bfa" }
   ];
   c.innerHTML = cards
     .map(
@@ -144,12 +142,10 @@ export const SECTION_DRAWERS: Record<string, () => void> = {
   panorama: () => {
     drawMigracion();
     drawPaises();
-    drawEdades();
     drawGlobalCharts();
   },
   mayores: () => {
     drawMayores();
-    drawAccidentes();
     drawRespuesta();
     drawEstados();
     buildProgBars();

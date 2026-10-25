@@ -1,11 +1,9 @@
 import {
   MIGRATION_DATA,
   COUNTRIES_DATA,
-  AGES_DATA,
   GLOBAL_ELDERLY_DATA,
   ESCALABILIDAD_DATA,
   MAYORES_DATA,
-  ACCIDENTS_DATA,
   RESPUESTA_DATA,
   ESTADOS_DATA
 } from "./data.js";
@@ -192,45 +190,6 @@ export function drawPaises(): void {
   });
 }
 
-export function drawEdades(): void {
-  destroyChart("chartEdades");
-  const canvas = document.getElementById("chartEdades") as HTMLCanvasElement | null;
-  if (!canvas) return;
-
-  charts["chartEdades"] = new Chart(canvas, {
-    type: "doughnut",
-    data: {
-      labels: AGES_DATA.labels,
-      datasets: [
-        {
-          data: AGES_DATA.values,
-          backgroundColor: AGES_DATA.colors,
-          borderColor: "#080c14",
-          borderWidth: 3,
-          hoverOffset: 8
-        }
-      ]
-    },
-    options: {
-      cutout: "60%",
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: { color: "#94a3b8", font: { family: "Inter", size: 11 }, boxWidth: 12 }
-        },
-        tooltip: baseOpts().plugins.tooltip,
-        datalabels: {
-          display: true,
-          color: "#fff",
-          font: { size: 10, weight: "700", family: "Inter" },
-          formatter: (v: number) => v + "%"
-        }
-      }
-    },
-    plugins: [ChartDataLabels]
-  });
-}
-
 export function drawGlobalCharts(): void {
   destroyChart("chartGlobalPaises");
   destroyChart("chartEscalabilidad");
@@ -374,49 +333,6 @@ export function drawMayores(): void {
         }
       },
       layout: { padding: { right: 35 } }
-    },
-    plugins: [ChartDataLabels]
-  });
-}
-
-export function drawAccidentes(): void {
-  destroyChart("chartAccidentes");
-  const canvas = document.getElementById("chartAccidentes") as HTMLCanvasElement | null;
-  if (!canvas) return;
-
-  charts["chartAccidentes"] = new Chart(canvas, {
-    type: "polarArea",
-    data: {
-      labels: ACCIDENTS_DATA.labels,
-      datasets: [
-        {
-          data: ACCIDENTS_DATA.values,
-          backgroundColor: ACCIDENTS_DATA.colors.map(c => c + "cc"),
-          borderColor: ACCIDENTS_DATA.colors,
-          borderWidth: 2
-        }
-      ]
-    },
-    options: {
-      plugins: {
-        legend: {
-          position: "right",
-          labels: { color: "#94a3b8", font: { family: "Inter", size: 10 }, boxWidth: 12 }
-        },
-        tooltip: baseOpts().plugins.tooltip,
-        datalabels: {
-          display: true,
-          color: "#fff",
-          font: { size: 11, weight: "700", family: "Inter" },
-          formatter: (v: number) => v + "%"
-        }
-      },
-      scales: {
-        r: {
-          grid: { color: "rgba(45,53,97,.4)" },
-          ticks: { color: "#64748b", backdropColor: "transparent", font: { size: 9 } }
-        }
-      }
     },
     plugins: [ChartDataLabels]
   });

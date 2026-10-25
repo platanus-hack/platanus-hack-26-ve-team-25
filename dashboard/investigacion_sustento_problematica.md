@@ -1,5 +1,8 @@
 # 📋 Investigación y Sustento Estadístico del Problema
 
+> [!WARNING]
+> **Documento de investigación interno.** Contiene cifras **no verificadas** y afirmaciones sin fuente. La versión publicable y auditada es el dashboard; no uses estas cifras en el pitch sin verificar la fuente original.
+
 > **Proyecto:** En Casa — El teléfono que cuida a los mayores que se quedaron solos  
 > **Evento:** Platanus Hack 26  
 > **Temática:** Impacto de la migración juvenil en el desamparo de adultos mayores en Venezuela y escalabilidad global (*Left-Behind Elderly*)
@@ -8,15 +11,15 @@
 
 ## 1. 📌 Resumen Ejecutivo y Narrativa del Proyecto
 
-La crisis migratoria venezolana representa el mayor desplazamiento humano en la historia moderna del hemisferio occidental, superando los **7.89 millones de personas en el exterior** según datos oficiales de ACNUR y la OIM (2024). No obstante, detrás de esta cifra masiva subyace una fractura demográfica silenciosa: **el perfil etario de quienes emigran y las consecuencias críticas para quienes permanecen**.
+La crisis migratoria venezolana representa el mayor desplazamiento humano de la historia moderna del hemisferio occidental *no verificado*, superando los **7.89 millones de personas en el exterior** según datos oficiales de ACNUR y la OIM (2024). No obstante, detrás de esta cifra masiva subyace una fractura demográfica silenciosa: **el perfil etario de quienes emigran y las consecuencias críticas para quienes permanecen**.
 
-Más del **53% de los migrantes venezolanos son adultos jóvenes en edad productiva (15 a 34 años)**, elevándose al **66%** en el caso de las mujeres adultas. Su partida ha desarticulado la red de cuidado y auxilio primario en el hogar, dejando atrás a una población estimada de entre **300.000 y 500.000 adultos mayores viviendo en aislamiento o soledad absoluta**.
+Más del **53% de los migrantes venezolanos son adultos jóvenes en edad productiva (15 a 34 años)** *no verificado*, elevándose al **66%** en el caso de las mujeres adultas *no verificado*. Su partida ha desarticulado la red de cuidado y auxilio primario en el hogar, dejando atrás a una población estimada de entre **300.000 y 380.000 adultos mayores viviendo en aislamiento o soledad absoluta** (Convite AC, 2025).
 
 > [!IMPORTANT]
 > ### El Factor Crítico: La Soledad y el Síndrome del *"Long Lie"*
 > A nivel sociosanitario, la soledad en la tercera edad convierte cualquier incidente doméstico menor en una emergencia potencialmente letal:
-> - Según la **Organización Mundial de la Salud (OMS)**, las caídas son la **segunda causa mundial de muerte** por traumatismos no intencionales. **1 de cada 3 adultos de 65+ años** sufre al menos una caída al año.
-> - Cuando la persona vive sola, ocurre con frecuencia el fenómeno clínico del **"Long Lie"**: permanecer inmovilizado en el suelo por más de una hora sin auxilio. Investigaciones del **National Institute on Aging (NIH)** confirman que este retraso **duplica el riesgo de mortalidad** en los meses posteriores y desencadena hipotermia, deshidratación grave, rabdomiólisis y úlceras isquémicas.
+> - Según la **Organización Mundial de la Salud (OMS)**, las caídas son la **segunda causa mundial de muerte** por traumatismos no intencionales, con **842.000 muertes al año** (OMS, Global Health Estimates 2023). **28–35 % de los adultos de 65+** cae al menos una vez al año (OMS, *Global Report on Falls Prevention in Older Age*, 2007).
+> - Cuando la persona vive sola, ocurre con frecuencia el fenómeno clínico del **"Long Lie"**: permanecer inmovilizado en el suelo por más de una hora sin auxilio. El **30 % de los mayores de 90 años** que caen pasa **≥1 hora en el suelo** (Fleming & Brayne, BMJ 2008), y **la mitad de quienes yacen más de una hora muere en los 6 meses siguientes** (Wild et al., BMJ 1981). También se describen hipotermia, deshidratación grave, rabdomiólisis y úlceras isquémicas.
 
 ### La Solución: En Casa
 **En Casa** interviene de forma directa en este cuello de botella:
