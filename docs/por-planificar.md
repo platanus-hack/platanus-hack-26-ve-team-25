@@ -12,7 +12,7 @@
 | 1 | [Proyección: seguros, ficha médica, farmacia, 911 y ambulancia](#1-proyección-para-el-pitch) | Pitch | Va al cierre del demo; se habla después |
 | 2 | [Tres vistas: de mesa, personal y familia](#2-tres-vistas-y-cómo-se-conectan) | Producto | Por decidir |
 | 3 | [Mejorar los mockups de la vista de mesa](#3-mejorar-los-mockups-de-mesa) | Diseño | Por hacer |
-| 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Decidido que sí; falta el cómo |
+| 4 | [Cámara y fotos que la IA describe](#4-cámara-y-fotos-que-la-ia-describe) | Producto e investigación | Hecha la foto antes de una llamada de emergencia (domingo 02:10); el video y la voz que la describe, no |
 | 5 | [Altavoz y volumen al máximo en la llamada](#5-altavoz-y-volumen-al-máximo-en-la-llamada) | Técnico | Decidido; se puede probar ya |
 | 6 | [Que el teléfono del hijo suene aunque esté en silencio](#6-que-el-teléfono-del-hijo-suene-aunque-esté-en-silencio) | Técnico | Depende del punto 2 |
 | 7 | [Probar y afinar las IAs: voz y OCR](#7-probar-y-afinar-las-ias-voz-y-ocr) | Prueba | Por hacer |

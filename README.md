@@ -64,6 +64,13 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 - **El audio nunca sale del teléfono.** Vive en un buffer circular de 5 s en memoria
   ([`anillo.dart`](app/lib/oido/anillo.dart)); a la base van etiquetas de eventos, alertas y
   latidos. Es privacidad y es costo: no hay un servidor de audio que pagar por minuto.
+- **Una foto sí sale, y solo en una emergencia.** Justo antes de llamar a la familia porque nadie
+  respondió, o de llamar a emergencias, la cámara de adelante toma una foto de la sala
+  ([`camara.dart`](app/lib/datos/camara.dart)). Va a un bucket privado de Supabase, Claude dice lo
+  que se ve y la familia la recibe por Telegram y en la alerta roja
+  ([`api/casa/foto`](web/src/app/api/casa/foto/route.ts)). Se borra a las 24 h. La llamada la
+  espera 4 s como mucho: si la cámara falla, se llama igual. «Lucero, llama a mi hijo» es una
+  llamada normal y no toma foto.
 - **YAMNet, elegido midiendo.** Comparamos 9 modelos sobre 640 sonidos de casa de ESC-50. YAMNet
   acierta el 82% en el top-5 con 4,1 MB y 2,5 ms por segundo de audio en una CPU de escritorio.
   Los dos que se le acercan (81%) pesan entre 7 y 80 veces más y tardan entre 10 y 27 veces más
@@ -86,8 +93,9 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
   ejecutar funciones, y cada función pide la clave de la casa o el token de la familia, de 128 bits
   y guardados como SHA-256. El token `demo` es público a propósito: es el del QR.
 - **El camino de la alarma no depende de un modelo de lenguaje.** Oír, preguntar, escalar y avisar
-  son reglas. Claude solo lee la foto de la factura de la farmacia, con salida estructurada, y la
+  son reglas. Claude lee la foto de la factura de la farmacia, con salida estructurada, y la
   familia confirma antes de guardar ([`leer/route.ts`](web/src/app/f/[token]/pastillas/factura/leer/route.ts)).
+  También describe la foto de la emergencia, pero eso va después de llamar y no la frena.
 - **El inventario de pastillas es un libro de movimientos:** la factura suma, cada «Ya me la tomé»
   resta y el conteo a mano ajusta. El conteo vive en la base, para que la casa y la web no tengan
   dos números; la web calcula cuántos días alcanzan ([`inventario.ts`](web/src/lib/familia/inventario.ts)).
@@ -100,9 +108,9 @@ FAMILIA · Next.js 16 en Vercel, sin login: el enlace de invitación es la llave
 
 | Qué | Cuántas | Cómo |
 |---|---|---|
-| Web: estado de la familia, audio, inventario, factura y el tope de lecturas | 56 | `cd web && bun test` |
+| Web: estado de la familia, audio, inventario, factura, el tope de lecturas y la foto de la emergencia | 63 | `cd web && bun test` |
 | Contra la base real: alertas, escalamiento y pastillas | 11 | `cd web && bun run test:integracion` (llaves en `web/.env.local`) |
-| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola | 121 | `make test` |
+| App de la casa: alerta, pastillas, pedidos y órdenes por voz, nube con cola, la foto antes de llamar | 127 | `make test` |
 | Carga del pitch: 50 teléfonos durante 2 min | 1124 lecturas, 0 fallas, p95 1,5 s | `cd web && bun --env-file=.env.local scripts/carga.ts 50 120` |
 | Carga con 150 teléfonos durante 1 min | 1653 lecturas, 0 fallas, p95 2,9 s | `… scripts/carga.ts 150 60` |
 | Modelos de audio: 9 modelos, 640 clips | [resultados](experimentos/modelos-audio/resultados-1s.md) | `cd experimentos/modelos-audio && uv run comparar.py` |

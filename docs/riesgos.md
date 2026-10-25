@@ -194,7 +194,7 @@ avisos. El adulto mayor confía porque su familia confía. Por eso:
 
 | Duda | Respuesta de una línea |
 |---|---|
-| «¿Me están grabando?» | No hay cámara, y el audio nunca sale del teléfono. Solo sale «alarma de humo a las 14:05» |
+| «¿Me están grabando?» | El audio nunca sale del teléfono: sale «alarma de humo a las 14:05». La cámara solo toma una foto justo antes de llamar por una emergencia, y se borra a las 24 h |
 | «¿Y si se equivoca?» | Antes de avisar, te pregunta a ti. Si dices que estás bien, no molesta a nadie |
 | «¿Y mis datos de salud?» | Solo se guarda lo que cambia el aviso, como «usa oxígeno». No el historial |
 | «¿Esto reemplaza al 911?» | No. Avisa a tu familia y a tu vecino |

@@ -39,6 +39,17 @@ guarda lo que está en el récipe. Falta encenderla:
       más alta y con letra de 27, y el borde de los botones a 3,8:1 de contraste. Captura sin
       teléfono: `flutter test --run-skipped --update-goldens -t captura` →
       [`app/test/capturas/reposo.png`](../app/test/capturas/reposo.png).
+- [x] **La foto de la emergencia** (domingo 02:10): antes de llamar por una alerta o a
+      emergencias, la cámara de adelante toma una foto; Claude la describe y sale por Telegram y
+      en la alerta roja. Bucket privado `fotos` en Supabase Storage, sin migración. Ver la fila de
+      AGENTS.md.
+- [ ] **Probar la foto en el Samsung** con una alerta de verdad: «Pedir ayuda» llama a Josuep y
+      tiene que llegar la foto por Telegram. Necesita `ANTHROPIC_API_KEY` en Vercel para la
+      descripción; sin ella la foto llega igual, sin «Lo que se ve». Probar también con la
+      pantalla apagada: lo más probable es que Android no preste la cámara y la llamada salga sin
+      foto, y hay que decirlo así en el pitch.
+- [ ] **Actualizar la sección de seguridad de los datos en Play Console:** ahora la app recoge
+      fotos (solo en emergencias, se borran a las 24 h).
 - [x] **Probado en el Samsung (domingo 00:00–00:10), y dos arreglos:** la alarma se callaba sola a
       los 10 s porque Vosk oía la frase del propio teléfono («Diga "Lucero, estoy bien"…»), y
       toda versión release se cerraba al abrir porque R8 renombraba las clases de JNA que usa Vosk
