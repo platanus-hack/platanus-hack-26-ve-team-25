@@ -118,8 +118,8 @@ webhook y el vigilante están hechos y verificados.
       un teléfono del equipo».
 - [ ] **Ensayamos los cuatro**, y el domingo presenta el que esté más preparado y seguro. Se decide
       a las 09:15.
-- [ ] **Logo propio e identidad gráfica** (Rogelio): `project-logo.png` todavía es el de Platanus,
-      y sale en el Market y en la página de votación.
+- [x] **Logo propio** (domingo 05:20): `project-logo.png` es el ícono de Presente que hizo Abrahan
+      en [`marca/`](../marca/), el mismo de la app y de Play. Sale en el Market y en la votación.
 - [ ] **Ensayar las limitaciones en voz alta** ([riesgos.md](riesgos.md#cómo-contar-la-verdad)).
 - [ ] **Un correo de contacto para la [política de privacidad](../web/src/app/privacidad/page.tsx)**
       (`CONTACTO`): hoy lleva a los issues del repo. Lo natural es el correo de desarrollador de

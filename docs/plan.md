@@ -45,7 +45,8 @@
 | Sáb 20:00 | Kapso y pastillas conectados. Taller «Cómo hacer un buen demo» (va todo el equipo) |
 | Sáb 21:00–24:00 | Nombre, README, ensayo y video de respaldo |
 | Sáb 24:00 | Alcance congelado: desde aquí solo arreglos y ensayo |
-| **Dom 08:30** | **Fin del hacking. Lo que no esté pusheado no existe.** |
+| Dom 08:30 | Último push propio, con margen |
+| **Dom 09:15** | **Gong: el repo deja de recibir commits. Lo que no esté pusheado no existe.** |
 | Dom 10:00 | Presentaciones |
 
 ## El flujo del MVP
