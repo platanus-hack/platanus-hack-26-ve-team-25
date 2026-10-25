@@ -102,7 +102,7 @@ class AppCasa extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: temaCasa(),
       // Atrás no cierra la app: si se cierra, la casa deja de oír. Las pantallas que se abren
-      // encima (configurar, leer récipe) sí vuelven con Atrás.
+      // encima (configurar) sí vuelven con Atrás.
       home: PopScope(canPop: false, child: Raiz(c: controlador)),
     );
   }

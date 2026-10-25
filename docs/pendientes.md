@@ -39,6 +39,10 @@ guarda lo que está en el récipe. Falta encenderla:
       más alta y con letra de 27, y el borde de los botones a 3,8:1 de contraste. Captura sin
       teléfono: `flutter test --run-skipped --update-goldens -t captura` →
       [`app/test/capturas/reposo.png`](../app/test/capturas/reposo.png).
+- [x] **Sin «Leer récipe» en el teléfono de mesa** (sábado 24, 23:55): el botón solo decía que no
+      estaba listo. «Pedir ayuda» ocupa ahora toda la columna derecha. Leer una foto se hace desde la
+      web de la familia, desplegada en Vercel: la factura en
+      [`/f/demo/pastillas/factura`](https://platanus-hack-26-ve-team-25.vercel.app/f/demo/pastillas/factura).
 - [ ] **Las demás vistas del teléfono de mesa,** con las indicaciones que va a dar Abrahan.
 - [ ] **Armar el demo** con los cuatro teléfonos ([armar-demo.md](armar-demo.md)): Infinix de
       mesa, Samsung de la familia, iPhone como «el 911» y el Honor por definir.
@@ -108,8 +112,8 @@ Todo con pruebas automáticas; lo de la app de la casa, todavía sin probar en e
 
 **App de la casa ([`app/`](../app/README.md)), 121 pruebas:**
 
-- [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho, la pastilla
-      en chico y «Leer récipe».
+- [x] Horizontal como reloj de mesa: reposo con «Pedir ayuda» en todo el panel derecho y la
+      pastilla en chico.
 - [x] El oído: micrófono crudo → compuerta de dB → YAMNet en el teléfono. Arreglado el sábado: el
       audio llegaba en bloques que empezaban en un byte impar y el oído estaba sordo.
 - [x] «¿Está bien?» con 60 s, deslizar para «estoy bien» y tocar para «necesito ayuda». Suena a

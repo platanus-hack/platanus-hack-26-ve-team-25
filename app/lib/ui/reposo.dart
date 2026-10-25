@@ -7,7 +7,6 @@ import '../tema.dart';
 import 'componentes/boton_grande.dart';
 import 'componentes/capsula.dart';
 import 'configurar.dart';
-import 'leer_recipe.dart';
 import 'controlador.dart';
 
 const _dias = [
@@ -36,8 +35,8 @@ const _meses = [
 
 /// El teléfono acostado como reloj de mesa. A la izquierda la hora, grande, tenue sobre negro (gasta
 /// poco y no calienta) y más arriba que abajo, y debajo la cinta de la próxima pastilla. A la
-/// derecha, «Pedir ayuda», lo único que hay que encontrar con prisa, y debajo «Leer récipe», a la
-/// misma altura que la cinta.
+/// derecha, todo el alto, «Pedir ayuda»: lo único que hay que encontrar con prisa. Las fotos (la
+/// factura de la farmacia) se leen desde la web de la familia, no desde aquí.
 ///
 /// «Huele a gas» y «Me siento mal» ya no son botones: se dicen en voz alta (ver
 /// Controlador._reconocerPedido y el banco de pedidos.dart).
@@ -46,7 +45,7 @@ const _meses = [
 /// - mantener el reloj simula una alarma de humo;
 /// - mantener «Cuidando la casa» abre la configuración (la usa el familiar);
 /// - mantener «Pastillas de hoy» recuerda ya la próxima pastilla.
-/// La cinta de la pastilla y «Leer récipe» comparten la fila de abajo y su alto.
+/// El alto de la cinta de la pastilla.
 const _altoDeAbajo = 96.0;
 
 class Reposo extends StatelessWidget {
@@ -140,22 +139,13 @@ class Reposo extends StatelessWidget {
               const SizedBox(width: 22),
               SizedBox(
                 width: 300,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: BotonGrande(
-                        texto: c.textoDelBotonRojo,
-                        alto: double.infinity,
-                        tamano: 44,
-                        fondo: Colores.rojo,
-                        color: Colors.white,
-                        alTocar: () => c.pedirAyuda(TipoEvento.panico),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const SizedBox(height: _altoDeAbajo, child: _LeerRecipe()),
-                  ],
+                child: BotonGrande(
+                  texto: c.textoDelBotonRojo,
+                  alto: double.infinity,
+                  tamano: 44,
+                  fondo: Colores.rojo,
+                  color: Colors.white,
+                  alTocar: () => c.pedirAyuda(TipoEvento.panico),
                 ),
               ),
             ],
@@ -230,38 +220,6 @@ class _Pastillas extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// El botón chico para leer un récipe o un informe médico con la cámara.
-class _LeerRecipe extends StatelessWidget {
-  const _LeerRecipe();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute<void>(builder: (_) => const LeerRecipe())),
-        icon: const Icon(Icons.document_scanner_rounded, size: 32),
-        label: const Text('Leer récipe', textAlign: TextAlign.center),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Colores.textoClaro,
-          side: const BorderSide(color: Colores.nocheBorde, width: 2),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: const TextStyle(
-            fontFamily: fuente,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            height: 1.1,
           ),
         ),
       ),
