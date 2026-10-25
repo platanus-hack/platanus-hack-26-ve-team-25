@@ -6,7 +6,8 @@
 mayor que vive solo, lo acompaña en el día a día (la pastilla, llamar a su hijo con un toque) y oye
 lo que pasa en la casa: una alarma de humo, un vidrio roto, un golpe, un grito o un «¡ayuda!» dicho
 en voz alta. Antes de avisar, pregunta «¿Está bien?». Si nadie responde en 60 s, avisa a la
-familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp. **El audio se
+familia, que suele estar en otro país, por Telegram y con una llamada de WhatsApp; si nadie
+contesta, la casa llama a emergencias, y sin internet llama igual por la línea. **El audio se
 procesa en el teléfono y nunca sale de él.** Su asistente de voz se llama **Lucero**: «Lucero,
 estoy bien» calla la alarma y «Lucero, llama a mi hijo» llama.
 
@@ -40,6 +41,7 @@ TELÉFONO DE LA CASA · Flutter en Android
      ├─ «Estoy bien», deslizando o con la voz ─► casa_responder('cancelar')      │
      ├─ «ayuda», «me caí» o «no» ─► escala sin esperar los 60 s                  │
      └─ vence sin respuesta ─► llama al hijo por WhatsApp; si no, por teléfono   │
+                               si tampoco contesta, llama a emergencias          │
   latido cada 90 s, con enchufado y batería ─► casa_latido                       │
                                                                                  ▼
 SUPABASE · Postgres

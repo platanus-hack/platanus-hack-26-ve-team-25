@@ -13,8 +13,8 @@ la casa: una alarma de humo, un vidrio roto, un golpe, un grito o un «¡ayuda!�
    **Estoy bien** se desliza en un riel ancho, para que no se active con un roce, o se dice:
    «Lucero, estoy bien». «Ayuda», «me caí» o «no» llaman de una vez.
 2. Si nadie responde en 60 segundos, la alerta escala: la casa llama al hijo por WhatsApp (si no
-   contesta, por teléfono), la web de la familia se pone roja y a cada familiar le llega un aviso
-   por Telegram con el enlace.
+   contesta, por teléfono, y si tampoco, a emergencias), la web de la familia se pone roja y a cada
+   familiar le llega un aviso por Telegram con el enlace.
 3. La persona también puede pedir ayuda sin esperar: con el botón **Pedir ayuda** o con la voz
    («Lucero, llama a mi hijo»), con 5 segundos para decir «no».
 
@@ -44,6 +44,8 @@ señal. Con un toque se suscribe a los avisos por Telegram.
 - **La alerta vive en la base desde que nace**, con su hora de vencimiento. Si el teléfono de la
   casa se apaga a mitad de la cuenta, la base la escala igual: un vigilante con pg_cron revisa cada
   5 segundos y manda los avisos sin repetirlos.
+- **Sin internet, sigue cuidando.** El teléfono sigue oyendo y llama igual por la línea; lo que no
+  pudo mandar a la base queda en cola.
 - **El camino de la alarma no depende de un modelo de lenguaje.** Oír, preguntar, escalar y avisar
   son reglas. Claude solo lee la factura.
 - **Probado con 150 teléfonos a la vez** contra producción, sin una falla.
@@ -52,6 +54,12 @@ señal. Con un toque se suscribe a los avisos por Telegram.
 
 El cliente es el que cuida: el hijo o el familiar que está lejos. Es quien lo configura y quien
 recibe los avisos. El adulto mayor no tiene que aprender nada: solo dejar el teléfono enchufado.
+
+## Quién paga
+
+El hijo, con una suscripción por casa (la propuesta: 5 dólares al mes): no hay equipo que comprar
+ni un servidor de audio que mantener. El segundo canal: aseguradoras y servicios de emergencia que
+lo suman a su plan.
 
 ## Lo que viene
 
@@ -62,5 +70,5 @@ y varios teléfonos por casa.
 ## Con qué está hecho
 
 Flutter en Android para el teléfono de la casa · YAMNet con TensorFlow Lite y Vosk en el teléfono ·
-Next.js 16 en Vercel para la familia · Supabase con pg_cron, pg_net y Vault · Telegram y WhatsApp
-con Kapso para los avisos · Claude para leer la factura.
+Next.js 16 en Vercel para la familia · Supabase con pg_cron, pg_net y Vault · Telegram para los
+avisos y la llamada de WhatsApp desde el teléfono · Claude para leer la factura.
