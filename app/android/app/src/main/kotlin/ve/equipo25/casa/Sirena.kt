@@ -43,12 +43,20 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
     /** Lo que dice en el próximo turno de voz. Dart lo cambia cerca del final. */
     private var frase = ""
 
+    /** Cuántos ciclos de tono van antes de la primera frase: 1 en la versión de tarima (DEMO). */
+    private var ciclosAntesDeLaFrase = CICLOS_ENTRE_FRASES
+
     private val canal = MethodChannel(mensajero, "casa/sirena")
 
     init {
         canal.setMethodCallHandler { call, result ->
             when (call.method) {
-                "sonar" -> { frase = call.argument<String>("frase").orEmpty(); sonar(); result.success(null) }
+                "sonar" -> {
+                    frase = call.argument<String>("frase").orEmpty()
+                    ciclosAntesDeLaFrase = call.argument<Int>("ciclosAntes") ?: CICLOS_ENTRE_FRASES
+                    sonar()
+                    result.success(null)
+                }
                 "decir" -> { frase = call.argument<String>("frase").orEmpty(); result.success(null) }
                 "callar" -> { callar(); result.success(null) }
                 else -> result.notImplemented()
@@ -102,7 +110,8 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
         volverAlTono()
     }
 
-    private fun programarVoz(): Boolean = reloj.postDelayed(turnoDeVoz, CICLOS_ENTRE_FRASES * 4000L)
+    private fun programarVoz(ciclos: Int = CICLOS_ENTRE_FRASES): Boolean =
+        reloj.postDelayed(turnoDeVoz, ciclos * 4000L)
 
     private fun volverAlTono() {
         val p = pista ?: return
@@ -135,7 +144,7 @@ class Sirena(private val contexto: Context, mensajero: BinaryMessenger) {
                 play()
             }
         vibrar()
-        programarVoz()
+        programarVoz(ciclosAntesDeLaFrase)
     }
 
     // El mismo ritmo en la vibración: espera, pulso, pausa… y se repite desde el principio.

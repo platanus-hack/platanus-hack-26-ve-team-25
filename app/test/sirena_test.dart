@@ -110,7 +110,33 @@ void main() {
       'decir: Carmen, si no responde, voy a avisar a su familia.',
     ]);
     c.dispose();
-  });
+  }, skip: !Controlador.diceElFinal);
+
+  // Con DEMO=true: flutter test --dart-define=DEMO=true test/sirena_test.dart
+  testWidgets(
+    'en la tarima (15 s) no cambia la frase: siempre pregunta «¿Está bien?»',
+    (tester) async {
+      final c = Controlador(
+        casa: casaSimulada,
+        reloj: () => ahora,
+        sirena: sirena,
+      );
+      c.oirEvento(TipoEvento.alarma);
+      for (var i = 0; i < esperaConfirmacion.inSeconds - 1; i++) {
+        ahora = ahora.add(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
+      }
+      expect(sirena.pasos.where((p) => p.startsWith('decir')), isEmpty);
+      // La primera pregunta (unos 5 s de voz lenta) y su ventana callada de 4 s caben antes de
+      // avisar.
+      expect(
+        ciclosAntesDeLaPregunta * 4 + 5 + 4,
+        lessThanOrEqualTo(esperaConfirmacion.inSeconds),
+      );
+      c.dispose();
+    },
+    skip: Controlador.diceElFinal,
+  );
 
   testWidgets(
     'en la ventana callada dice «Le escucho…» y entiende lo que se dijo',

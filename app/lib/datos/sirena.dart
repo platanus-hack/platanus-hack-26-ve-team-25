@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+import '../dominio/alerta.dart';
+
 /// La alarma que suena y vibra mientras «¿Está bien?» espera respuesta. En la app es el tono de
 /// 520 Hz de Sirena.kt, que cada dos ciclos dice [frase] con la voz del teléfono; en las pruebas,
 /// una falsa que anota.
@@ -32,8 +34,10 @@ class SirenaAndroid implements Sirena {
   Stream<bool> get ventanas => _ventanas.stream;
 
   @override
-  Future<void> sonar(String frase) =>
-      _canal.invokeMethod<void>('sonar', {'frase': frase});
+  Future<void> sonar(String frase) => _canal.invokeMethod<void>('sonar', {
+    'frase': frase,
+    'ciclosAntes': ciclosAntesDeLaPregunta,
+  });
 
   @override
   Future<void> decir(String frase) =>

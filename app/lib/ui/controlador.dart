@@ -65,6 +65,10 @@ class Controlador extends ChangeNotifier {
   /// Cuando falta esto para avisar, la voz de la alarma dice a quién va a llamar.
   static const avisoFinal = Duration(seconds: 20);
 
+  /// Con los 15 s de la tarima no hay un segundo turno de voz: si el aviso final reemplazara la
+  /// frase, nunca se oiría «¿Está bien?». Ahí solo pregunta, y la pantalla dice a quién llama.
+  static final diceElFinal = esperaConfirmacion > avisoFinal;
+
   /// Cuánto se ignoran los sonidos después de callar la alarma: el anillo es de 5 s.
   static const sordoTrasLaAlarma = Duration(seconds: 5);
 
@@ -567,7 +571,8 @@ class Controlador extends ChangeNotifier {
     final silencio = rutina.revisar(ahora);
     if (silencio != null) nube?.rutina(silencio);
     final pendiente = _alerta;
-    if (!_dijoElFinal &&
+    if (diceElFinal &&
+        !_dijoElFinal &&
         pendiente?.estado == EstadoAlerta.pendiente &&
         pendiente!.restante(ahora) <= avisoFinal) {
       _dijoElFinal = true;
