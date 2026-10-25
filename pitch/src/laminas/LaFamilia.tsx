@@ -17,9 +17,7 @@ const DASH = CIRC * PROGRESO;
 export default function LaFamilia() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2cqh", height: "100%" }}>
-      <h2 className="titular" style={{ fontSize: "6cqh" }}>
-        Alguien tiene que enterarse.
-      </h2>
+      <img src="/presente-logo.svg" alt="Presente" className="portada-logo" width={918} height={180} />
 
       {/* Flujo horizontal: banda entre los dos paneles */}
       <div
@@ -28,9 +26,9 @@ export default function LaFamilia() {
           alignItems: "center",
           justifyContent: "center",
           gap: "2cqw",
-          fontSize: "1.6cqh",
+          fontSize: "2.1cqh",
           color: "var(--texto)",
-          padding: "0.8cqh 0",
+          padding: "1cqh 0",
         }}
       >
         <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
@@ -45,7 +43,7 @@ export default function LaFamilia() {
           />
           <span style={{ whiteSpace: "nowrap" }}>casa</span>
         </span>
-        <span style={{ color: "var(--gris)", fontSize: "1.8cqh" }}>→</span>
+        <span style={{ color: "var(--gris)", fontSize: "2.3cqh" }}>→</span>
         <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
           <span
             style={{
@@ -58,7 +56,7 @@ export default function LaFamilia() {
           />
           <span style={{ whiteSpace: "nowrap" }}>Supabase</span>
         </span>
-        <span style={{ color: "var(--gris)", fontSize: "1.8cqh" }}>→</span>
+        <span style={{ color: "var(--gris)", fontSize: "2.3cqh" }}>→</span>
         <span style={{ display: "flex", alignItems: "center", gap: "0.8cqw" }}>
           <span
             style={{
@@ -136,14 +134,14 @@ export default function LaFamilia() {
               48 s
             </text>
           </svg>
-          <div className="telefono-boton" style={{ paddingLeft: "calc(5cqw + 1.2cqw)" }}>
+          <div className="telefono-boton" style={{ paddingLeft: "calc(3.5cqw + 1cqw)" }}>
             <div className="telefono-riel" aria-hidden="true" />
             <span
               className="telefono-desliza"
               style={{
                 position: "relative",
                 zIndex: 1,
-                fontSize: "1.2cqh",
+                fontSize: "1.45cqh",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
               }}

@@ -112,7 +112,8 @@ export default function App() {
   ];
 
   // En la lámina 4 (Cierre), el QR chico se oculta (se muestra uno grande dentro de la lámina)
-  const mostrarQrFijo = actual !== 4;
+  // Sin QR fijo en la lámina 3 (la familia) ni en la 4 (el cierre, que lleva el suyo grande).
+  const mostrarQrFijo = actual !== 3 && actual !== 4;
 
   return (
     <div

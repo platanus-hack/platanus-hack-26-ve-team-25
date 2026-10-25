@@ -142,7 +142,7 @@ button {
 }
 
 .fuente {
-  font-size: 1.2cqh;
+  font-size: 1.7cqh;
   color: var(--gris);
 }
 
@@ -272,7 +272,7 @@ button {
 }
 
 .marco-url {
-  font-size: 1.1cqh;
+  font-size: 1.6cqh;
   color: var(--gris);
   background: var(--superficie-alta);
   border-radius: 0.4cqh;
@@ -356,7 +356,7 @@ button {
 }
 
 .kpi-etiqueta {
-  font-size: 1.5cqh;
+  font-size: 1.9cqh;
   font-weight: 500;
   color: var(--texto);
   line-height: 1.3;
@@ -442,7 +442,7 @@ button {
 }
 
 .telefono-reloj {
-  font-size: 2cqh;
+  font-size: 2.6cqh;
   color: var(--tinta);
   font-variant-numeric: tabular-nums;
 }
@@ -474,14 +474,14 @@ button {
 .telefono-riel {
   position: absolute;
   left: 0.4cqw;
-  width: 5cqw;
+  width: 3.5cqw;
   height: 4.2cqh;
   background: var(--verde);
   border-radius: 1cqh;
 }
 
 .telefono-desliza {
-  font-size: 1.6cqh;
+  font-size: 1.9cqh;
   color: var(--verde);
   font-weight: 500;
 }
@@ -546,7 +546,7 @@ button {
   display: flex;
   align-items: center;
   gap: 0.6cqw;
-  font-size: 1.4cqh;
+  font-size: 1.8cqh;
   color: var(--texto);
   margin-top: 1cqh;
 }
